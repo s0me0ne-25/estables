@@ -165,7 +165,6 @@ final class UsersPageTest extends DatabaseTestCase
     public function testPlaceholdersOfLaterBuilds(): void
     {
         self::assertStringContainsString('появятся в сборке 4', $this->browser->get('/admin/')->body());
-        self::assertStringContainsString('появится в сборке 3', $this->browser->get('/admin/rubrics/')->body());
     }
 
     private function signIn(string $login, ?string $userAgent = null): Browser

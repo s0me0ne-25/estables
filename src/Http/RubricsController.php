@@ -1,0 +1,195 @@
+<?php
+
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+declare(strict_types=1);
+
+namespace Estables\Http;
+
+use Estables\Catalog\Rubric;
+use Estables\Catalog\RubricException;
+use Estables\Catalog\RubricTree;
+use Estables\Core\HttpException;
+use Estables\Core\Request;
+use Estables\Core\Response;
+use Estables\Core\Services;
+use Estables\Core\View;
+
+/**
+ * Admin page "Rubricator": the tree on the left, the form of the selected
+ * or new rubric on the right. Drag and drop in the tree posts every move to
+ * /admin/rubrics/move/. The kernel has already checked the CSRF token.
+ *
+ * @phpstan-import-type RubricInput from \Estables\Catalog\RubricRepository
+ */
+final class RubricsController
+{
+    private const PATH = '/admin/rubrics/';
+
+    private const NOTICES = [
+        'created' => 'Раздел добавлен.',
+        'saved' => 'Раздел сохранён.',
+        'deleted' => 'Раздел удалён.',
+    ];
+
+    public function __construct(
+        private readonly Services $services,
+        private readonly View $view,
+    ) {}
+
+    /**
+     * @param array<string, string> $params
+     */
+    public function handle(Request $request, array $params): Response
+    {
+        $rubrics = $this->services->rubrics();
+        $errors = [];
+        $failure = null;
+        $input = null;
+
+        if ($request->isPost()) {
+            $id = (int) $request->input('id');
+            if ($request->input('action') === 'delete') {
+                try {
+                    $parent = $rubrics->tree()->has($id) ? $rubrics->tree()->node($id)['parent'] : 0;
+                    $rubrics->delete($id);
+                    $this->services->logger->info("Rubric {$id} deleted");
+
+                    return Response::redirect(self::PATH . ($parent !== 0 ? "?id={$parent}&" : '?') . 'done=deleted', 303);
+                } catch (RubricException $e) {
+                    $failure = $e->getMessage();
+                    $request = new Request('GET', $request->path, ['id' => (string) $id]);
+                }
+            } else {
+                $input = self::input($request);
+                $errors = $rubrics->validate($input, $id > 0 ? $id : null);
+                if ($errors === []) {
+                    if ($id > 0) {
+                        $rubrics->update($id, $input);
+
+                        return Response::redirect(self::PATH . "?id={$id}&done=saved", 303);
+                    }
+                    $id = $rubrics->create($input);
+
+                    return Response::redirect(self::PATH . "?id={$id}&done=created", 303);
+                }
+            }
+        }
+
+        $tree = $rubrics->tree();
+        $selected = (int) ($request->isPost() ? $request->input('id') : self::query($request, 'id'));
+        $rubric = $selected > 0 ? $rubrics->find($selected) : null;
+        if ($selected > 0 && $rubric === null) {
+            throw HttpException::notFound();
+        }
+        $creating = $rubric === null && ($tree->isEmpty() || self::query($request, 'new') !== '' || $input !== null);
+        if ($creating) {
+            $parent = $input['parent'] ?? (int) self::query($request, 'parent');
+            $input ??= ['parent' => $tree->has($parent) ? $parent : 0, 'name' => '', 'title' => '', 'slug' => '', 'description' => '', 'visible' => true];
+        } elseif ($rubric !== null) {
+            $input ??= [
+                'parent' => $rubric->parentId ?? 0,
+                'name' => $rubric->name,
+                'title' => $rubric->title,
+                'slug' => $rubric->slug,
+                'description' => $rubric->description,
+                'visible' => $rubric->visible,
+            ];
+        }
+
+        $done = self::query($request, 'done');
+
+        return Response::html($this->view->page('admin/rubrics', [
+            'title' => 'Рубрикатор',
+            'header' => 'admin',
+            'activeNav' => 'rubrics',
+            'noindex' => true,
+            'tree' => $tree,
+            'rubric' => $rubric,
+            'creating' => $creating,
+            'form' => $input,
+            'errors' => $errors,
+            'failure' => $failure,
+            'notice' => self::NOTICES[$done] ?? null,
+            'open' => $this->openBranches($tree, $rubric, $creating ? $input['parent'] : 0),
+            'parents' => $input === null ? [] : $this->parentOptions($tree, $rubric),
+        ]), $errors === [] && $failure === null ? 200 : 422);
+    }
+
+    /**
+     * A drag-and-drop move: answers JSON {ok: true} or {ok: false, error}.
+     *
+     * @param array<string, string> $params
+     */
+    public function move(Request $request, array $params): Response
+    {
+        $id = (int) $request->input('id');
+        try {
+            $this->services->rubrics()->move($id, (int) $request->input('parent'), (int) $request->input('index'));
+        } catch (RubricException $e) {
+            return Response::json(['ok' => false, 'error' => $e->getMessage()], 409);
+        }
+
+        return Response::json(['ok' => true]);
+    }
+
+    /**
+     * @return RubricInput
+     */
+    private static function input(Request $request): array
+    {
+        return [
+            'parent' => (int) $request->input('parent'),
+            'name' => $request->input('name'),
+            'title' => $request->input('title'),
+            'slug' => strtolower($request->input('slug')),
+            'description' => str_replace("\r\n", "\n", $request->input('description')),
+            'visible' => $request->input('visible') === '1',
+        ];
+    }
+
+    private static function query(Request $request, string $name): string
+    {
+        $value = $request->query[$name] ?? '';
+
+        return \is_string($value) ? $value : '';
+    }
+
+    /**
+     * Branches shown expanded: the path to the selected rubric (or to the
+     * parent of a new one).
+     *
+     * @return array<int, true>
+     */
+    private function openBranches(RubricTree $tree, ?Rubric $rubric, int $newParent): array
+    {
+        $ids = [];
+        if ($rubric !== null && $tree->has($rubric->id)) {
+            $ids = $tree->ancestors($rubric->id);
+        } elseif ($newParent !== 0 && $tree->has($newParent)) {
+            $ids = [...$tree->ancestors($newParent), $newParent];
+        }
+
+        return array_fill_keys($ids, true);
+    }
+
+    /**
+     * Choices for "Parent rubric": the top level and every rubric except the
+     * edited one and its subtree, with the address prefix each one gives.
+     *
+     * @return list<array{id: int, label: string, prefix: string}>
+     */
+    private function parentOptions(RubricTree $tree, ?Rubric $rubric): array
+    {
+        $options = [['id' => 0, 'label' => 'Верхний уровень', 'prefix' => '/catalog/']];
+        foreach ($tree->flatten($rubric?->id) as ['id' => $id, 'depth' => $depth]) {
+            $options[] = [
+                'id' => $id,
+                'label' => str_repeat("\u{00A0}\u{00A0}", $depth) . $tree->node($id)['name'],
+                'prefix' => ($depth === 0 ? '/catalog/' : '…/') . $tree->node($id)['slug'] . '/',
+            ];
+        }
+
+        return $options;
+    }
+}

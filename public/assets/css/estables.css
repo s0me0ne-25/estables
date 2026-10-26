@@ -1110,3 +1110,11 @@ body {
   max-width: 62ch;
   font-size: 1.0625rem;
 }
+
+/* ---- Rubric card without a cover: an empty mount (covers come with photos) */
+.es-mount-empty {
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  color: var(--es-line);
+}

@@ -26,14 +26,6 @@ final class AdminController
         return $this->placeholder('items', 'Предметы', 'Список предметов, редактор и массовые действия появятся в сборке 4.');
     }
 
-    /**
-     * @param array<string, string> $params
-     */
-    public function rubrics(Request $request, array $params): Response
-    {
-        return $this->placeholder('rubrics', 'Рубрикатор', 'Дерево разделов с перетаскиванием появится в сборке 3.');
-    }
-
     private function placeholder(string $nav, string $title, string $text): Response
     {
         return Response::html($this->view->page('admin/placeholder', [

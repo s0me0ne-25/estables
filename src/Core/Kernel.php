@@ -12,6 +12,7 @@ use Estables\Db\SchemaState;
 use Estables\Http\AdminController;
 use Estables\Http\AuthController;
 use Estables\Http\CatalogController;
+use Estables\Http\RubricsController;
 use Estables\Http\SetupController;
 use Estables\Http\UsersController;
 use Estables\Install\Environment;
@@ -187,9 +188,11 @@ final class Kernel
         // 5. Routing
         $this->router = $router = new Router();
         $view = new View($this->paths->templates(), $this->paths->public(), $router, $this->globals);
-        $catalog = new CatalogController($view);
+        $catalog = new CatalogController($view, $services, $auth?->session() !== null);
         $router->add('home', 'GET', '/', $catalog->home(...));
         $router->add('about', 'GET', '/about/', $catalog->about(...));
+        $router->add('catalog', 'GET', '/catalog/', $catalog->catalogRoot(...));
+        $router->add('rubric', 'GET', '/catalog/{path:.+}/', $catalog->rubric(...));
         if ($auth === null) {
             $setup = new SetupController($services, $view, $this->paths);
             $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
@@ -200,7 +203,9 @@ final class Kernel
             $router->add('login', ['GET', 'POST'], '/login/', $login->login(...));
             $router->add('logout', 'POST', '/logout/', $login->logout(...));
             $router->add('admin', 'GET', '/admin/', $admin->items(...));
-            $router->add('admin.rubrics', 'GET', '/admin/rubrics/', $admin->rubrics(...));
+            $rubrics = new RubricsController($services, $view);
+            $router->add('admin.rubrics', ['GET', 'POST'], '/admin/rubrics/', $rubrics->handle(...));
+            $router->add('admin.rubrics.move', 'POST', '/admin/rubrics/move/', $rubrics->move(...));
             $router->add('admin.users', ['GET', 'POST'], '/admin/users/', $users->handle(...));
         }
 
