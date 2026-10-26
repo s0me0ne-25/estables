@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+// eStables command line: php bin/estables help
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+declare(strict_types=1);
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+$root = dirname(__DIR__);
+if (!is_file($root . '/vendor/autoload.php')) {
+    fwrite(STDERR, "Run \"composer install --no-dev\" in {$root} first.\n");
+    exit(1);
+}
+require $root . '/vendor/autoload.php';
+
+exit(new Estables\Cli\Application(new Estables\Core\Paths($root))->run(array_slice($argv, 1)));

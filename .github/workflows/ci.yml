@@ -1,0 +1,87 @@
+# Static checks and tests for the PHP engine.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "demo/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, coding style, static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_mysql, mbstring, intl, fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: Syntax check
+        run: |
+          find src tests config public -name '*.php' -print0 | xargs -0 -n1 php -l
+          php -l bin/estables
+
+      - name: Coding style
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+  tests:
+    name: Tests on PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.4", "8.5"]
+    # PHP 8.5 is a look ahead; the target is 8.4 from Debian 13.
+    continue-on-error: ${{ matrix.php == '8.5' }}
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: estables_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      ESTABLES_TEST_DB_HOST: 127.0.0.1
+      ESTABLES_TEST_DB_PORT: "3306"
+      ESTABLES_TEST_DB_NAME: estables_test
+      ESTABLES_TEST_DB_USER: root
+      ESTABLES_TEST_DB_PASSWORD: root
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_mysql, mbstring, intl, fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress
+
+      - name: Unit and integration tests
+        run: vendor/bin/phpunit
