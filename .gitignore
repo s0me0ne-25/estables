@@ -1,0 +1,25 @@
+# Local configuration with secrets.
+# Every such file has a committed *.template.* counterpart that is copied
+# and filled in manually (e.g. config.template.php -> config.php).
+config.php
+config.local.php
+.env
+.env.*
+!.env.template
+
+# Runtime data
+/uploads/
+/cache/
+/logs/
+*.log
+
+# Dependencies installed locally
+/vendor/
+/node_modules/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

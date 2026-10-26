@@ -1,0 +1,354 @@
+<!doctype html>
+<!--
+  eStables demo: catalogue (category) page.
+  Static mock-up for design review; all data and images are placeholders.
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<html lang="ru" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ленинградский фарфоровый завод — eStables</title>
+  <meta name="description" content="eStables: справочник коллекционера конной тематики. Демонстрационная страница.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" integrity="sha384-nWN3KqaaVcbEsCjLSV+2jMjh62Iny/+mN3srM8TZeM8N6aj7eDl5wwYggjAJ4/sJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/estables.css">
+
+  <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <script src="js/demo.js"></script>
+</head>
+<body>
+
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
+
+<!-- ============================ Header ============================ -->
+<header class="es-header">
+  <nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Основная навигация">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand" href="index.html">
+        <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+        eStables
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Каталог</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Новые поступления</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Производители</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">О справочнике</a></li>
+        </ul>
+
+        <form class="d-flex gap-2 align-items-center" role="search">
+          <label class="visually-hidden" for="q">Поиск по каталогу</label>
+          <input class="form-control" type="search" id="q" placeholder="Поиск по каталогу">
+          <div class="dropdown">
+            <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+              <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+              <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+              <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+            </ul>
+          </div>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<div class="es-layout">
+
+    <!-- ======================= Rubricator ======================= -->
+    <aside class="es-aside">
+      <div class="offcanvas-lg offcanvas-start es-sidebar" tabindex="-1" id="rubricator" aria-labelledby="rubricatorTitle">
+        <div class="offcanvas-header">
+          <h2 class="offcanvas-title es-sidebar-title mb-0" id="rubricatorTitle">Рубрикатор</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#rubricator" aria-label="Закрыть"></button>
+        </div>
+        <div class="offcanvas-body d-block p-3 p-lg-4">
+          <h2 class="es-sidebar-title d-none d-lg-block">Рубрикатор</h2>
+
+          <nav aria-label="Рубрикатор">
+            <ul class="es-tree">
+              <li class="is-lineage">
+                <div class="es-node">
+                  <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-fig" aria-expanded="true" aria-controls="t-fig" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                  <a href="#">Фигурки <span class="es-count">612</span></a>
+                </div>
+                <ul class="collapse show" id="t-fig">
+                  <li class="is-lineage">
+                    <div class="es-node">
+                      <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-porc" aria-expanded="true" aria-controls="t-porc" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                      <a href="#">Фарфор <span class="es-count">284</span></a>
+                    </div>
+                    <ul class="collapse show" id="t-porc">
+                      <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Дулёвский завод <span class="es-count">71</span></a></div></li>
+                      <li class="is-current"><div class="es-node"><span class="es-toggle-spacer"></span><a href="index.html" aria-current="page">Ленинградский завод <span class="es-count">48</span></a></div></li>
+                      <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Вербилки <span class="es-count">39</span></a></div></li>
+                      <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Европейские мануфактуры <span class="es-count">126</span></a></div></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="es-node">
+                      <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-cast" aria-expanded="false" aria-controls="t-cast" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                      <a href="#">Художественное литьё <span class="es-count">97</span></a>
+                    </div>
+                    <ul class="collapse" id="t-cast">
+                      <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Чугун <span class="es-count">58</span></a></div></li>
+                      <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Бронза <span class="es-count">39</span></a></div></li>
+                    </ul>
+                  </li>
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Пластик и смола <span class="es-count">231</span></a></div></li>
+                </ul>
+              </li>
+              <li>
+                <div class="es-node">
+                  <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-med" aria-expanded="false" aria-controls="t-med" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                  <a href="#">Медали и знаки <span class="es-count">187</span></a>
+                </div>
+                <ul class="collapse" id="t-med">
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Конный спорт <span class="es-count">104</span></a></div></li>
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Ипподромы <span class="es-count">52</span></a></div></li>
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Конные заводы <span class="es-count">31</span></a></div></li>
+                </ul>
+              </li>
+              <li>
+                <div class="es-node">
+                  <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-phil" aria-expanded="false" aria-controls="t-phil" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                  <a href="#">Филателия <span class="es-count">344</span></a>
+                </div>
+                <ul class="collapse" id="t-phil">
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Марки <span class="es-count">268</span></a></div></li>
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Конверты и карточки <span class="es-count">76</span></a></div></li>
+                </ul>
+              </li>
+              <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Открытки <span class="es-count">415</span></a></div></li>
+              <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Графика и плакаты <span class="es-count">88</span></a></div></li>
+              <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Книги и каталоги <span class="es-count">63</span></a></div></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= Main content ======================= -->
+    <main id="main" class="es-main px-3 px-lg-4 px-xxl-5 py-4">
+
+      <nav aria-label="Путь по разделам">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Каталог</a></li>
+          <li class="breadcrumb-item"><a href="#">Фигурки</a></li>
+          <li class="breadcrumb-item"><a href="#">Фарфор</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Ленинградский завод</li>
+        </ol>
+      </nav>
+
+      <div class="row g-4 align-items-end mb-4">
+        <div class="col-xl-8">
+          <h1 class="mb-3">Ленинградский фарфоровый завод</h1>
+          <p class="es-lead mb-0">
+            Анималистическая скульптура завода: лошади в бисквите и с росписью,
+            от первых послевоенных моделей до поздних тиражей. Каждая модель
+            описана со всеми известными вариантами окраса и клейма.
+          </p>
+        </div>
+        <div class="col-xl-4">
+          <dl class="es-facts justify-content-xl-end">
+            <div><dt>Моделей</dt><dd>48</dd></div>
+            <div><dt>Вариантов</dt><dd>131</dd></div>
+            <div><dt>Годы выпуска</dt><dd>1950–1991</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="es-chips mb-4" role="group" aria-label="Десятилетие выпуска">
+        <a class="es-chip active" href="#" aria-current="true">Все <small>48</small></a>
+        <a class="es-chip" href="#">1950-е <small>9</small></a>
+        <a class="es-chip" href="#">1960-е <small>17</small></a>
+        <a class="es-chip" href="#">1970-е <small>14</small></a>
+        <a class="es-chip" href="#">1980-е <small>8</small></a>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between border-top border-bottom py-2 mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#rubricator" aria-controls="rubricator">
+            <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор
+          </button>
+          <span class="text-body-secondary small">Показаны 1–12 из 48</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="visually-hidden" for="sort">Сортировка</label>
+          <select class="form-select form-select-sm w-auto" id="sort">
+            <option>По номеру в каталоге</option>
+            <option>По году выпуска</option>
+            <option>По названию</option>
+            <option>Недавно добавленные</option>
+          </select>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Вид списка">
+            <button class="btn btn-outline-secondary active" type="button" data-es-view="grid" aria-pressed="true" title="Плитка"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="visually-hidden">Плитка</span></button>
+            <button class="btn btn-outline-secondary" type="button" data-es-view="list" aria-pressed="false" title="Список"><i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden">Список</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catalogue grid -->
+      <div class="row row-cols-2 row-cols-md-3 row-cols-xxl-4 g-3 g-md-4 es-catalog">
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1042.svg" alt="Конь вздыбленный, белый бисквит" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1042</span>
+            <h3><a href="item.html">Конь вздыбленный</a></h3>
+            <p class="es-meta">1958, бисквит, 3 варианта</p>
+            <p class="es-desc text-body-secondary">Одна из первых послевоенных анималистических моделей завода; выпускалась в белом бисквите и с подглазурной росписью.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1043.svg" alt="Голова арабского скакуна" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1043</span>
+            <h3><a href="item.html">Голова арабского скакуна</a></h3>
+            <p class="es-meta">1961, глазурь, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Настольная скульптура на круглом постаменте, тёмно-гнедой окрас под глазурью.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1051.svg" alt="Орловский рысак" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1051</span>
+            <h3><a href="item.html">Орловский рысак</a></h3>
+            <p class="es-meta">1962, роспись, 4 варианта</p>
+            <p class="es-desc text-body-secondary">Рысак на ходу; варианты различаются мастью и цветом постамента.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1057.svg" alt="Жеребёнок" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1057</span>
+            <h3><a href="item.html">Жеребёнок</a></h3>
+            <p class="es-meta">1964, роспись, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Малая пластика, высота около 9 см. Встречается с рыжим и буланым окрасом.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1060.svg" alt="Голова коня, рельеф" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1060</span>
+            <h3><a href="item.html">Голова коня, рельеф</a></h3>
+            <p class="es-meta">1966, бисквит, 1 вариант</p>
+            <p class="es-desc text-body-secondary">Настенный рельеф в белом бисквите, выпускался ограниченным тиражом.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1064.svg" alt="Вороной конь на скаку" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1064</span>
+            <h3><a href="item.html">Вороной на скаку</a></h3>
+            <p class="es-meta">1967, глазурь, 3 варианта</p>
+            <p class="es-desc text-body-secondary">Динамичная композиция с развевающейся гривой; поздние тиражи с золочением копыт.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1071.svg" alt="Конь с золочением" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1071</span>
+            <h3><a href="item.html">Конь с золочением</a></h3>
+            <p class="es-meta">1969, надглазурное золото, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Сувенирная модель, полностью покрытая золотом; встречается в фирменной коробке.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1078.svg" alt="Конь в попоне" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1078</span>
+            <h3><a href="item.html">Конь в попоне</a></h3>
+            <p class="es-meta">1972, роспись, 5 вариантов</p>
+            <p class="es-desc text-body-secondary">Парадный конь в расписной попоне; рисунок попоны менялся от тиража к тиражу.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1080.svg" alt="Будённовская кобыла" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1080</span>
+            <h3><a href="item.html">Будённовская кобыла</a></h3>
+            <p class="es-meta">1974, роспись, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Модель по мотивам породного стандарта; рыжая масть с золотистым отливом.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1085.svg" alt="Белая лошадь" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1085</span>
+            <h3><a href="item.html">Белая лошадь</a></h3>
+            <p class="es-meta">1976, глазурь, 1 вариант</p>
+            <p class="es-desc text-body-secondary">Лаконичная фигура под прозрачной глазурью, без росписи.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1090.svg" alt="Голова тяжеловоза" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1090</span>
+            <h3><a href="item.html">Голова тяжеловоза</a></h3>
+            <p class="es-meta">1981, роспись, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Крупная настольная скульптура; гнедая и караковая масти.</p>
+          </div>
+        </article></div>
+
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1094.svg" alt="Пони" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1094</span>
+            <h3><a href="item.html">Пони</a></h3>
+            <p class="es-meta">1985, роспись, 3 варианта</p>
+            <p class="es-desc text-body-secondary">Детская серия; выпускалась в наборе с жеребёнком той же масти.</p>
+          </div>
+        </article></div>
+
+      </div>
+
+      <nav class="mt-5" aria-label="Страницы каталога">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Назад</span></span></li>
+          <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right" aria-hidden="true"></i><span class="visually-hidden">Вперёд</span></a></li>
+        </ul>
+      </nav>
+    </main>
+</div>
+
+<!-- ============================ Footer ============================ -->
+<footer class="es-footer">
+  <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-3 justify-content-between">
+    <p class="mb-0">eStables — справочник коллекционера. Демонстрационная страница: описания и изображения условные.</p>
+    <p class="mb-0"><a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
