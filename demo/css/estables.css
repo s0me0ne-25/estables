@@ -29,6 +29,15 @@
   --es-danger: #b42318;      /* destructive actions, 5.4:1 */
   --es-danger-rgb: 180, 35, 24;
 
+  --es-link-hover: var(--es-primary-active); /* links on hover: darker teal */
+  --es-link-hover-rgb: 0, 74, 92;
+  --es-focus: var(--es-header-bg);          /* keyboard focus rings */
+  --es-focus-rgb: 10, 207, 250;
+  --es-header-focus: var(--es-header-fg);   /* focus inside the header */
+  --es-header-focus-ring: var(--es-header-field-border);
+  --es-catno-color: var(--es-ink);          /* catalogue numbers, as item titles */
+  --es-thumb-active: var(--es-header-bg);   /* selected thumbnail frame */
+
   --es-tree-lineage: var(--es-header-bg);   /* rubricator: path to the current node */
   --es-tree-current-bg: var(--es-paper);    /* rubricator: current node */
 
@@ -53,13 +62,13 @@
   --bs-primary-rgb: var(--es-primary-rgb);
   --bs-link-color: var(--es-primary);
   --bs-link-color-rgb: var(--es-primary-rgb);
-  --bs-link-hover-color: var(--es-accent);
-  --bs-link-hover-color-rgb: var(--es-accent-rgb);
+  --bs-link-hover-color: var(--es-link-hover);
+  --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
   --bs-font-sans-serif: var(--es-font-text);
   --bs-border-radius: .25rem;
   --bs-border-radius-sm: .1875rem;
   --bs-border-radius-lg: .375rem;
-  --bs-focus-ring-color: rgba(var(--es-accent-rgb), .45);
+  --bs-focus-ring-color: rgba(var(--es-focus-rgb), .45);
 }
 
 [data-bs-theme="dark"] {
@@ -80,6 +89,15 @@
   --es-danger: #f0897c;
   --es-danger-rgb: 240, 137, 124;
 
+  --es-link-hover: var(--es-accent);
+  --es-link-hover-rgb: var(--es-accent-rgb);
+  --es-focus: var(--es-accent);
+  --es-focus-rgb: var(--es-accent-rgb);
+  --es-header-focus: var(--es-accent);
+  --es-header-focus-ring: rgba(var(--es-accent-rgb), .45);
+  --es-catno-color: var(--es-accent);
+  --es-thumb-active: var(--es-accent);
+
   --es-tree-lineage: var(--es-accent);
   --es-tree-current-bg: #3a3122;
 
@@ -94,8 +112,9 @@
   --bs-body-bg-rgb: 20, 26, 23;
   --bs-body-color: var(--es-ink);
   --bs-body-color-rgb: 227, 231, 224;
-  --bs-link-hover-color-rgb: var(--es-accent-rgb);
-  --bs-focus-ring-color: rgba(var(--es-accent-rgb), .45);
+  --bs-link-hover-color: var(--es-link-hover);
+  --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
+  --bs-focus-ring-color: rgba(var(--es-focus-rgb), .45);
 }
 
 /* ------------------------------------------------------------------
@@ -124,16 +143,16 @@ h3, .h3 { font-size: 1.25rem; }
   color: var(--es-muted);
 }
 
-/* Catalogue numbers are data: tabular figures, accent colour. */
+/* Catalogue numbers are data: tabular figures, own colour token. */
 .es-catno {
   font-variant-numeric: tabular-nums lining-nums;
   font-weight: 600;
   font-size: .8125rem;
-  color: var(--es-accent);
+  color: var(--es-catno-color);
 }
 
 :focus-visible {
-  outline: 2px solid var(--es-accent);
+  outline: 2px solid var(--es-focus);
   outline-offset: 2px;
 }
 
@@ -258,10 +277,13 @@ h3, .h3 { font-size: 1.25rem; }
   color: var(--es-header-fg);
 }
 .es-header .form-control::placeholder { color: var(--es-header-fg-muted); opacity: .8; }
+/* In the light theme the focus colour equals the header background,
+   so the header has its own focus colour. */
 .es-header .form-control:focus {
-  box-shadow: 0 0 0 .2rem var(--bs-focus-ring-color);
-  border-color: var(--es-accent);
+  box-shadow: 0 0 0 .2rem var(--es-header-focus-ring);
+  border-color: var(--es-header-focus);
 }
+.es-header :focus-visible { outline-color: var(--es-header-focus); }
 .es-header .btn-icon {
   color: inherit;
   border: 1px solid var(--es-header-field-border);
@@ -535,7 +557,7 @@ h3, .h3 { font-size: 1.25rem; }
   padding: .25rem;
 }
 .es-thumbs a:hover { border-color: var(--es-muted); }
-.es-thumbs a.active { border-color: var(--es-accent); box-shadow: inset 0 0 0 1px var(--es-accent); }
+.es-thumbs a.active { border-color: var(--es-thumb-active); box-shadow: inset 0 0 0 1px var(--es-thumb-active); }
 .es-thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 
 .es-attrs {
@@ -559,7 +581,7 @@ h3, .h3 { font-size: 1.25rem; }
   font-size: .9375rem;
 }
 .es-variants th { font-weight: 600; color: var(--es-muted); font-size: .8125rem; }
-.es-variants td.es-catno { color: var(--es-accent); }
+.es-variants td.es-catno { color: var(--es-catno-color); }
 .es-variants .es-nowrap { white-space: nowrap; }
 
 .es-prose { max-width: 68ch; }
@@ -720,7 +742,7 @@ h3, .h3 { font-size: 1.25rem; }
   white-space: nowrap;
 }
 .es-admin-table td { vertical-align: middle; }
-.es-admin-table td.es-catno { color: var(--es-accent); white-space: nowrap; }
+.es-admin-table td.es-catno { color: var(--es-catno-color); white-space: nowrap; }
 .es-admin-table .es-thumb {
   width: 3.5rem;
   aspect-ratio: 4 / 3;
