@@ -24,7 +24,9 @@
   --es-on-primary: #ffffff;  /* text on primary, 6.6:1 */
   --es-accent: #9a4a06;      /* accent: amber, complementary to aqua, 5.3:1 */
   --es-accent-rgb: 154, 74, 6;
-  --es-accent-soft: #fde4c4; /* current-node highlight */
+
+  --es-tree-lineage: var(--es-header-bg);   /* rubricator: path to the current node */
+  --es-tree-current-bg: var(--es-paper);    /* rubricator: current node */
 
   --es-header-bg: #0acffa;   /* site header (set by the client) */
   --es-header-fg: #062b36;   /* header text, 8:1 on header */
@@ -69,7 +71,9 @@
   --es-on-primary: #10170f;
   --es-accent: #d0ab6e;
   --es-accent-rgb: 208, 171, 110;
-  --es-accent-soft: #3a3122;
+
+  --es-tree-lineage: var(--es-accent);
+  --es-tree-current-bg: #3a3122;
 
   --es-header-bg: #0f1512;
   --es-header-fg: #f1f3ee;
@@ -219,7 +223,7 @@ h3, .h3 { font-size: 1.25rem; }
 /* ------------------------------------------------------------------
  * Sidebar: hierarchical rubricator drawn as a pedigree chart.
  * Each nesting level is joined by elbow connectors, the way horse
- * pedigrees connect sire and dam lines. The active line is in the accent colour.
+ * pedigrees connect sire and dam lines. The active line has its own colour token.
  * ------------------------------------------------------------------ */
 .es-layout { display: block; }
 @media (min-width: 992px) {
@@ -278,12 +282,12 @@ h3, .h3 { font-size: 1.25rem; }
 }
 
 /*
- * The current lineage is painted in the accent colour: the spine runs down past the
- * preceding siblings and turns into the active node; siblings below it
- * keep the neutral line.
+ * The current lineage is painted with --es-tree-lineage: the spine runs
+ * down past the preceding siblings and turns into the active node;
+ * siblings below it keep the neutral line.
  */
 .es-tree ul > li:has(~ li.is-lineage, ~ li.is-current) {
-  background-image: linear-gradient(var(--es-accent), var(--es-accent));
+  background-image: linear-gradient(var(--es-tree-lineage), var(--es-tree-lineage));
   background-size: 2px 100%;
 }
 .es-tree ul > li.is-lineage::before,
@@ -293,11 +297,11 @@ h3, .h3 { font-size: 1.25rem; }
   left: 0;
   top: 0;
   height: calc(1.15rem + 1px);
-  border-left: 2px solid var(--es-accent);
+  border-left: 2px solid var(--es-tree-lineage);
 }
 .es-tree ul > li.is-lineage::after,
 .es-tree ul > li.is-current::after {
-  border-top: 2px solid var(--es-accent);
+  border-top: 2px solid var(--es-tree-lineage);
 }
 
 .es-node {
@@ -327,7 +331,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-tree li.is-lineage > .es-node a { font-weight: 600; }
 .es-tree li.is-current > .es-node a {
   font-weight: 700;
-  background: var(--es-accent-soft);
+  background: var(--es-tree-current-bg);
 }
 
 /* Expand/collapse toggle */
