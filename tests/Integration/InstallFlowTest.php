@@ -58,6 +58,16 @@ final class InstallFlowTest extends DatabaseTestCase
         self::assertSame(404, $this->get('/setup/')->status());
     }
 
+    public function testShownPasswordNeedsNoConfirmation(): void
+    {
+        $form = $this->get('/setup/');
+        $token = trim((string) file_get_contents($this->site->paths->installToken()));
+        $fields = array_diff_key(['install_token' => $token] + $this->account(), ['password_again' => true]);
+        $done = $this->post('/setup/', $this->formCookie($form), $this->csrfToken($form), $fields);
+        self::assertSame(200, $done->status());
+        self::assertStringContainsString('Установка завершена', $done->body());
+    }
+
     public function testFormRejectsMissingCsrfToken(): void
     {
         $this->get('/setup/');

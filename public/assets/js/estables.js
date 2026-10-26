@@ -5,7 +5,7 @@
  * matching pages; the demo stays the behavioural reference. Every feature is
  * an init function bound to data-es-* hooks:
  * - colour theme switcher (light / dark / auto), persisted in localStorage
- * - password visibility toggle
+ * - password visibility toggle; hides the confirmation of a new password
  * - confirmation of destructive admin actions (form[data-es-confirm])
  * - reopening a modal form that came back with errors ([data-es-modal-open])
  *
@@ -90,15 +90,30 @@
 
   /* ------------------------------------------------------- password fields */
 
+  /*
+   * The eye button shows the password in clear text. A new password usually
+   * has a confirmation field (data-es-password-confirm="<its id>"): a typo is
+   * visible in clear text, so the confirmation is hidden and disabled, and a
+   * disabled field is not submitted, so the server skips the comparison.
+   */
   const initPasswordToggles = () => {
     document.querySelectorAll('[data-es-password-toggle]').forEach((btn) => {
       const input = document.getElementById(btn.getAttribute('aria-controls'));
       if (!input) return;
+      const confirm = document.getElementById(btn.dataset.esPasswordConfirm || '');
+      const confirmField = confirm && (confirm.closest('[data-es-password-confirm-field]') || confirm);
+      const label = btn.querySelector('.visually-hidden');
       btn.addEventListener('click', () => {
         const show = input.type === 'password';
         input.type = show ? 'text' : 'password';
         btn.setAttribute('aria-pressed', String(show));
+        btn.title = show ? 'Скрыть пароль' : 'Показать пароль';
+        if (label) label.textContent = btn.title;
         btn.querySelector('.bi').className = 'bi ' + (show ? 'bi-eye-slash' : 'bi-eye');
+        if (confirm) {
+          confirmField.hidden = show;
+          confirm.disabled = show;
+        }
       });
     });
   };

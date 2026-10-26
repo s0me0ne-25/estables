@@ -105,7 +105,7 @@ final class UserRepository
      *
      * @return array<string, string>
      */
-    public function validateNew(string $login, string $password, string $passwordAgain, string $displayName): array
+    public function validateNew(string $login, string $password, ?string $passwordAgain, string $displayName): array
     {
         $errors = [];
         if (!preg_match(self::LOGIN_PATTERN, $login)) {
@@ -121,14 +121,17 @@ final class UserRepository
     }
 
     /**
+     * @param string|null $passwordAgain confirmation; null when the user typed
+     *                                   the password in clear text and needed none
+     *
      * @return array<string, string>
      */
-    public static function validatePassword(string $password, string $passwordAgain): array
+    public static function validatePassword(string $password, ?string $passwordAgain): array
     {
         if (mb_strlen($password) < self::MIN_PASSWORD_LENGTH) {
             return ['password' => 'Не короче ' . self::MIN_PASSWORD_LENGTH . ' символов.'];
         }
-        if ($password !== $passwordAgain) {
+        if ($passwordAgain !== null && $password !== $passwordAgain) {
             return ['password_again' => 'Пароли не совпадают.'];
         }
 

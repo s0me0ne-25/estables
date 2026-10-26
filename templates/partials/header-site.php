@@ -7,7 +7,10 @@
  * @var string              $activeNav key of the current menu item
  */
 $activeNav ??= '';
-$items = ['catalog' => ['Каталог', $this->url('home')]];
+$items = [
+    'catalog' => ['Каталог', $this->url('home')],
+    'about' => ['О справочнике', $this->url('about')],
+];
 ?>
 <header class="es-header">
   <nav class="navbar navbar-expand-md" aria-label="Основная навигация">

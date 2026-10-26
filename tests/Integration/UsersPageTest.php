@@ -75,6 +75,30 @@ final class UsersPageTest extends DatabaseTestCase
         self::assertSame(3, $this->services->users()->count());
     }
 
+    public function testShownPasswordNeedsNoConfirmation(): void
+    {
+        // With the password shown in clear text the page disables the confirmation field.
+        $done = $this->act('add', ['login' => 'archive', 'display_name' => '', 'password' => self::PASSWORD]);
+        self::assertSame(303, $done->status());
+
+        $password = $this->act('password', ['user' => (string) $this->otherId, 'password' => 'a new long password']);
+        self::assertSame(303, $password->status());
+        self::assertTrue(password_verify('a new long password', (string) $this->db->value('SELECT password_hash FROM users WHERE id = ' . $this->otherId)));
+
+        // A sent confirmation is still compared
+        $mismatch = $this->act('password', ['user' => (string) $this->otherId, 'password' => 'a new long password', 'password_again' => 'something else']);
+        self::assertSame(422, $mismatch->status());
+        self::assertStringContainsString('Пароли не совпадают', $mismatch->body());
+    }
+
+    public function testPasswordFieldsHaveTheEyeButton(): void
+    {
+        $body = $this->browser->get('/admin/users/')->body();
+        self::assertStringContainsString('data-es-password-confirm="u-pass2" aria-controls="u-pass"', $body);
+        self::assertStringContainsString('data-es-password-confirm="p' . $this->myId . '-new2" aria-controls="p' . $this->myId . '-new"', $body);
+        self::assertStringContainsString('data-es-password-confirm="p' . $this->otherId . '-new2" aria-controls="p' . $this->otherId . '-new"', $body);
+    }
+
     public function testBlockingEndsSessionsAndUnblockingRestoresAccess(): void
     {
         $other = $this->signIn('ekovaleva');

@@ -65,6 +65,23 @@ final readonly class Request
         return \is_string($value) ? $value : '';
     }
 
+    /**
+     * Whether the form sent the field at all (a disabled field is not sent).
+     */
+    public function has(string $name): bool
+    {
+        return \array_key_exists($name, $this->post);
+    }
+
+    /**
+     * The password confirmation field, or null when the form left it out:
+     * with the password shown in clear text the page disables that field.
+     */
+    public function passwordConfirmation(string $name = 'password_again'): ?string
+    {
+        return $this->has($name) ? $this->rawInput($name) : null;
+    }
+
     public function isPost(): bool
     {
         return $this->method === 'POST';

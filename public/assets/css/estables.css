@@ -1100,3 +1100,13 @@ body {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* ---- New password shown in clear text: its confirmation field is hidden,
+   so the field before it closes the form without a trailing gap */
+.modal-body > :has(+ [data-es-password-confirm-field][hidden]:last-child) { margin-bottom: 0 !important; }
+
+/* ---- "About" page: owner-written text */
+.es-about {
+  max-width: 62ch;
+  font-size: 1.0625rem;
+}

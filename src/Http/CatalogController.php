@@ -11,7 +11,7 @@ use Estables\Core\Response;
 use Estables\Core\View;
 
 /**
- * Public catalogue pages.
+ * Public pages of the site.
  */
 final class CatalogController
 {
@@ -28,6 +28,20 @@ final class CatalogController
             'title' => 'Каталог',
             'description' => 'eStables — справочник коллекционера.',
             'activeNav' => 'catalog',
+        ]));
+    }
+
+    /**
+     * "About" page.
+     *
+     * @param array<string, string> $params
+     */
+    public function about(Request $request, array $params): Response
+    {
+        return Response::html($this->view->page('pages/about', [
+            'title' => 'О справочнике',
+            'description' => 'eStables — свободная программа для каталога коллекции.',
+            'activeNav' => 'about',
         ]));
     }
 }

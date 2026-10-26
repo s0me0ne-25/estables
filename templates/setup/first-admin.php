@@ -66,9 +66,7 @@ $error = function (string $name) use ($errors): string {
         <div class="input-group has-validation">
           <input class="form-control<?= $field('password') ?>" type="password" id="password" name="password"
                  autocomplete="new-password" required<?= $describedBy('password', isset($errors['password']) ? '' : 'password-help') ?>>
-          <button class="btn btn-outline-secondary" type="button" data-es-password-toggle aria-controls="password" aria-pressed="false" title="Показать пароль">
-            <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
-          </button>
+          <?= $this->partial('partials/password-toggle', ['for' => 'password', 'confirm' => 'password_again']) ?>
           <?= $error('password') ?>
         </div>
 <?php if (!isset($errors['password'])): ?>
@@ -76,7 +74,7 @@ $error = function (string $name) use ($errors): string {
 <?php endif ?>
       </div>
 
-      <div class="mb-4">
+      <div class="mb-4" data-es-password-confirm-field>
         <label class="form-label" for="password_again">Пароль ещё раз</label>
         <input class="form-control<?= $field('password_again') ?>" type="password" id="password_again" name="password_again"
                autocomplete="new-password" required<?= $describedBy('password_again') ?>>

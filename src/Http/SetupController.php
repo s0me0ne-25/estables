@@ -56,7 +56,7 @@ final class SetupController
                 $errors = $this->services->users()->validateNew(
                     $old['login'],
                     $password,
-                    $request->rawInput('password_again'),
+                    $request->passwordConfirmation(),
                     $old['display_name'],
                 );
             }

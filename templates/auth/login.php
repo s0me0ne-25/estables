@@ -35,9 +35,7 @@
         <label class="form-label" for="password">Пароль</label>
         <div class="input-group">
           <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required<?= $login !== '' ? ' autofocus' : '' ?>>
-          <button class="btn btn-outline-secondary" type="button" data-es-password-toggle aria-controls="password" aria-pressed="false" title="Показать пароль">
-            <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
-          </button>
+          <?= $this->partial('partials/password-toggle', ['for' => 'password']) ?>
         </div>
       </div>
 

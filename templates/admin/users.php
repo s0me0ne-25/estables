@@ -165,13 +165,16 @@ $value = function (string $modal, string $name) use ($old, $openModal): string {
         </div>
         <div class="mb-3">
           <label class="form-label" for="u-pass">Пароль</label>
-          <input class="form-control<?= $invalid('addUserModal', 'password') ?>" type="password" id="u-pass" name="password" autocomplete="new-password" aria-describedby="u-pass-help" required>
-          <?= $error('addUserModal', 'password', 'u-pass-help') ?>
+          <div class="input-group has-validation">
+            <input class="form-control<?= $invalid('addUserModal', 'password') ?>" type="password" id="u-pass" name="password" autocomplete="new-password" aria-describedby="u-pass-help" required>
+            <?= $this->partial('partials/password-toggle', ['for' => 'u-pass', 'confirm' => 'u-pass2']) ?>
+            <?= $error('addUserModal', 'password', 'u-pass-help') ?>
+          </div>
 <?php if ($invalid('addUserModal', 'password') === ''): ?>
           <div class="form-text" id="u-pass-help">Не короче <?= $minPassword ?> символов.</div>
 <?php endif ?>
         </div>
-        <div>
+        <div data-es-password-confirm-field>
           <label class="form-label" for="u-pass2">Пароль ещё раз</label>
           <input class="form-control<?= $invalid('addUserModal', 'password_again') ?>" type="password" id="u-pass2" name="password_again" autocomplete="new-password" required>
           <?= $error('addUserModal', 'password_again') ?>
@@ -213,13 +216,16 @@ $value = function (string $modal, string $name) use ($old, $openModal): string {
 <?php endif ?>
         <div class="mb-3">
           <label class="form-label" for="<?= $p ?>new">Новый пароль</label>
-          <input class="form-control<?= $invalid($modal, 'password') ?>" type="password" id="<?= $p ?>new" name="password" autocomplete="new-password" aria-describedby="<?= $p ?>new-help" required>
-          <?= $error($modal, 'password', $p . 'new-help') ?>
+          <div class="input-group has-validation">
+            <input class="form-control<?= $invalid($modal, 'password') ?>" type="password" id="<?= $p ?>new" name="password" autocomplete="new-password" aria-describedby="<?= $p ?>new-help" required>
+            <?= $this->partial('partials/password-toggle', ['for' => $p . 'new', 'confirm' => $p . 'new2']) ?>
+            <?= $error($modal, 'password', $p . 'new-help') ?>
+          </div>
 <?php if ($invalid($modal, 'password') === ''): ?>
           <div class="form-text" id="<?= $p ?>new-help">Не короче <?= $minPassword ?> символов.</div>
 <?php endif ?>
         </div>
-        <div class="mb-3">
+        <div class="mb-3" data-es-password-confirm-field>
           <label class="form-label" for="<?= $p ?>new2">Новый пароль ещё раз</label>
           <input class="form-control<?= $invalid($modal, 'password_again') ?>" type="password" id="<?= $p ?>new2" name="password_again" autocomplete="new-password" required>
           <?= $error($modal, 'password_again') ?>

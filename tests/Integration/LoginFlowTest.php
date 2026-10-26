@@ -39,6 +39,16 @@ final class LoginFlowTest extends DatabaseTestCase
         self::assertSame([], $this->browser->cookies, 'Guests get no cookies');
     }
 
+    public function testAboutPageAndMenu(): void
+    {
+        $about = $this->browser->get('/about/');
+        self::assertSame(200, $about->status());
+        self::assertStringContainsString('<a class="nav-link active" aria-current="page" href="/about/">О справочнике</a>', $about->body());
+        self::assertStringContainsString('<b>eStables</b> - это свободное программное обеспечение', $about->body());
+        // Error pages link the menu like any other page
+        self::assertStringContainsString('href="/about/">О справочнике</a>', $this->browser->get('/no/such/page/')->body());
+    }
+
     public function testGuestFooterAndLoginForm(): void
     {
         self::assertStringContainsString('href="/login/">Вход администратора', $this->browser->get('/')->body());

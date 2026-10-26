@@ -110,7 +110,7 @@ final class UsersController
         }
         if ($action === 'add') {
             $old = ['login' => $request->input('login'), 'display_name' => $request->input('display_name')];
-            $errors = $users->validateNew($old['login'], $request->rawInput('password'), $request->rawInput('password_again'), $old['display_name']);
+            $errors = $users->validateNew($old['login'], $request->rawInput('password'), $request->passwordConfirmation(), $old['display_name']);
             if ($errors !== []) {
                 return ['addUserModal', $errors, $old];
             }
@@ -130,7 +130,7 @@ final class UsersController
             case 'password':
                 $modal = 'passwordModal-' . $target->id;
                 $endSessions = $request->input('end_sessions') === '1';
-                $errors = UserRepository::validatePassword($request->rawInput('password'), $request->rawInput('password_again'));
+                $errors = UserRepository::validatePassword($request->rawInput('password'), $request->passwordConfirmation());
                 if ($self && !Passwords::verify($request->rawInput('current_password'), $target->passwordHash)) {
                     $errors = ['current_password' => 'Текущий пароль введён неверно.'] + $errors;
                 }

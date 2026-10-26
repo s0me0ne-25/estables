@@ -28,6 +28,9 @@ final class Kernel
     private readonly Logger $logger;
     private bool $debug = false;
 
+    /** Routes of the current request, so error pages link like the rest of the site. */
+    private ?Router $router = null;
+
     /** Login state of the current request, once the site is installed. */
     private ?Auth $auth = null;
 
@@ -81,6 +84,7 @@ final class Kernel
     private function process(Request $request): Response
     {
         $this->auth = null;
+        $this->router = null;
 
         // 1. Configuration
         $config = Config::load($this->paths->configFile());
@@ -181,10 +185,11 @@ final class Kernel
         }
 
         // 5. Routing
-        $router = new Router();
+        $this->router = $router = new Router();
         $view = new View($this->paths->templates(), $this->paths->public(), $router, $this->globals);
         $catalog = new CatalogController($view);
         $router->add('home', 'GET', '/', $catalog->home(...));
+        $router->add('about', 'GET', '/about/', $catalog->about(...));
         if ($auth === null) {
             $setup = new SetupController($services, $view, $this->paths);
             $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
@@ -235,7 +240,7 @@ final class Kernel
      */
     private function page(string $template, array $vars, int $status): Response
     {
-        $view = new View($this->paths->templates(), $this->paths->public(), null, $this->globals);
+        $view = new View($this->paths->templates(), $this->paths->public(), $this->router, $this->globals);
 
         return Response::html($view->page($template, $vars), $status);
     }
