@@ -132,6 +132,7 @@
   --bs-link-color-rgb: var(--es-primary-rgb);
   --bs-link-hover-color: var(--es-link-hover);
   --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
+  --bs-code-color: var(--es-ink);
   --bs-focus-ring-color: color-mix(in srgb, var(--es-focus) 45%, transparent);
   --bs-font-sans-serif: var(--es-font-text);
   --bs-border-radius: .25rem;
@@ -656,6 +657,14 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 
+/* "Скачать оригинал" with the size of the current photo */
+.es-photo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+}
+
 .es-attrs {
   display: grid;
   grid-template-columns: minmax(8rem, 38%) 1fr;
@@ -825,6 +834,30 @@ h3, .h3 { font-size: 1.25rem; }
 .es-admin-table .es-title { font-weight: 600; color: var(--es-ink); text-decoration: none; }
 .es-admin-table .es-title:hover { text-decoration: underline; }
 .es-admin-table .es-path { display: block; font-size: var(--es-text-sm); color: var(--es-muted); }
+/* "+N" marker for further rubrics of an item */
+.es-more {
+  display: inline-block;
+  margin-left: .25rem;
+  padding: 0 .4rem;
+  border: 1px solid var(--es-line);
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-xs);
+  cursor: help;
+}
+
+/* Authorial order: position column and drag feedback */
+.es-admin-table .es-col-order { width: 5.5rem; }
+.es-position {
+  display: inline-block;
+  min-width: 1.75rem;
+  text-align: right;
+  font-size: var(--es-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--es-muted);
+}
+.es-admin-table tr.is-dragging { opacity: .45; }
+.es-admin-table tr.is-drop-before > td { box-shadow: inset 0 2px 0 var(--es-focus); }
+.es-admin-table tr.is-drop-after > td { box-shadow: inset 0 -2px 0 var(--es-focus); }
 
 .es-status {
   display: inline-block;
@@ -855,6 +888,24 @@ h3, .h3 { font-size: 1.25rem; }
 }
 
 /* ---- Item editor */
+
+/* Rubrics of an item, one per line; the main one is marked */
+.es-rubric-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--es-line);
+}
+.es-rubric {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem .75rem;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--es-line);
+}
+.es-rubric.is-main .es-rubric-path { font-weight: 600; }
+
 .es-photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));

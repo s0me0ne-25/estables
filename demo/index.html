@@ -136,6 +136,16 @@
               <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Открытки <span class="es-count">415</span></a></div></li>
               <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Графика и плакаты <span class="es-count">88</span></a></div></li>
               <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Книги и каталоги <span class="es-count">63</span></a></div></li>
+              <li>
+                <div class="es-node">
+                  <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-sets" aria-expanded="false" aria-controls="t-sets" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+                  <a href="#">Тематические подборки <span class="es-count">23</span></a>
+                </div>
+                <ul class="collapse" id="t-sets">
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Кони на дыбах <span class="es-count">14</span></a></div></li>
+                  <li><div class="es-node"><span class="es-toggle-spacer"></span><a href="#">Орловские рысаки <span class="es-count">11</span></a></div></li>
+                </ul>
+              </li>
             </ul>
           </nav>
         </div>
@@ -190,11 +200,12 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <label class="visually-hidden" for="sort">Сортировка</label>
-          <select class="form-select form-select-sm w-auto" id="sort">
-            <option>По номеру в каталоге</option>
-            <option>По году выпуска</option>
-            <option>По названию</option>
-            <option>Недавно добавленные</option>
+          <!-- The visitor's choice is remembered site-wide in the es_sort cookie (see js/demo.js) -->
+          <select class="form-select form-select-sm w-auto" id="sort" data-es-sort>
+            <option value="author" selected>Авторский порядок</option>
+            <option value="number">По номеру в каталоге</option>
+            <option value="year">По году выпуска</option>
+            <option value="title">По названию</option>
           </select>
           <div class="btn-group btn-group-sm" role="group" aria-label="Вид списка">
             <button class="btn btn-outline-secondary active" type="button" data-es-view="grid" aria-pressed="true" title="Плитка"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="visually-hidden">Плитка</span></button>
@@ -205,78 +216,7 @@
 
       <!-- Catalogue grid -->
       <div class="row row-cols-2 row-cols-md-3 row-cols-xxl-4 g-3 g-md-4 es-catalog" data-es-catalog>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1042.svg" alt="Конь вздыбленный, белый бисквит" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1042</span>
-            <h3><a href="item.html">Конь вздыбленный</a></h3>
-            <p class="es-meta">1958, бисквит, 3 варианта</p>
-            <p class="es-desc text-body-secondary">Одна из первых послевоенных анималистических моделей завода; выпускалась в белом бисквите и с подглазурной росписью.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1043.svg" alt="Голова арабского скакуна" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1043</span>
-            <h3><a href="item.html">Голова арабского скакуна</a></h3>
-            <p class="es-meta">1961, глазурь, 2 варианта</p>
-            <p class="es-desc text-body-secondary">Настольная скульптура на круглом постаменте, тёмно-гнедой окрас под глазурью.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1051.svg" alt="Орловский рысак" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1051</span>
-            <h3><a href="item.html">Орловский рысак</a></h3>
-            <p class="es-meta">1962, роспись, 4 варианта</p>
-            <p class="es-desc text-body-secondary">Рысак на ходу; варианты различаются мастью и цветом постамента.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1057.svg" alt="Жеребёнок" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1057</span>
-            <h3><a href="item.html">Жеребёнок</a></h3>
-            <p class="es-meta">1964, роспись, 2 варианта</p>
-            <p class="es-desc text-body-secondary">Малая пластика, высота около 9 см. Встречается с рыжим и буланым окрасом.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1060.svg" alt="Голова коня, рельеф" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1060</span>
-            <h3><a href="item.html">Голова коня, рельеф</a></h3>
-            <p class="es-meta">1966, бисквит, 1 вариант</p>
-            <p class="es-desc text-body-secondary">Настенный рельеф в белом бисквите, выпускался ограниченным тиражом.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1064.svg" alt="Вороной конь на скаку" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1064</span>
-            <h3><a href="item.html">Вороной на скаку</a></h3>
-            <p class="es-meta">1967, глазурь, 3 варианта</p>
-            <p class="es-desc text-body-secondary">Динамичная композиция с развевающейся гривой; поздние тиражи с золочением копыт.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
-          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1071.svg" alt="Конь с золочением" loading="lazy"></div>
-          <div class="es-label">
-            <span class="es-catno">ЛФЗ-1071</span>
-            <h3><a href="item.html">Конь с золочением</a></h3>
-            <p class="es-meta">1969, надглазурное золото, 2 варианта</p>
-            <p class="es-desc text-body-secondary">Сувенирная модель, полностью покрытая золотом; встречается в фирменной коробке.</p>
-          </div>
-        </article></div>
-
-        <div class="col"><article class="es-specimen">
+        <div class="col" data-sort-author="1" data-sort-number="1078" data-sort-year="1972" data-sort-title="Конь в попоне"><article class="es-specimen">
           <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1078.svg" alt="Конь в попоне" loading="lazy"></div>
           <div class="es-label">
             <span class="es-catno">ЛФЗ-1078</span>
@@ -286,7 +226,47 @@
           </div>
         </article></div>
 
-        <div class="col"><article class="es-specimen">
+        <div class="col" data-sort-author="2" data-sort-number="1042" data-sort-year="1958" data-sort-title="Конь вздыбленный"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1042.svg" alt="Конь вздыбленный, белый бисквит" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1042</span>
+            <h3><a href="item.html">Конь вздыбленный</a></h3>
+            <p class="es-meta">1958, бисквит, 3 варианта</p>
+            <p class="es-desc text-body-secondary">Одна из первых послевоенных анималистических моделей завода; выпускалась в белом бисквите и с подглазурной росписью.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="3" data-sort-number="1051" data-sort-year="1962" data-sort-title="Орловский рысак"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1051.svg" alt="Орловский рысак" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1051</span>
+            <h3><a href="item.html">Орловский рысак</a></h3>
+            <p class="es-meta">1962, роспись, 4 варианта</p>
+            <p class="es-desc text-body-secondary">Рысак на ходу; варианты различаются мастью и цветом постамента.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="4" data-sort-number="1064" data-sort-year="1967" data-sort-title="Вороной на скаку"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1064.svg" alt="Вороной конь на скаку" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1064</span>
+            <h3><a href="item.html">Вороной на скаку</a></h3>
+            <p class="es-meta">1967, глазурь, 3 варианта</p>
+            <p class="es-desc text-body-secondary">Динамичная композиция с развевающейся гривой; поздние тиражи с золочением копыт.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="5" data-sort-number="1043" data-sort-year="1961" data-sort-title="Голова арабского скакуна"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1043.svg" alt="Голова арабского скакуна" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1043</span>
+            <h3><a href="item.html">Голова арабского скакуна</a></h3>
+            <p class="es-meta">1961, глазурь, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Настольная скульптура на круглом постаменте, тёмно-гнедой окрас под глазурью.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="6" data-sort-number="1080" data-sort-year="1974" data-sort-title="Будённовская кобыла"><article class="es-specimen">
           <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1080.svg" alt="Будённовская кобыла" loading="lazy"></div>
           <div class="es-label">
             <span class="es-catno">ЛФЗ-1080</span>
@@ -296,7 +276,17 @@
           </div>
         </article></div>
 
-        <div class="col"><article class="es-specimen">
+        <div class="col" data-sort-author="7" data-sort-number="1057" data-sort-year="1964" data-sort-title="Жеребёнок"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1057.svg" alt="Жеребёнок" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1057</span>
+            <h3><a href="item.html">Жеребёнок</a></h3>
+            <p class="es-meta">1964, роспись, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Малая пластика, высота около 9 см. Встречается с рыжим и буланым окрасом.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="8" data-sort-number="1085" data-sort-year="1976" data-sort-title="Белая лошадь"><article class="es-specimen">
           <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1085.svg" alt="Белая лошадь" loading="lazy"></div>
           <div class="es-label">
             <span class="es-catno">ЛФЗ-1085</span>
@@ -306,7 +296,27 @@
           </div>
         </article></div>
 
-        <div class="col"><article class="es-specimen">
+        <div class="col" data-sort-author="9" data-sort-number="1060" data-sort-year="1966" data-sort-title="Голова коня, рельеф"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1060.svg" alt="Голова коня, рельеф" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1060</span>
+            <h3><a href="item.html">Голова коня, рельеф</a></h3>
+            <p class="es-meta">1966, бисквит, 1 вариант</p>
+            <p class="es-desc text-body-secondary">Настенный рельеф в белом бисквите, выпускался ограниченным тиражом.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="10" data-sort-number="1071" data-sort-year="1969" data-sort-title="Конь с золочением"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1071.svg" alt="Конь с золочением" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1071</span>
+            <h3><a href="item.html">Конь с золочением</a></h3>
+            <p class="es-meta">1969, надглазурное золото, 2 варианта</p>
+            <p class="es-desc text-body-secondary">Сувенирная модель, полностью покрытая золотом; встречается в фирменной коробке.</p>
+          </div>
+        </article></div>
+
+        <div class="col" data-sort-author="11" data-sort-number="1090" data-sort-year="1981" data-sort-title="Голова тяжеловоза"><article class="es-specimen">
           <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1090.svg" alt="Голова тяжеловоза" loading="lazy"></div>
           <div class="es-label">
             <span class="es-catno">ЛФЗ-1090</span>
@@ -316,7 +326,7 @@
           </div>
         </article></div>
 
-        <div class="col"><article class="es-specimen">
+        <div class="col" data-sort-author="12" data-sort-number="1094" data-sort-year="1985" data-sort-title="Пони"><article class="es-specimen">
           <div class="es-mount ratio ratio-4x3"><img src="img/lfz-1094.svg" alt="Пони" loading="lazy"></div>
           <div class="es-label">
             <span class="es-catno">ЛФЗ-1094</span>

@@ -45,6 +45,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
           <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
         </ul>
         <div class="d-flex gap-2 align-items-center">
           <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
@@ -88,22 +89,47 @@
         <div class="row g-3">
           <div class="col-sm-4">
             <label class="form-label" for="i-no">Номер в каталоге</label>
-            <input class="form-control" type="text" id="i-no" value="ЛФЗ-1042">
+            <input class="form-control" type="text" id="i-no" value="ЛФЗ-1042" aria-describedby="i-no-help">
+            <div class="form-text" id="i-no-help">Уникален на весь сайт. Если оставить пустым, номер будет создан при сохранении.</div>
           </div>
           <div class="col-sm-8">
             <label class="form-label" for="i-name">Название</label>
             <input class="form-control" type="text" id="i-name" value="Конь вздыбленный">
           </div>
           <div class="col-12">
-            <label class="form-label" for="i-rubric">Раздел</label>
-            <select class="form-select" id="i-rubric">
-              <option>Фигурки</option>
-              <option>&nbsp;&nbsp;Фарфор</option>
-              <option>&nbsp;&nbsp;&nbsp;&nbsp;Дулёвский завод</option>
-              <option selected>&nbsp;&nbsp;&nbsp;&nbsp;Ленинградский завод</option>
-              <option>&nbsp;&nbsp;&nbsp;&nbsp;Вербилки</option>
-              <option>&nbsp;&nbsp;Художественное литьё</option>
-            </select>
+            <!-- Rubrics work like tags; the main one drives the breadcrumbs (see js/demo.js for the demo behaviour) -->
+            <fieldset aria-describedby="i-rubrics-help">
+              <legend class="form-label fs-6">Разделы</legend>
+              <ul class="es-rubric-list" data-es-rubrics>
+                <li class="es-rubric is-main" data-es-rubric>
+                  <span class="es-rubric-path">Фигурки / Фарфор / Ленинградский завод</span>
+                  <span class="es-status es-status-published" data-es-rubric-badge>Главный</span>
+                  <button class="btn btn-sm btn-link p-0" type="button" data-es-rubric-main hidden>Сделать главным</button>
+                  <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger ms-auto" type="button" title="Убрать из раздела" data-es-rubric-remove><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Убрать из раздела «Фигурки / Фарфор / Ленинградский завод»</span></button>
+                </li>
+                <li class="es-rubric" data-es-rubric>
+                  <span class="es-rubric-path">Тематические подборки / Кони на дыбах</span>
+                  <span class="es-status es-status-published" data-es-rubric-badge hidden>Главный</span>
+                  <button class="btn btn-sm btn-link p-0" type="button" data-es-rubric-main>Сделать главным</button>
+                  <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger ms-auto" type="button" title="Убрать из раздела" data-es-rubric-remove><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Убрать из раздела «Тематические подборки / Кони на дыбах»</span></button>
+                </li>
+              </ul>
+              <div class="input-group mt-2">
+                <select class="form-select" id="i-rubric-add" aria-label="Раздел для добавления" data-es-rubric-select>
+                  <option value="Фигурки">Фигурки</option>
+                  <option value="Фигурки / Фарфор">&nbsp;&nbsp;Фарфор</option>
+                  <option value="Фигурки / Фарфор / Дулёвский завод">&nbsp;&nbsp;&nbsp;&nbsp;Дулёвский завод</option>
+                  <option value="Фигурки / Фарфор / Ленинградский завод">&nbsp;&nbsp;&nbsp;&nbsp;Ленинградский завод</option>
+                  <option value="Фигурки / Фарфор / Вербилки">&nbsp;&nbsp;&nbsp;&nbsp;Вербилки</option>
+                  <option value="Фигурки / Художественное литьё">&nbsp;&nbsp;Художественное литьё</option>
+                  <option value="Тематические подборки">Тематические подборки</option>
+                  <option value="Тематические подборки / Кони на дыбах">&nbsp;&nbsp;Кони на дыбах</option>
+                  <option value="Тематические подборки / Орловские рысаки" selected>&nbsp;&nbsp;Орловские рысаки</option>
+                </select>
+                <button class="btn btn-outline-secondary" type="button" data-es-rubric-add><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить раздел</button>
+              </div>
+              <div class="form-text" id="i-rubrics-help">Первый добавленный раздел становится главным: от него строятся хлебные крошки и «из той же серии». В каждом новом разделе предмет встаёт в начало авторского порядка.</div>
+            </fieldset>
           </div>
           <div class="col-12">
             <label class="form-label" for="i-lead">Краткое описание</label>
@@ -123,7 +149,7 @@
       <section class="es-panel" aria-labelledby="sPhotos">
         <div class="d-flex flex-wrap gap-2 align-items-baseline justify-content-between mb-3">
           <h2 id="sPhotos" class="mb-0">Фотографии</h2>
-          <span class="small text-body-secondary">Перетащите фото, чтобы изменить порядок. Первое фото становится обложкой.</span>
+          <span class="small text-body-secondary">Перетащите фото, чтобы изменить порядок. Первое фото становится обложкой. Метаданные (EXIF, GPS) удаляются при загрузке.</span>
         </div>
         <div class="es-photo-grid">
           <div class="es-photo is-cover">
@@ -178,6 +204,7 @@
             <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
             <span>Добавить фото</span>
             <span class="small">перетащите файлы сюда или выберите на компьютере</span>
+            <span class="small">JPEG, PNG и GIF сохраняются как есть, остальные форматы преобразуются в JPEG; до 50 МБ</span>
             <input class="visually-hidden" type="file" id="i-upload" accept="image/*" multiple>
           </label>
         </div>
@@ -310,7 +337,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-0">Предмет будет удалён вместе с 4 фотографиями и 3 вариантами. Это действие нельзя отменить. Чтобы только убрать предмет с сайта, переведите его в черновики.</p>
+        <p class="mb-0">Предмет будет удалён из всех разделов вместе с 3 вариантами; его 4 фотографии удалятся, если не используются у других предметов. Это действие нельзя отменить. Чтобы только убрать предмет с сайта, переведите его в черновики.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>

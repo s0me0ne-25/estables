@@ -45,6 +45,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item"><a class="nav-link" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
           <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
         </ul>
         <div class="d-flex gap-2 align-items-center">
           <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
@@ -276,6 +277,41 @@
               </div>
             </div>
           </li>
+          <li>
+            <div class="es-node">
+              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Тематические подборки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-0-sets" aria-expanded="false" aria-controls="a-0-sets" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+              <a href="#"><span>Тематические подборки</span> <span class="es-count">23</span></a>
+              <div class="es-node-actions">
+                <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Тематические подборки»</span></button>
+                <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Тематические подборки»</span></button>
+              </div>
+            </div>
+            <ul class="collapse" id="a-0-sets">
+              <li>
+                <div class="es-node">
+                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Кони на дыбах»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <span class="es-toggle-spacer"></span>
+                  <a href="#"><span>Кони на дыбах</span> <span class="es-count">14</span></a>
+                  <div class="es-node-actions">
+                    <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Кони на дыбах»</span></button>
+                    <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Кони на дыбах»</span></button>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="es-node">
+                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Орловские рысаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <span class="es-toggle-spacer"></span>
+                  <a href="#"><span>Орловские рысаки</span> <span class="es-count">11</span></a>
+                  <div class="es-node-actions">
+                    <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Орловские рысаки»</span></button>
+                    <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Орловские рысаки»</span></button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </li>
         </ul>
       </section>
     </div>
@@ -309,6 +345,7 @@
                 <option>&nbsp;&nbsp;Художественное литьё</option>
                 <option>Медали и знаки</option>
                 <option>Филателия</option>
+                <option>Тематические подборки</option>
               </select>
             </div>
             <div class="col-md-6">
@@ -326,17 +363,9 @@
             </div>
 
             <div class="col-md-6">
-              <label class="form-label" for="r-sort">Порядок предметов по умолчанию</label>
-              <select class="form-select" id="r-sort">
-                <option selected>По номеру в каталоге</option>
-                <option>По году выпуска</option>
-                <option>По названию</option>
-              </select>
-            </div>
-            <div class="col-md-6">
               <label class="form-label" for="r-cover">Обложка раздела</label>
               <input class="form-control" type="file" id="r-cover" accept="image/*">
-              <div class="form-text">Необязательно. Без обложки берётся фото первого предмета.</div>
+              <div class="form-text">Необязательно. Без обложки берётся фото первого предмета в авторском порядке.</div>
             </div>
 
             <div class="col-12">
@@ -369,7 +398,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <div class="modal-body">
-        <p>В разделе 48 предметов. Что с ними сделать?</p>
+        <p>В разделе 48 предметов. 3 из них есть и в других разделах: у них связь с этим разделом просто снимется. Для остальных 45 раздел единственный. Что с ними сделать?</p>
         <div class="form-check mb-2">
           <input class="form-check-input" type="radio" name="delMode" id="delMove" checked>
           <label class="form-check-label" for="delMove">Перенести в другой раздел</label>
@@ -382,7 +411,7 @@
         </select>
         <div class="form-check">
           <input class="form-check-input" type="radio" name="delMode" id="delAll">
-          <label class="form-check-label" for="delAll">Удалить вместе с предметами и фотографиями</label>
+          <label class="form-check-label" for="delAll">Удалить эти 45 предметов</label>
         </div>
       </div>
       <div class="modal-footer">

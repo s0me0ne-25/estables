@@ -76,6 +76,14 @@
         </div>
       </div>
 
+      <!-- Without the mark the session cookie lives until the browser closes;
+           with it, for the period set in the config (30 days by default, sliding). -->
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="remember" aria-describedby="rememberHelp">
+        <label class="form-check-label" for="remember">Запомнить меня</label>
+        <div class="form-text mt-0" id="rememberHelp">Вход сохранится на этом устройстве на 30 дней. Без отметки — до закрытия браузера.</div>
+      </div>
+
       <!-- Captcha slot: the module is chosen with the backend (reCAPTCHA, Turnstile, Anubis...). -->
       <div class="mb-4">
         <div class="es-captcha">
