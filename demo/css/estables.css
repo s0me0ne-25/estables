@@ -1,45 +1,44 @@
 /*
  * eStables demo theme.
- * Layered on top of Bootstrap 5.3: only CSS custom properties and a few
- * project-specific components (pedigree tree, specimen card, item gallery).
+ * Layered on top of Bootstrap 5.3: CSS custom properties plus a few
+ * project-specific components (pedigree tree, specimen card, item gallery,
+ * admin panels).
+ *
+ * Structure:
+ *   1. Tokens: palette per theme, theme-independent tokens, Bootstrap mapping
+ *   2. Base
+ *   3. Bootstrap component adjustments
+ *   4. Project components, public area
+ *   5. Project components, login and admin area
+ *   6. Motion preferences
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-/* ------------------------------------------------------------------
- * Design tokens
- * ------------------------------------------------------------------ */
+/* ==================================================================
+ * 1. Tokens
+ * ================================================================== */
+
+/* ---- Palette: light theme (aqua). Contrast ratios are against --es-paper. */
 :root,
 [data-bs-theme="light"] {
-  /* Light theme: aqua palette. Contrast ratios are against --es-paper. */
   --es-paper: #caf2fc;       /* page background (set by the client) */
-  --es-surface: #effbfe;     /* raised surfaces: sidebar, mounts */
+  --es-paper-rgb: 202, 242, 252;
+  --es-surface: #effbfe;     /* raised surfaces: sidebar, mounts, panels */
   --es-ink: #0b2a33;         /* main text: deep sea navy, 12.6:1 */
+  --es-ink-rgb: 11, 42, 51;
   --es-muted: #3b5f6b;       /* secondary text, 5.8:1 */
   --es-line: #8ccfe0;        /* hairlines, tree connectors */
-  --es-primary: #00657e;     /* primary: deep teal, links and buttons, 5.6:1 */
+  --es-primary: #00657e;     /* deep teal: links and buttons, 5.6:1 */
   --es-primary-rgb: 0, 101, 126;
   --es-primary-hover: #00566b;
   --es-primary-active: #004a5c;
   --es-on-primary: #ffffff;  /* text on primary, 6.6:1 */
-  --es-accent: #9a4a06;      /* accent: amber, complementary to aqua, 5.3:1 */
-  --es-accent-rgb: 154, 74, 6;
-
+  --es-accent: #9a4a06;      /* amber, complementary to aqua, 5.3:1 */
   --es-field-bg: #ffffff;    /* form fields */
   --es-danger: #b42318;      /* destructive actions, 5.4:1 */
-  --es-danger-rgb: 180, 35, 24;
-
-  --es-link-hover: var(--es-primary-active); /* links on hover: darker teal */
-  --es-link-hover-rgb: 0, 74, 92;
-  --es-focus: var(--es-header-bg);          /* keyboard focus rings */
-  --es-focus-rgb: 10, 207, 250;
-  --es-header-focus: var(--es-header-fg);   /* focus inside the header */
-  --es-header-focus-ring: var(--es-header-field-border);
-  --es-catno-color: var(--es-ink);          /* catalogue numbers, as item titles */
-  --es-thumb-active: var(--es-header-bg);   /* selected thumbnail frame */
-
-  --es-tree-lineage: var(--es-header-bg);   /* rubricator: path to the current node */
-  --es-tree-current-bg: var(--es-paper);    /* rubricator: current node */
+  --es-danger-hover: #93190f;
+  --es-on-danger: #ffffff;
 
   --es-header-bg: #0acffa;   /* site header (set by the client) */
   --es-header-fg: #062b36;   /* header text, 8:1 on header */
@@ -48,13 +47,82 @@
   --es-header-field-bg: rgba(255, 255, 255, .55);
   --es-header-field-border: rgba(6, 43, 54, .22);
 
+  /* Roles */
+  --es-link-hover: var(--es-primary-active);   /* links darken on hover */
+  --es-link-hover-rgb: 0, 74, 92;              /* = --es-primary-active */
+  --es-focus: var(--es-header-bg);             /* keyboard focus rings */
+  --es-header-focus: var(--es-header-fg);      /* focus inside the header */
+  --es-header-focus-ring: var(--es-header-field-border);
+  --es-catno-color: var(--es-ink);             /* catalogue numbers, as item titles */
+  --es-thumb-active: var(--es-header-bg);      /* selected thumbnail frame */
+  --es-tree-lineage: var(--es-header-bg);      /* rubricator: path to the current node */
+  --es-tree-current-bg: var(--es-paper);       /* rubricator: current node */
+}
+
+/* ---- Palette: dark theme (previous green and brass, not redesigned yet). */
+[data-bs-theme="dark"] {
+  --es-paper: #141a17;
+  --es-paper-rgb: 20, 26, 23;
+  --es-surface: #1b231f;
+  --es-ink: #e3e7e0;
+  --es-ink-rgb: 227, 231, 224;
+  --es-muted: #9ba69f;
+  --es-line: #34413a;
+  --es-primary: #8fb39c;
+  --es-primary-rgb: 143, 179, 156;
+  --es-primary-hover: #a6c4b0;
+  --es-primary-active: #b8d1c0;
+  --es-on-primary: #10170f;
+  --es-accent: #d0ab6e;
+  --es-field-bg: var(--es-surface);
+  --es-danger: #f0897c;
+  --es-danger-hover: #93190f;
+  --es-on-danger: #ffffff;
+
+  --es-header-bg: #0f1512;
+  --es-header-fg: #f1f3ee;
+  --es-header-fg-muted: rgba(241, 243, 238, .82);
+  --es-header-edge: var(--es-line);
+  --es-header-field-bg: rgba(255, 255, 255, .1);
+  --es-header-field-border: rgba(255, 255, 255, .25);
+
+  --es-link-hover: var(--es-accent);
+  --es-link-hover-rgb: 208, 171, 110;          /* = --es-accent */
+  --es-focus: var(--es-accent);
+  --es-header-focus: var(--es-accent);
+  --es-header-focus-ring: color-mix(in srgb, var(--es-accent) 45%, transparent);
+  --es-catno-color: var(--es-accent);
+  --es-thumb-active: var(--es-accent);
+  --es-tree-lineage: var(--es-accent);
+  --es-tree-current-bg: #3a3122;
+}
+
+/* ---- Theme-independent tokens */
+:root {
   --es-font-text: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
   --es-font-display: "Alegreya", Georgia, "Times New Roman", serif;
 
+  --es-text-xs: .75rem;
+  --es-text-sm: .8125rem;
+  --es-text-md: .875rem;
+  --es-radius-pill: 2rem;
+
+  /* Caption badge over photos: always dark, whatever the theme */
+  --es-overlay-bg: rgba(11, 42, 51, .75);
+  --es-overlay-fg: #ffffff;
+}
+
+/*
+ * ---- Bootstrap mapping, shared by all themes.
+ * Bootstrap's own [data-bs-theme=dark] block has the same specificity;
+ * this file loads later, so the mapping wins on every themed element.
+ */
+:root,
+[data-bs-theme] {
   --bs-body-bg: var(--es-paper);
-  --bs-body-bg-rgb: 202, 242, 252;
+  --bs-body-bg-rgb: var(--es-paper-rgb);
   --bs-body-color: var(--es-ink);
-  --bs-body-color-rgb: 11, 42, 51;
+  --bs-body-color-rgb: var(--es-ink-rgb);
   --bs-secondary-color: var(--es-muted);
   --bs-border-color: var(--es-line);
   --bs-tertiary-bg: var(--es-surface);
@@ -64,62 +132,16 @@
   --bs-link-color-rgb: var(--es-primary-rgb);
   --bs-link-hover-color: var(--es-link-hover);
   --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
+  --bs-focus-ring-color: color-mix(in srgb, var(--es-focus) 45%, transparent);
   --bs-font-sans-serif: var(--es-font-text);
   --bs-border-radius: .25rem;
   --bs-border-radius-sm: .1875rem;
   --bs-border-radius-lg: .375rem;
-  --bs-focus-ring-color: rgba(var(--es-focus-rgb), .45);
 }
 
-[data-bs-theme="dark"] {
-  --es-paper: #141a17;
-  --es-surface: #1b231f;
-  --es-ink: #e3e7e0;
-  --es-muted: #9ba69f;
-  --es-line: #34413a;
-  --es-primary: #8fb39c;
-  --es-primary-rgb: 143, 179, 156;
-  --es-primary-hover: #a6c4b0;
-  --es-primary-active: #b8d1c0;
-  --es-on-primary: #10170f;
-  --es-accent: #d0ab6e;
-  --es-accent-rgb: 208, 171, 110;
-
-  --es-field-bg: var(--es-surface);
-  --es-danger: #f0897c;
-  --es-danger-rgb: 240, 137, 124;
-
-  --es-link-hover: var(--es-accent);
-  --es-link-hover-rgb: var(--es-accent-rgb);
-  --es-focus: var(--es-accent);
-  --es-focus-rgb: var(--es-accent-rgb);
-  --es-header-focus: var(--es-accent);
-  --es-header-focus-ring: rgba(var(--es-accent-rgb), .45);
-  --es-catno-color: var(--es-accent);
-  --es-thumb-active: var(--es-accent);
-
-  --es-tree-lineage: var(--es-accent);
-  --es-tree-current-bg: #3a3122;
-
-  --es-header-bg: #0f1512;
-  --es-header-fg: #f1f3ee;
-  --es-header-fg-muted: rgba(241, 243, 238, .82);
-  --es-header-edge: var(--es-line);
-  --es-header-field-bg: rgba(255, 255, 255, .1);
-  --es-header-field-border: rgba(255, 255, 255, .25);
-
-  --bs-body-bg: var(--es-paper);
-  --bs-body-bg-rgb: 20, 26, 23;
-  --bs-body-color: var(--es-ink);
-  --bs-body-color-rgb: 227, 231, 224;
-  --bs-link-hover-color: var(--es-link-hover);
-  --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
-  --bs-focus-ring-color: rgba(var(--es-focus-rgb), .45);
-}
-
-/* ------------------------------------------------------------------
- * Base typography (scale ~1.25, display face for headings only)
- * ------------------------------------------------------------------ */
+/* ==================================================================
+ * 2. Base (type scale ~1.25, display face for headings only)
+ * ================================================================== */
 body {
   font-family: var(--es-font-text);
   font-size: 1rem;
@@ -127,7 +149,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, .h1, .h2, .h3, .es-display {
+h1, h2, h3, .h1, .h2, .h3 {
   font-family: var(--es-font-display);
   font-weight: 700;
   letter-spacing: -.005em;
@@ -136,6 +158,11 @@ h1, h2, h3, .h1, .h2, .h3, .es-display {
 h1, .h1 { font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem); }
 h2, .h2 { font-size: 1.6rem; }
 h3, .h3 { font-size: 1.25rem; }
+
+:focus-visible {
+  outline: 2px solid var(--es-focus);
+  outline-offset: 2px;
+}
 
 .es-lead {
   max-width: 62ch;
@@ -147,18 +174,22 @@ h3, .h3 { font-size: 1.25rem; }
 .es-catno {
   font-variant-numeric: tabular-nums lining-nums;
   font-weight: 600;
-  font-size: .8125rem;
+  font-size: var(--es-text-sm);
   color: var(--es-catno-color);
 }
 
-:focus-visible {
-  outline: 2px solid var(--es-focus);
-  outline-offset: 2px;
+/* Small secondary text under titles and in lists */
+.es-meta {
+  font-size: var(--es-text-sm);
+  color: var(--es-muted);
+  margin: 0;
 }
 
-/* ------------------------------------------------------------------
- * Bootstrap component adjustments
- * ------------------------------------------------------------------ */
+/* ==================================================================
+ * 3. Bootstrap component adjustments
+ * ================================================================== */
+
+/* ---- Buttons */
 .btn-primary {
   --bs-btn-bg: var(--es-primary);
   --bs-btn-border-color: var(--es-primary);
@@ -182,6 +213,50 @@ h3, .h3 { font-size: 1.25rem; }
   --bs-btn-active-color: var(--es-on-primary);
 }
 
+.btn-danger {
+  --bs-btn-bg: var(--es-danger);
+  --bs-btn-border-color: var(--es-danger);
+  --bs-btn-hover-bg: var(--es-danger-hover);
+  --bs-btn-hover-border-color: var(--es-danger-hover);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--es-danger);
+  --bs-btn-border-color: var(--es-danger);
+  --bs-btn-hover-bg: var(--es-danger);
+  --bs-btn-hover-border-color: var(--es-danger);
+  --bs-btn-hover-color: var(--es-on-danger);
+  --bs-btn-active-bg: var(--es-danger);
+  --bs-btn-active-border-color: var(--es-danger);
+}
+
+/* Text-only destructive action, e.g. "Удалить предмет": stays red on hover */
+.btn-link-danger {
+  --bs-btn-color: var(--es-danger);
+  --bs-btn-hover-color: var(--es-danger);
+  --bs-btn-active-color: var(--es-danger);
+}
+
+/*
+ * Quiet icon button: muted glyph, no frame. Used for row and node actions.
+ * Combine with .btn (and .btn-sm where needed); add .es-btn-quiet-danger
+ * for destructive actions.
+ */
+.es-btn-quiet {
+  --bs-btn-padding-x: .45rem;
+  --bs-btn-border-width: 0;
+  --bs-btn-color: var(--es-muted);
+  --bs-btn-hover-color: var(--es-ink);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-active-color: var(--es-ink);
+  --bs-btn-active-border-color: transparent;
+}
+.es-btn-quiet-danger {
+  --bs-btn-hover-color: var(--es-danger);
+  --bs-btn-active-color: var(--es-danger);
+}
+
+/* ---- Forms */
 .form-control,
 .form-select {
   background-color: var(--es-field-bg);
@@ -191,7 +266,7 @@ h3, .h3 { font-size: 1.25rem; }
 .form-select:focus,
 .form-check-input:focus {
   border-color: var(--es-primary);
-  box-shadow: 0 0 0 .2rem rgba(var(--es-primary-rgb), .25);
+  box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--es-primary) 25%, transparent);
 }
 .form-check-input {
   background-color: var(--es-field-bg);
@@ -205,29 +280,23 @@ h3, .h3 { font-size: 1.25rem; }
 .form-label { font-weight: 500; margin-bottom: .3rem; }
 .form-text { color: var(--es-muted); }
 
-.btn-outline-danger {
-  --bs-btn-color: var(--es-danger);
-  --bs-btn-border-color: var(--es-danger);
-  --bs-btn-hover-bg: var(--es-danger);
-  --bs-btn-hover-border-color: var(--es-danger);
-  --bs-btn-hover-color: #fff;
-  --bs-btn-active-bg: var(--es-danger);
-  --bs-btn-active-border-color: var(--es-danger);
+/* ---- Overlays */
+.dropdown-menu {
+  --bs-dropdown-bg: var(--es-surface);
+  --bs-dropdown-border-color: var(--es-line);
 }
-.btn-danger {
-  --bs-btn-bg: var(--es-danger);
-  --bs-btn-border-color: var(--es-danger);
-  --bs-btn-hover-bg: #93190f;
-  --bs-btn-hover-border-color: #93190f;
-}
-.btn-link-danger { color: var(--es-danger); }
-
-.dropdown-menu { --bs-dropdown-bg: var(--es-surface); --bs-dropdown-border-color: var(--es-line); }
 .dropdown-item.active,
-.dropdown-item:active { --bs-dropdown-link-active-bg: var(--es-primary); --bs-dropdown-link-active-color: var(--es-on-primary); }
-.modal { --bs-modal-bg: var(--es-surface); --bs-modal-border-color: var(--es-line); }
+.dropdown-item:active {
+  --bs-dropdown-link-active-bg: var(--es-primary);
+  --bs-dropdown-link-active-color: var(--es-on-primary);
+}
+.modal {
+  --bs-modal-bg: var(--es-surface);
+  --bs-modal-border-color: var(--es-line);
+}
 .modal-title { font-family: var(--es-font-display); font-weight: 700; }
 
+/* ---- Navigation */
 .pagination {
   --bs-pagination-bg: transparent;
   --bs-pagination-border-color: var(--es-line);
@@ -243,14 +312,37 @@ h3, .h3 { font-size: 1.25rem; }
 .breadcrumb {
   --bs-breadcrumb-divider-color: var(--es-muted);
   --bs-breadcrumb-item-active-color: var(--es-muted);
-  font-size: .875rem;
+  font-size: var(--es-text-md);
 }
 .breadcrumb a { text-decoration: none; }
 .breadcrumb a:hover { text-decoration: underline; }
 
-/* ------------------------------------------------------------------
- * Header
- * ------------------------------------------------------------------ */
+/* ---- Tables: shared look for every data table */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--es-ink);
+  --bs-table-border-color: var(--es-line);
+}
+/* Column labels: table headers and the header row of editable lists */
+.table > thead th,
+.es-row-head {
+  font-weight: 600;
+  font-size: var(--es-text-sm);
+  color: var(--es-muted);
+}
+/* Bootstrap colours table cells explicitly, so catalogue numbers need this */
+.table td.es-catno {
+  color: var(--es-catno-color);
+  white-space: nowrap;
+}
+/* Keeps visually-hidden labels inside the scroll box from widening the page */
+.table-responsive { position: relative; }
+
+/* ==================================================================
+ * 4. Project components, public area
+ * ================================================================== */
+
+/* ---- Header */
 .es-header {
   background: var(--es-header-bg);
   color: var(--es-header-fg);
@@ -290,12 +382,7 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-header .btn-icon:hover { background: var(--es-header-field-bg); color: inherit; }
 
-/* ------------------------------------------------------------------
- * Sidebar: hierarchical rubricator drawn as a pedigree chart.
- * Each nesting level is joined by elbow connectors, the way horse
- * pedigrees connect sire and dam lines. The active line has its own colour token.
- * ------------------------------------------------------------------ */
-.es-layout { display: block; }
+/* ---- Page layout with the rubricator sidebar */
 @media (min-width: 992px) {
   .es-layout { display: flex; align-items: stretch; }
   .es-aside {
@@ -304,19 +391,17 @@ h3, .h3 { font-size: 1.25rem; }
     border-right: 1px solid var(--es-line);
   }
   .es-main { flex: 1 1 auto; min-width: 0; }
-}
-
-.es-sidebar {
-  --bs-offcanvas-bg: var(--es-surface);
-  background: var(--es-surface);
-}
-@media (min-width: 992px) {
   .es-sidebar {
     position: sticky;
     top: 0;
     max-height: 100vh;
     overflow-y: auto;
   }
+}
+
+.es-sidebar {
+  --bs-offcanvas-bg: var(--es-surface);
+  background: var(--es-surface);
 }
 .es-sidebar-title {
   font-family: var(--es-font-display);
@@ -325,6 +410,12 @@ h3, .h3 { font-size: 1.25rem; }
   margin-bottom: .75rem;
 }
 
+/*
+ * ---- Rubricator drawn as a pedigree chart.
+ * Each nesting level is joined by elbow connectors, the way horse
+ * pedigrees connect sire and dam lines. The path to the current node
+ * has its own colour token.
+ */
 .es-tree,
 .es-tree ul {
   list-style: none;
@@ -351,11 +442,8 @@ h3, .h3 { font-size: 1.25rem; }
   border-top: 1px solid var(--es-line);
 }
 
-/*
- * The current lineage is painted with --es-tree-lineage: the spine runs
- * down past the preceding siblings and turns into the active node;
- * siblings below it keep the neutral line.
- */
+/* The lineage spine runs down past the preceding siblings and turns into
+   the active node; siblings below it keep the neutral line. */
 .es-tree ul > li:has(~ li.is-lineage, ~ li.is-current) {
   background-image: linear-gradient(var(--es-tree-lineage), var(--es-tree-lineage));
   background-size: 2px 100%;
@@ -394,7 +482,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-node a:hover { background: var(--es-paper); }
 .es-node .es-count {
   white-space: nowrap;
-  font-size: .75rem;
+  font-size: var(--es-text-xs);
   font-variant-numeric: tabular-nums;
   color: var(--es-muted);
 }
@@ -404,6 +492,16 @@ h3, .h3 { font-size: 1.25rem; }
   background: var(--es-tree-current-bg);
 }
 
+/* Structural icon controls of the tree and lists: muted, darken on hover */
+.es-toggle,
+.es-drag {
+  border: 0;
+  background: none;
+  color: var(--es-muted);
+}
+.es-toggle:hover,
+.es-drag:hover { color: var(--es-ink); }
+
 /* Expand/collapse toggle */
 .es-toggle {
   width: 1.5rem;
@@ -412,19 +510,21 @@ h3, .h3 { font-size: 1.25rem; }
   display: inline-grid;
   place-items: center;
   padding: 0;
-  border: 0;
-  background: none;
-  color: var(--es-muted);
   border-radius: var(--bs-border-radius-sm);
 }
-.es-toggle:hover { color: var(--es-ink); background: var(--es-paper); }
+.es-toggle:hover { background: var(--es-paper); }
 .es-toggle .bi { transition: transform .15s ease; }
 .es-toggle[aria-expanded="true"] .bi { transform: rotate(90deg); }
 .es-toggle-spacer { width: 1.5rem; flex: none; }
 
-/* ------------------------------------------------------------------
- * Category heading block
- * ------------------------------------------------------------------ */
+/* Drag handle for reordering */
+.es-drag {
+  cursor: grab;
+  padding: 0 .25rem;
+  line-height: 1;
+}
+
+/* ---- Category heading block */
 .es-facts {
   display: flex;
   flex-wrap: wrap;
@@ -432,7 +532,7 @@ h3, .h3 { font-size: 1.25rem; }
   margin: 0;
 }
 .es-facts div { display: flex; flex-direction: column; }
-.es-facts dt { font-weight: 400; font-size: .8125rem; color: var(--es-muted); }
+.es-facts dt { font-weight: 400; font-size: var(--es-text-sm); color: var(--es-muted); }
 .es-facts dd {
   margin: 0;
   font-family: var(--es-font-display);
@@ -445,8 +545,8 @@ h3, .h3 { font-size: 1.25rem; }
 .es-chip {
   padding: .3rem .8rem;
   border: 1px solid var(--es-line);
-  border-radius: 2rem;
-  font-size: .875rem;
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-md);
   color: var(--es-ink);
   text-decoration: none;
   background: transparent;
@@ -459,10 +559,10 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-chip small { color: inherit; opacity: .7; margin-left: .25rem; }
 
-/* ------------------------------------------------------------------
- * Specimen card: a photo on a mount with a museum label beneath it.
+/*
+ * ---- Specimen card: a photo on a mount with a museum label beneath it.
  * No boxed card chrome; the mount is the only frame.
- * ------------------------------------------------------------------ */
+ */
 .es-specimen {
   position: relative;
   height: 100%;
@@ -495,11 +595,6 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-specimen:hover .es-label h3 a { text-decoration: underline; text-underline-offset: .2em; }
 .es-specimen:hover .es-mount { border-color: var(--es-muted); }
-.es-meta {
-  font-size: .8125rem;
-  color: var(--es-muted);
-  margin: 0;
-}
 
 /* List view: same specimen, laid out horizontally */
 .es-catalog.is-list > [class*="col"] { width: 100%; }
@@ -515,14 +610,12 @@ h3, .h3 { font-size: 1.25rem; }
 .es-catalog .es-desc { display: none; }
 .es-catalog.is-list .es-desc {
   display: block;
-  font-size: .875rem;
+  font-size: var(--es-text-md);
   max-width: 70ch;
   margin: .375rem 0 0;
 }
 
-/* ------------------------------------------------------------------
- * Item page
- * ------------------------------------------------------------------ */
+/* ---- Item page */
 .es-stage {
   background: var(--es-surface);
   border: 1px solid var(--es-line);
@@ -539,9 +632,9 @@ h3, .h3 { font-size: 1.25rem; }
   position: absolute;
   right: .5rem;
   bottom: .5rem;
-  background: rgba(11, 42, 51, .75);
-  color: #fff;
-  font-size: .8125rem;
+  background: var(--es-overlay-bg);
+  color: var(--es-overlay-fg);
+  font-size: var(--es-text-sm);
   padding: .25rem .6rem;
   border-radius: var(--bs-border-radius-sm);
 }
@@ -557,7 +650,10 @@ h3, .h3 { font-size: 1.25rem; }
   padding: .25rem;
 }
 .es-thumbs a:hover { border-color: var(--es-muted); }
-.es-thumbs a.active { border-color: var(--es-thumb-active); box-shadow: inset 0 0 0 1px var(--es-thumb-active); }
+.es-thumbs a.active {
+  border-color: var(--es-thumb-active);
+  box-shadow: inset 0 0 0 1px var(--es-thumb-active);
+}
 .es-thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 
 .es-attrs {
@@ -574,15 +670,7 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-attrs dt { font-weight: 400; color: var(--es-muted); padding-right: 1rem; }
 
-.es-variants {
-  --bs-table-bg: transparent;
-  --bs-table-color: var(--es-ink);
-  --bs-table-border-color: var(--es-line);
-  font-size: .9375rem;
-}
-.es-variants th { font-weight: 600; color: var(--es-muted); font-size: .8125rem; }
-.es-variants td.es-catno { color: var(--es-catno-color); }
-.es-variants .es-nowrap { white-space: nowrap; }
+.es-variants { font-size: .9375rem; }
 
 .es-prose { max-width: 68ch; }
 .es-prose p { margin-bottom: 1em; }
@@ -594,7 +682,7 @@ h3, .h3 { font-size: 1.25rem; }
   color: var(--es-ink);
   padding: .75rem 0;
 }
-.es-pager a span { font-size: .8125rem; color: var(--es-muted); }
+.es-pager a span { font-size: var(--es-text-sm); color: var(--es-muted); }
 .es-pager a:hover strong { text-decoration: underline; }
 
 /* GLightbox caption in project colours */
@@ -606,25 +694,25 @@ h3, .h3 { font-size: 1.25rem; }
   font-size: .9375rem;
 }
 
-/* ------------------------------------------------------------------
- * Footer
- * ------------------------------------------------------------------ */
+/* ---- Footer */
 .es-footer {
   border-top: 1px solid var(--es-line);
   color: var(--es-muted);
-  font-size: .875rem;
+  font-size: var(--es-text-md);
 }
 .es-footer a { color: inherit; }
+.es-footer [data-es-auth] { margin-left: .5rem; }
 /* Unobtrusive admin entry: reads as plain footer text until hovered. */
 .es-footer .es-quiet-link { text-decoration: none; }
 .es-footer .es-quiet-link:hover,
 .es-footer .es-quiet-link:focus-visible { text-decoration: underline; color: var(--es-ink); }
-.es-footer [data-es-auth] { margin-left: .5rem; }
 .es-footer [data-es-auth="admin"] a { text-decoration: underline; }
 
-/* ------------------------------------------------------------------
- * Login page
- * ------------------------------------------------------------------ */
+/* ==================================================================
+ * 5. Project components, login and admin area
+ * ================================================================== */
+
+/* ---- Login page */
 .es-auth-page {
   min-height: calc(100vh - 9rem);
   display: grid;
@@ -653,9 +741,18 @@ h3, .h3 { font-size: 1.25rem; }
   border: 1px dashed var(--es-muted);
   border-radius: var(--bs-border-radius);
 }
-.es-captcha .form-check-input { width: 1.5rem; height: 1.5rem; margin-top: 0; }
-.es-captcha .form-check { display: flex; align-items: center; gap: .75rem; padding-left: 0; }
-.es-captcha .form-check .form-check-input { float: none; margin-left: 0; }
+.es-captcha .form-check {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding-left: 0;
+}
+.es-captcha .form-check .form-check-input {
+  float: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+}
 .es-captcha-mark {
   display: flex;
   flex-direction: column;
@@ -666,13 +763,11 @@ h3, .h3 { font-size: 1.25rem; }
 }
 .es-captcha-mark .bi { font-size: 1.5rem; color: var(--es-primary); }
 
-/* ------------------------------------------------------------------
- * Admin area
- * ------------------------------------------------------------------ */
+/* ---- Admin shell */
 .es-brand-role {
   font-family: var(--es-font-text);
   font-weight: 500;
-  font-size: .875rem;
+  font-size: var(--es-text-md);
   opacity: .8;
   align-self: flex-end;
   margin-bottom: .2rem;
@@ -690,18 +785,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-panel h2 { font-size: 1.25rem; margin-bottom: 1rem; }
 .es-panel-sticky { position: sticky; top: 1rem; }
 
-.es-drag {
-  cursor: grab;
-  color: var(--es-muted);
-  border: 0;
-  background: none;
-  padding: 0 .25rem;
-  line-height: 1;
-}
-.es-drag:hover { color: var(--es-ink); }
-
-/* Admin rubricator: the public pedigree tree with edit controls */
-.es-tree-admin .es-node a { flex: 1; }
+/* ---- Admin rubricator: the public pedigree tree with edit controls */
 .es-tree-admin .es-node-actions {
   display: flex;
   gap: .125rem;
@@ -716,33 +800,21 @@ h3, .h3 { font-size: 1.25rem; }
 .es-node-actions .btn {
   --bs-btn-padding-x: .3rem;
   --bs-btn-padding-y: .1rem;
-  --bs-btn-color: var(--es-muted);
-  --bs-btn-hover-color: var(--es-ink);
   --bs-btn-hover-bg: var(--es-paper);
-  --bs-btn-border-width: 0;
 }
-.es-node-actions .btn.es-danger-action { --bs-btn-hover-color: var(--es-danger); }
-.es-node .es-hidden-mark { color: var(--es-muted); font-size: .8125rem; margin-left: .25rem; }
+.es-node .es-hidden-mark { color: var(--es-muted); font-size: var(--es-text-sm); margin-left: .25rem; }
 
-/* Items table */
-/* Keeps visually-hidden labels inside the scroll box from widening the page */
-.table-responsive { position: relative; }
+/* ---- Items table */
 .es-admin-table {
-  --bs-table-bg: transparent;
-  --bs-table-color: var(--es-ink);
-  --bs-table-border-color: var(--es-line);
-  --bs-table-hover-bg: rgba(var(--es-primary-rgb), .06);
+  --bs-table-hover-bg: color-mix(in srgb, var(--es-primary) 6%, transparent);
   --bs-table-hover-color: var(--es-ink);
   margin-bottom: 0;
 }
-.es-admin-table th {
-  font-weight: 600;
-  font-size: .8125rem;
-  color: var(--es-muted);
-  white-space: nowrap;
-}
+.es-admin-table th { white-space: nowrap; }
 .es-admin-table td { vertical-align: middle; }
-.es-admin-table td.es-catno { color: var(--es-catno-color); white-space: nowrap; }
+.es-admin-table .es-col-check { width: 2.5rem; }
+.es-admin-table .es-col-thumb { width: 4.5rem; }
+.es-admin-table .es-col-title { min-width: 15rem; }
 .es-admin-table .es-thumb {
   width: 3.5rem;
   aspect-ratio: 4 / 3;
@@ -750,21 +822,26 @@ h3, .h3 { font-size: 1.25rem; }
   border: 1px solid var(--es-line);
   display: block;
 }
-.es-admin-table .es-col-title { min-width: 15rem; }
 .es-admin-table .es-title { font-weight: 600; color: var(--es-ink); text-decoration: none; }
 .es-admin-table .es-title:hover { text-decoration: underline; }
-.es-admin-table .es-path { display: block; font-size: .8125rem; color: var(--es-muted); }
+.es-admin-table .es-path { display: block; font-size: var(--es-text-sm); color: var(--es-muted); }
 
 .es-status {
   display: inline-block;
   padding: .15rem .55rem;
-  border-radius: 2rem;
-  font-size: .8125rem;
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-sm);
   font-weight: 500;
   white-space: nowrap;
 }
-.es-status-published { background: rgba(var(--es-primary-rgb), .12); color: var(--es-primary); }
-.es-status-draft { background: rgba(var(--es-accent-rgb), .12); color: var(--es-accent); }
+.es-status-published {
+  background: color-mix(in srgb, var(--es-primary) 12%, transparent);
+  color: var(--es-primary);
+}
+.es-status-draft {
+  background: color-mix(in srgb, var(--es-accent) 12%, transparent);
+  color: var(--es-accent);
+}
 
 .es-bulk {
   display: flex;
@@ -772,13 +849,12 @@ h3, .h3 { font-size: 1.25rem; }
   align-items: center;
   gap: .5rem 1rem;
   padding: .5rem 1rem;
-  background: rgba(var(--es-primary-rgb), .1);
+  background: color-mix(in srgb, var(--es-primary) 10%, transparent);
   border: 1px solid var(--es-line);
   border-radius: var(--bs-border-radius);
 }
-.es-bulk[hidden] { display: none; }
 
-/* Item editor */
+/* ---- Item editor */
 .es-photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
@@ -799,9 +875,9 @@ h3, .h3 { font-size: 1.25rem; }
   left: .875rem;
   background: var(--es-primary);
   color: var(--es-on-primary);
-  font-size: .75rem;
+  font-size: var(--es-text-xs);
   padding: .1rem .5rem;
-  border-radius: 2rem;
+  border-radius: var(--es-radius-pill);
 }
 .es-photo-tools {
   display: flex;
@@ -809,7 +885,7 @@ h3, .h3 { font-size: 1.25rem; }
   justify-content: space-between;
   margin-top: .5rem;
 }
-.es-photo .form-control { margin-top: .5rem; font-size: .8125rem; }
+.es-photo .form-control { margin-top: .5rem; font-size: var(--es-text-sm); }
 
 .es-dropzone {
   display: flex;
@@ -820,7 +896,7 @@ h3, .h3 { font-size: 1.25rem; }
   min-height: 100%;
   padding: 1rem;
   text-align: center;
-  font-size: .875rem;
+  font-size: var(--es-text-md);
   color: var(--es-muted);
   border: 1px dashed var(--es-muted);
   border-radius: var(--bs-border-radius);
@@ -829,6 +905,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-dropzone:hover { color: var(--es-ink); border-color: var(--es-primary); }
 .es-dropzone .bi { font-size: 1.75rem; color: var(--es-primary); }
 
+/* Editable lists (attributes, variants): one grid row per entry */
 .es-rows { display: grid; gap: .5rem; }
 .es-row {
   display: grid;
@@ -837,11 +914,6 @@ h3, .h3 { font-size: 1.25rem; }
   align-items: center;
 }
 .es-row-variant { grid-template-columns: auto minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1.4fr) auto; }
-.es-row-head {
-  font-size: .8125rem;
-  color: var(--es-muted);
-  font-weight: 600;
-}
 @media (max-width: 575.98px) {
   .es-row,
   .es-row-variant { grid-template-columns: auto 1fr auto; }
@@ -850,16 +922,10 @@ h3, .h3 { font-size: 1.25rem; }
   .es-row-variant > :nth-child(4) { grid-column: 2; }
   .es-row-head { display: none; }
 }
-.es-icon-btn {
-  --bs-btn-padding-x: .45rem;
-  --bs-btn-color: var(--es-muted);
-  --bs-btn-hover-color: var(--es-danger);
-  --bs-btn-border-width: 0;
-}
 
-/* ------------------------------------------------------------------
- * Motion preferences
- * ------------------------------------------------------------------ */
+/* ==================================================================
+ * 6. Motion preferences
+ * ================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition: none !important;
