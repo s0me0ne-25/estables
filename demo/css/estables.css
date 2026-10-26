@@ -598,7 +598,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-footer .es-quiet-link:hover,
 .es-footer .es-quiet-link:focus-visible { text-decoration: underline; color: var(--es-ink); }
 .es-footer [data-es-auth] { margin-left: .5rem; }
-.es-footer [data-es-logout] { text-decoration: underline; }
+.es-footer [data-es-auth="admin"] a { text-decoration: underline; }
 
 /* ------------------------------------------------------------------
  * Login page
