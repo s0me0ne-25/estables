@@ -57,7 +57,7 @@ final class Kernel
             $response = $this->page('errors/http', [
                 'title' => 'Ошибка на сервере',
                 'heading' => 'Ошибка на сервере',
-                'text' => 'Что-то пошло не так. Подробности записаны в журнал сайта.',
+                'text' => 'Что-то пошло не так. Подробности записаны в журнал сайта var/log/estables.log.',
                 'details' => $this->debug ? $e::class . ': ' . $e->getMessage() . "\n\n" . $e->getTraceAsString() : null,
                 'noindex' => true,
             ], 500);

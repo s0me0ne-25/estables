@@ -1,11 +1,13 @@
 # Local configuration with secrets.
 # Every such file has a committed *.template.* counterpart that is copied
 # and filled in manually (e.g. config/config.template.php -> config/config.php).
-config.php
-config.local.php
-.env
-.env.*
-!.env.template
+# Patterns are anchored to the repository root: an unanchored "config.php"
+# also hides src/Core/Config.php on case-insensitive file systems.
+/config/config.php
+/config/config.local.php
+/.env
+/.env.*
+!/.env.template
 
 # Runtime data: cache, logs, backups, install token (see docs/INSTALL.md)
 /var/
