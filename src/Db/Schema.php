@@ -23,7 +23,7 @@ namespace Estables\Db;
  */
 final class Schema
 {
-    public const VERSION = 6;
+    public const VERSION = 11;
 
     /** Table options shared by every table. */
     private const TABLE_OPTIONS = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=' . Connection::COLLATION;
@@ -130,6 +130,87 @@ final class Schema
                     KEY ix_slug_history_target (kind, target_id)
                 ) ' . self::TABLE_OPTIONS);
                 $stepDone(6);
+                // no break
+            case 6:
+                // Build 4: items. catno_sort pads the digits of the number for natural
+                // ordering; search_text gathers characteristics and variants for FULLTEXT.
+                $this->db->exec('CREATE TABLE IF NOT EXISTS items (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    catno VARCHAR(64) NOT NULL,
+                    catno_sort VARCHAR(191) NOT NULL,
+                    slug VARCHAR(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    summary TEXT NOT NULL,
+                    description MEDIUMTEXT NOT NULL,
+                    year_from SMALLINT UNSIGNED NULL,
+                    year_to SMALLINT UNSIGNED NULL,
+                    is_published TINYINT(1) NOT NULL DEFAULT 0,
+                    search_text MEDIUMTEXT NOT NULL,
+                    created_at DATETIME NOT NULL,
+                    updated_at DATETIME NOT NULL,
+                    updated_by INT UNSIGNED NULL,
+                    UNIQUE KEY uq_items_catno (catno),
+                    UNIQUE KEY uq_items_slug (slug),
+                    KEY ix_items_catno_sort (catno_sort),
+                    KEY ix_items_updated (updated_at),
+                    FULLTEXT KEY ft_items (catno, name, summary, description, search_text),
+                    CONSTRAINT fk_items_user FOREIGN KEY (updated_by) REFERENCES users (id) ON DELETE SET NULL
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(7);
+                // no break
+            case 7:
+                // Build 4: items in rubrics, like tags; one link per item is the main one.
+                // position: authorial order inside the rubric, with gaps.
+                $this->db->exec('CREATE TABLE IF NOT EXISTS item_rubrics (
+                    item_id INT UNSIGNED NOT NULL,
+                    rubric_id INT UNSIGNED NOT NULL,
+                    is_main TINYINT(1) NOT NULL DEFAULT 0,
+                    position INT NOT NULL,
+                    added_at DATETIME(6) NOT NULL,
+                    PRIMARY KEY (item_id, rubric_id),
+                    KEY ix_item_rubrics_order (rubric_id, position),
+                    CONSTRAINT fk_item_rubrics_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+                    CONSTRAINT fk_item_rubrics_rubric FOREIGN KEY (rubric_id) REFERENCES rubrics (id)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(8);
+                // no break
+            case 8:
+                // Build 4: dictionary of characteristic names
+                $this->db->exec('CREATE TABLE IF NOT EXISTS attribute_names (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(150) NOT NULL,
+                    UNIQUE KEY uq_attribute_names (name)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(9);
+                // no break
+            case 9:
+                // Build 4: characteristics of items; (name, value) prepares value suggestions
+                $this->db->exec('CREATE TABLE IF NOT EXISTS item_attributes (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    item_id INT UNSIGNED NOT NULL,
+                    name_id INT UNSIGNED NOT NULL,
+                    value VARCHAR(500) NOT NULL,
+                    position INT NOT NULL,
+                    KEY ix_item_attributes_item (item_id, position),
+                    KEY ix_item_attributes_value (name_id, value(100)),
+                    CONSTRAINT fk_item_attributes_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+                    CONSTRAINT fk_item_attributes_name FOREIGN KEY (name_id) REFERENCES attribute_names (id)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(10);
+                // no break
+            case 10:
+                // Build 4: variants of items
+                $this->db->exec('CREATE TABLE IF NOT EXISTS item_variants (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    item_id INT UNSIGNED NOT NULL,
+                    number VARCHAR(64) NOT NULL,
+                    finish VARCHAR(500) NOT NULL,
+                    years VARCHAR(64) NOT NULL,
+                    position INT NOT NULL,
+                    KEY ix_item_variants_item (item_id, position),
+                    CONSTRAINT fk_item_variants_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(11);
                 // no break
             default:
                 // Up to date.

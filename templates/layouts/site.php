@@ -41,7 +41,7 @@ $header ??= 'site';
 
 <a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
 
-<?= $this->partial('partials/header-' . $header, ['activeNav' => $activeNav]) ?>
+<?= $this->partial('partials/header-' . $header, ['activeNav' => $activeNav, 'searchQuery' => $searchQuery ?? '']) ?>
 
 <?= $content ?>
 

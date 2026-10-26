@@ -162,10 +162,6 @@ final class UsersPageTest extends DatabaseTestCase
         self::assertSame(0, (int) $this->db->value('SELECT COUNT(*) FROM sessions'));
     }
 
-    public function testPlaceholdersOfLaterBuilds(): void
-    {
-        self::assertStringContainsString('появятся в сборке 4', $this->browser->get('/admin/')->body());
-    }
 
     private function signIn(string $login, ?string $userAgent = null): Browser
     {

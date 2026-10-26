@@ -13,7 +13,11 @@ namespace Estables\Catalog;
  *
  * Parent 0 stands for the top level.
  *
- * @phpstan-type Node array{id: int, parent: int, slug: string, name: string, visible: bool, count: int}
+ * Every node carries aggregates of its subtree: distinct published items
+ * ("count"), their variants and the span of their years. Items of a hidden
+ * rubric count in that rubric but not above it.
+ *
+ * @phpstan-type Node array{id: int, parent: int, slug: string, name: string, visible: bool, count: int, variants: int, yearMin: ?int, yearMax: ?int}
  */
 final class RubricTree
 {

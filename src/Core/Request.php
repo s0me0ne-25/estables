@@ -66,6 +66,24 @@ final readonly class Request
     }
 
     /**
+     * A repeated form field (name[]) as a list of trimmed strings.
+     *
+     * @return list<string>
+     */
+    public function inputList(string $name): array
+    {
+        $values = $this->post[$name] ?? [];
+        if (!\is_array($values)) {
+            return [];
+        }
+
+        return array_values(array_map(
+            static fn(mixed $value): string => \is_string($value) ? trim($value) : '',
+            $values,
+        ));
+    }
+
+    /**
      * Whether the form sent the field at all (a disabled field is not sent).
      */
     public function has(string $name): bool

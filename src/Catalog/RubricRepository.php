@@ -54,7 +54,7 @@ final class RubricRepository
                 return $this->tree = new RubricTree($nodes);
             }
         }
-        $this->tree = $this->loadTree();
+        $this->tree = $this->loadTree(true);
         try {
             $this->paths->writeAtomic($file, serialize($this->tree->toArray()));
         } catch (\RuntimeException) {
@@ -373,22 +373,77 @@ final class RubricRepository
         }
     }
 
-    private function loadTree(): RubricTree
+    /**
+     * Reads the tree; with $stats also the aggregates of published items.
+     */
+    private function loadTree(bool $stats = false): RubricTree
     {
         $nodes = [];
-        foreach ($this->db->run('SELECT id, parent_id, slug, name, is_visible FROM rubrics ORDER BY position, id')->fetchAll() as $row) {
-            /** @var array<string, mixed> $row */
-            $nodes[] = [
-                'id' => (int) $row['id'],
+        foreach ($this->db->rows('SELECT id, parent_id, slug, name, is_visible FROM rubrics ORDER BY position, id') as $row) {
+            $id = (int) $row['id'];
+            $nodes[$id] = [
+                'id' => $id,
                 'parent' => (int) ($row['parent_id'] ?? 0),
                 'slug' => (string) $row['slug'],
                 'name' => (string) $row['name'],
                 'visible' => (bool) $row['is_visible'],
                 'count' => 0,
+                'variants' => 0,
+                'yearMin' => null,
+                'yearMax' => null,
             ];
         }
+        if ($stats && $nodes !== []) {
+            $this->aggregate($nodes);
+        }
 
-        return new RubricTree($nodes);
+        return new RubricTree(array_values($nodes));
+    }
+
+    /**
+     * Fills count, variants and the span of years of every node from the
+     * published items of its subtree; each item counts once per node.
+     *
+     * @param array<int, Node> $nodes
+     */
+    private function aggregate(array &$nodes): void
+    {
+        $items = [];
+        $members = [];
+        $links = $this->db->rows(
+            'SELECT ir.item_id, ir.rubric_id, i.year_from, i.year_to,
+                (SELECT COUNT(*) FROM item_variants v WHERE v.item_id = i.id) AS variants
+             FROM item_rubrics ir JOIN items i ON i.id = ir.item_id WHERE i.is_published = 1',
+        );
+        foreach ($links as $link) {
+            $item = (int) $link['item_id'];
+            $from = $link['year_from'] === null ? null : (int) $link['year_from'];
+            $to = $link['year_to'] === null ? null : (int) $link['year_to'];
+            $items[$item] = ['variants' => (int) $link['variants'], 'min' => $from ?? $to, 'max' => $to ?? $from];
+            // Up the tree; a hidden rubric keeps its items to itself
+            for ($rubric = (int) $link['rubric_id']; isset($nodes[$rubric]); $rubric = $nodes[$rubric]['parent']) {
+                $members[$rubric][$item] = true;
+                if (!$nodes[$rubric]['visible']) {
+                    break;
+                }
+            }
+        }
+        foreach ($members as $rubric => $set) {
+            $node = &$nodes[$rubric];
+            $node['count'] = \count($set);
+            foreach (array_keys($set) as $item) {
+                $node['variants'] += $items[$item]['variants'];
+                $min = $items[$item]['min'];
+                $max = $items[$item]['max'];
+                if ($min !== null && ($node['yearMin'] === null || $min < $node['yearMin'])) {
+                    $node['yearMin'] = $min;
+                }
+                if ($max !== null && ($node['yearMax'] === null || $max > $node['yearMax'])) {
+                    $node['yearMax'] = $max;
+                }
+            }
+            unset($node);
+        }
     }
 
     private function cacheFile(): string

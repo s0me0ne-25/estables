@@ -1118,3 +1118,6 @@ body {
   font-size: 2.5rem;
   color: var(--es-line);
 }
+
+/* ---- Admin list: thumbnail cell of an item without photos (photos come in build 5) */
+.es-admin-table .es-thumb-empty { background: var(--es-surface); }

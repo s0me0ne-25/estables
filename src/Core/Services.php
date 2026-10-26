@@ -12,6 +12,7 @@ use Estables\Auth\Csrf;
 use Estables\Auth\LoginThrottle;
 use Estables\Auth\SessionStore;
 use Estables\Auth\UserRepository;
+use Estables\Catalog\ItemRepository;
 use Estables\Catalog\RubricRepository;
 use Estables\Db\Backup;
 use Estables\Db\Connection;
@@ -27,6 +28,7 @@ final class Services
     private ?Connection $db = null;
     private ?UserRepository $users = null;
     private ?RubricRepository $rubrics = null;
+    private ?ItemRepository $items = null;
 
     public function __construct(
         public readonly Paths $paths,
@@ -57,6 +59,11 @@ final class Services
     public function rubrics(): RubricRepository
     {
         return $this->rubrics ??= new RubricRepository($this->db(), $this->paths);
+    }
+
+    public function items(): ItemRepository
+    {
+        return $this->items ??= new ItemRepository($this->db(), $this->rubrics());
     }
 
     public function sessions(): SessionStore

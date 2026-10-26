@@ -4,9 +4,11 @@
  * Header of the public site.
  *
  * @var \Estables\Core\View $this
- * @var string              $activeNav key of the current menu item
+ * @var string              $activeNav   key of the current menu item
+ * @var string              $searchQuery text of the search field
  */
 $activeNav ??= '';
+$searchQuery ??= '';
 $items = [
     'catalog' => ['Каталог', $this->url('home')],
     'about' => ['О справочнике', $this->url('about')],
@@ -32,9 +34,11 @@ $items = [
           <?php endforeach ?>
         </ul>
 
-        <div class="d-flex gap-2 align-items-center">
+        <form class="d-flex gap-2 align-items-center" role="search" method="get" action="/search/">
+          <label class="visually-hidden" for="q">Поиск по каталогу</label>
+          <input class="form-control" type="search" id="q" name="q" value="<?= $this->e($searchQuery) ?>" placeholder="Поиск по каталогу">
           <?= $this->partial('partials/theme-menu') ?>
-        </div>
+        </form>
       </div>
     </div>
   </nav>

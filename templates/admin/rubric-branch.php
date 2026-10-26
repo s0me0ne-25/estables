@@ -8,6 +8,7 @@
  * @var int                         $parent    rubric whose children are listed (0: top level)
  * @var int                         $selected  rubric being edited, 0 if none
  * @var array<int, true>            $open      expanded branches
+ * @var array<int, array{items: int, shared: int}> $stats items linked directly, and how many of them have other rubrics
  */
 foreach ($tree->children($parent) as $id):
     $node = $tree->node($id);
@@ -26,12 +27,12 @@ foreach ($tree->children($parent) as $id):
     <a href="/admin/rubrics/?id=<?= $id ?>"<?= $id === $selected ? ' aria-current="true"' : '' ?>><span><?= $name ?><?php if (!$node['visible']): ?><i class="bi bi-eye-slash es-hidden-mark" aria-hidden="true" title="Скрыт на сайте"></i><span class="visually-hidden">, скрыт на сайте</span><?php endif ?></span> <span class="es-count"><?= $node['count'] ?></span></a>
     <div class="es-node-actions">
       <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="/admin/rubrics/?new=1&amp;parent=<?= $id ?>"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «<?= $name ?>»</span></button>
-      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="<?= $id ?>" data-es-rubric-name="<?= $name ?>" data-es-rubric-children="<?= \count($children) ?>"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «<?= $name ?>»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="<?= $id ?>" data-es-rubric-name="<?= $name ?>" data-es-rubric-children="<?= \count($children) ?>" data-es-rubric-items="<?= $stats[$id]['items'] ?? 0 ?>" data-es-rubric-shared="<?= $stats[$id]['shared'] ?? 0 ?>"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «<?= $name ?>»</span></button>
     </div>
   </div>
 <?php if ($children !== []): ?>
   <ul class="collapse<?= isset($open[$id]) ? ' show' : '' ?>" id="a-<?= $id ?>">
-<?= $this->partial('admin/rubric-branch', ['tree' => $tree, 'parent' => $id, 'selected' => $selected, 'open' => $open]) ?>
+<?= $this->partial('admin/rubric-branch', ['tree' => $tree, 'parent' => $id, 'selected' => $selected, 'open' => $open, 'stats' => $stats]) ?>
   </ul>
 <?php endif ?>
 </li>

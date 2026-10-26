@@ -26,4 +26,23 @@ final class Text
 
         return "{$n} {$word}";
     }
+
+    /**
+     * "12 марта 2025" in the site's time zone.
+     */
+    public static function longDate(\DateTimeInterface $date): string
+    {
+        $months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        $local = \DateTimeImmutable::createFromInterface($date)->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+
+        return $local->format('j') . ' ' . $months[(int) $local->format('n') - 1] . ' ' . $local->format('Y');
+    }
+
+    /**
+     * "1 996": thousands separated by a narrow no-break space, as in Russian typography.
+     */
+    public static function number(int $n): string
+    {
+        return number_format($n, 0, ',', "\u{202F}");
+    }
 }

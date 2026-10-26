@@ -51,9 +51,28 @@ final class RubricsController
             $id = (int) $request->input('id');
             if ($request->input('action') === 'delete') {
                 try {
-                    $parent = $rubrics->tree()->has($id) ? $rubrics->tree()->node($id)['parent'] : 0;
-                    $rubrics->delete($id);
-                    $this->services->logger->info("Rubric {$id} deleted");
+                    $tree = $rubrics->tree();
+                    $parent = $tree->has($id) ? $tree->node($id)['parent'] : 0;
+                    $mode = $request->input('items');
+                    $stats = $this->services->items()->rubricStats()[$id] ?? ['items' => 0, 'shared' => 0];
+                    if ($mode !== 'move' && $mode !== 'delete' && $stats['items'] > $stats['shared']) {
+                        throw new RubricException('Выберите, что сделать с предметами раздела: перенести или удалить.');
+                    }
+                    $target = $mode === 'move' ? (int) $request->input('target') : null;
+                    if ($target !== null && ($target === $id || !$tree->has($target))) {
+                        throw new RubricException('Выберите другой раздел, куда перенести предметы.');
+                    }
+                    $released = $this->services->db()->transaction(function () use ($rubrics, $id, $target): array {
+                        if ($rubrics->tree()->children($id) !== []) {
+                            throw new RubricException('Сначала перенесите или удалите подразделы этого раздела.');
+                        }
+                        $released = $this->services->items()->release($id, $target);
+                        $rubrics->delete($id);
+
+                        return $released;
+                    });
+                    $rubrics->invalidate();
+                    $this->services->logger->info("Rubric {$id} deleted; items moved {$released['moved']}, deleted {$released['deleted']}, unlinked {$released['unlinked']}");
 
                     return Response::redirect(self::PATH . ($parent !== 0 ? "?id={$parent}&" : '?') . 'done=deleted', 303);
                 } catch (RubricException $e) {
@@ -113,6 +132,8 @@ final class RubricsController
             'notice' => self::NOTICES[$done] ?? null,
             'open' => $this->openBranches($tree, $rubric, $creating ? $input['parent'] : 0),
             'parents' => $input === null ? [] : $this->parentOptions($tree, $rubric),
+            'stats' => $this->services->items()->rubricStats(),
+            'targets' => ItemsController::rubricOptions($tree),
         ]), $errors === [] && $failure === null ? 200 : 422);
     }
 

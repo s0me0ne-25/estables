@@ -81,6 +81,33 @@ final class Connection
     }
 
     /**
+     * All rows of a query.
+     *
+     * @param array<string|int, scalar|null> $params
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function rows(string $sql, array $params = []): array
+    {
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $this->run($sql, $params)->fetchAll();
+
+        return $rows;
+    }
+
+    /**
+     * The first column of every row as integers (ids).
+     *
+     * @param array<string|int, scalar|null> $params
+     *
+     * @return list<int>
+     */
+    public function ints(string $sql, array $params = []): array
+    {
+        return array_values(array_map('intval', $this->run($sql, $params)->fetchAll(\PDO::FETCH_COLUMN)));
+    }
+
+    /**
      * Executes a statement without parameters (DDL and the like).
      */
     public function exec(string $sql): void
@@ -89,7 +116,8 @@ final class Connection
     }
 
     /**
-     * Runs the callback in a transaction; rolls back on any exception.
+     * Runs the callback in a transaction; rolls back on any exception. Inside
+     * an open transaction the callback simply joins it.
      *
      * @template T
      *
@@ -100,6 +128,9 @@ final class Connection
     public function transaction(callable $callback): mixed
     {
         $pdo = $this->pdo();
+        if ($pdo->inTransaction()) {
+            return $callback();
+        }
         $pdo->beginTransaction();
         try {
             $result = $callback();
@@ -107,8 +138,10 @@ final class Connection
 
             return $result;
         } catch (\Throwable $e) {
-            if ($pdo->inTransaction()) {
+            try {
                 $pdo->rollBack();
+            } catch (\PDOException) {
+                // Already ended (MariaDB commits DDL statements implicitly)
             }
 
             throw $e;

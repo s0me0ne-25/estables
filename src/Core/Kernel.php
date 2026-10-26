@@ -9,9 +9,9 @@ namespace Estables\Core;
 use Estables\Auth\Auth;
 use Estables\Db\SchemaException;
 use Estables\Db\SchemaState;
-use Estables\Http\AdminController;
 use Estables\Http\AuthController;
 use Estables\Http\CatalogController;
+use Estables\Http\ItemsController;
 use Estables\Http\RubricsController;
 use Estables\Http\SetupController;
 use Estables\Http\UsersController;
@@ -193,16 +193,22 @@ final class Kernel
         $router->add('about', 'GET', '/about/', $catalog->about(...));
         $router->add('catalog', 'GET', '/catalog/', $catalog->catalogRoot(...));
         $router->add('rubric', 'GET', '/catalog/{path:.+}/', $catalog->rubric(...));
+        $router->add('item', 'GET', '/item/{slug}/', $catalog->item(...));
+        $router->add('search', 'GET', '/search/', $catalog->search(...));
         if ($auth === null) {
             $setup = new SetupController($services, $view, $this->paths);
             $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
         } else {
             $login = new AuthController($services, $view, $auth);
-            $admin = new AdminController($view);
+            $items = new ItemsController($services, $view, $auth);
             $users = new UsersController($services, $view, $auth);
             $router->add('login', ['GET', 'POST'], '/login/', $login->login(...));
             $router->add('logout', 'POST', '/logout/', $login->logout(...));
-            $router->add('admin', 'GET', '/admin/', $admin->items(...));
+            $router->add('admin', 'GET', '/admin/', $items->index(...));
+            $router->add('admin.items.bulk', 'POST', '/admin/items/bulk/', $items->bulk(...));
+            $router->add('admin.items.order', 'POST', '/admin/items/order/', $items->order(...));
+            $router->add('admin.items.new', ['GET', 'POST'], '/admin/items/new/', $items->edit(...));
+            $router->add('admin.items.edit', ['GET', 'POST'], '/admin/items/{id:\d+}/', $items->edit(...));
             $rubrics = new RubricsController($services, $view);
             $router->add('admin.rubrics', ['GET', 'POST'], '/admin/rubrics/', $rubrics->handle(...));
             $router->add('admin.rubrics.move', 'POST', '/admin/rubrics/move/', $rubrics->move(...));

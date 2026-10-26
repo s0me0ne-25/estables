@@ -10,6 +10,9 @@
  * - reopening a modal form that came back with errors ([data-es-modal-open])
  * - drag-and-drop sorting with mouse, touch and keyboard ([data-es-sortable])
  * - the admin rubricator: saving moves, the delete dialog, the slug prefix
+ * - the item editor: rubrics with the main one, rows of characteristics and variants
+ * - the admin list of items: selection for bulk actions, filters, authorial order
+ * - the catalogue: grid or list view, the visitor's sort order (es_sort cookie)
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
@@ -18,7 +21,12 @@
 
   const STORAGE_KEYS = {
     theme: 'estables-theme',
+    view: 'estables-view',
   };
+
+  // The visitor's sort order: a cookie, because the server sorts and pages the list.
+  const SORT_COOKIE = 'es_sort';
+  const SORT_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 
   /* ---------------------------------------------------------------- helpers */
 
@@ -140,6 +148,43 @@
       const field = modal.querySelector('.is-invalid') || modal.querySelector('input:not([type="hidden"]):not([hidden])');
       if (field) field.focus();
     }, { once: true });
+  };
+
+  /* -------------------------------------------------------- catalogue view */
+
+  // Grid or list; the choice is remembered in this browser.
+  const initCatalogView = () => {
+    const catalog = document.querySelector('[data-es-catalog]');
+    const buttons = Array.from(document.querySelectorAll('[data-es-view]'));
+    if (!catalog || !buttons.length) return;
+    const apply = (view) => {
+      catalog.classList.toggle('is-list', view === 'list');
+      setActive(buttons, buttons.find((btn) => btn.dataset.esView === view) || buttons[0], 'aria-pressed');
+    };
+    apply(storage.get(STORAGE_KEYS.view) === 'list' ? 'list' : 'grid');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        storage.set(STORAGE_KEYS.view, btn.dataset.esView);
+        apply(btn.dataset.esView);
+      });
+    });
+  };
+
+  /*
+   * Sort order of the catalogue. The visitor's choice becomes their default on
+   * the whole site (stored in a cookie); the server sorts, so the page reloads
+   * from its first page, without ?sort= in the address.
+   */
+  const initCatalogSort = () => {
+    const select = document.querySelector('[data-es-sort]');
+    if (!select) return;
+    select.addEventListener('change', () => {
+      document.cookie = `${SORT_COOKIE}=${encodeURIComponent(select.value)}; Max-Age=${SORT_COOKIE_MAX_AGE}; Path=/; SameSite=Lax`;
+      const url = new URL(window.location.href);
+      url.searchParams.delete('sort');
+      url.searchParams.delete('page');
+      window.location.assign(url.toString());
+    });
   };
 
   /* ------------------------------------------------- drag-and-drop sorting */
@@ -552,20 +597,55 @@
     });
   };
 
+  // "1 предмет", "2 предмета", "5 предметов".
+  const plural = (n, one, few, many) => {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    const word = mod10 === 1 && mod100 !== 11 ? one
+      : (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? few : many);
+    return `${n} ${word}`;
+  };
+
   // The delete dialog of the rubricator serves every rubric: the button that
-  // opens it carries the rubric's id, name and number of subrubrics.
+  // opens it carries the rubric's id, name, number of subrubrics and items.
   const initRubricDelete = () => {
     const modal = document.querySelector('[data-es-rubric-delete-modal]');
     if (!modal) return;
+    const part = (name) => modal.querySelector(`[data-es-rubric-delete-${name}]`);
     modal.addEventListener('show.bs.modal', (event) => {
       const button = event.relatedTarget;
       if (!button) return;
+      const id = button.dataset.esRubricDelete;
       const busy = Number(button.dataset.esRubricChildren) > 0;
-      modal.querySelector('[data-es-rubric-delete-id]').value = button.dataset.esRubricDelete;
-      modal.querySelector('[data-es-rubric-delete-name]').textContent = button.dataset.esRubricName;
-      modal.querySelector('[data-es-rubric-delete-empty]').hidden = busy;
-      modal.querySelector('[data-es-rubric-delete-busy]').hidden = !busy;
-      modal.querySelector('[data-es-rubric-delete-submit]').disabled = busy;
+      const items = Number(button.dataset.esRubricItems || 0);
+      const shared = Number(button.dataset.esRubricShared || 0);
+      const own = items - shared;
+      part('id').value = id;
+      part('name').textContent = button.dataset.esRubricName;
+      part('empty').hidden = busy || items > 0;
+      part('busy').hidden = !busy;
+      part('items').hidden = busy || items === 0;
+      part('choice').hidden = own === 0;
+      part('submit').disabled = busy;
+      let text = `В разделе ${plural(items, 'предмет', 'предмета', 'предметов')}.`;
+      if (own === 0) {
+        text += ' Все они есть и в других разделах: связь с этим разделом просто снимется.';
+      } else {
+        if (shared > 0) {
+          text += ` ${shared} из них есть и в других разделах: у них связь с этим разделом просто снимется.`;
+        }
+        text += ` Для ${shared > 0 ? 'остальных ' : ''}${plural(own, 'предмета', 'предметов', 'предметов')} раздел единственный. Что с ${own === 1 ? 'ним' : 'ними'} сделать?`;
+      }
+      part('summary').textContent = text;
+      part('all').textContent = `Удалить ${own === 1 ? 'этот предмет' : `эти ${plural(own, 'предмет', 'предмета', 'предметов')}`}`;
+      // Items cannot move into the rubric being deleted
+      const target = part('target');
+      Array.from(target.options).forEach((option) => { option.disabled = option.value === id; });
+      if (target.selectedOptions[0]?.disabled) {
+        target.value = Array.from(target.options).find((option) => !option.disabled)?.value || '';
+      }
+      modal.querySelector('#delMove').disabled = !target.value;
+      modal.querySelector(target.value ? '#delMove' : '#delAll').checked = true;
     });
   };
 
@@ -590,6 +670,184 @@
     });
   };
 
+  /* ------------------------------------------------- admin table selection */
+
+  const initBulkSelection = () => {
+    const rows = Array.from(document.querySelectorAll('[data-es-select]'));
+    if (!rows.length) return;
+    const selectAll = document.querySelector('[data-es-select-all]');
+    const bar = document.querySelector('[data-es-bulk]');
+    const count = document.querySelector('[data-es-bulk-count]');
+
+    const update = () => {
+      const selected = rows.filter((c) => c.checked).length;
+      if (bar) bar.hidden = selected === 0;
+      if (count) count.textContent = String(selected);
+      if (selectAll) {
+        selectAll.checked = selected > 0 && selected === rows.length;
+        selectAll.indeterminate = selected > 0 && selected < rows.length;
+      }
+    };
+    const setAll = (checked) => {
+      rows.forEach((c) => { c.checked = checked; });
+      update();
+    };
+
+    rows.forEach((c) => c.addEventListener('change', update));
+    selectAll?.addEventListener('change', () => setAll(selectAll.checked));
+    document.querySelector('[data-es-bulk-clear]')?.addEventListener('click', () => setAll(false));
+    update();
+  };
+
+  // Filter forms apply a choice at once; the search field on Enter.
+  const initAutoSubmit = () => {
+    document.querySelectorAll('form[data-es-autosubmit]').forEach((form) => {
+      form.querySelectorAll('select').forEach((select) => {
+        select.addEventListener('change', () => form.requestSubmit());
+      });
+    });
+  };
+
+  /* -------------------------------------------- admin: authorial order */
+
+  // Items of a rubric: drag and drop or the up / down buttons in each row.
+  // The position column is renumbered after every move, and the move goes
+  // to the server as "after the previous row" (or "before the next one").
+  const initOrderTable = () => {
+    const body = document.querySelector('[data-es-order]');
+    const sortable = body && sortables.get(body);
+    if (!sortable) return;
+    const firstPos = Number(body.querySelector('[data-es-order-pos]')?.textContent || 1);
+    const failure = document.querySelector('[data-es-order-error]');
+    let queue = Promise.resolve();
+
+    const save = (row) => {
+      const prev = row.previousElementSibling;
+      const next = row.nextElementSibling;
+      const data = new FormData();
+      data.append('_csrf', body.dataset.esCsrf);
+      data.append('rubric', body.dataset.esOrderRubric);
+      data.append('item', row.dataset.esItem);
+      if (prev?.dataset.esItem) data.append('after', prev.dataset.esItem);
+      else if (next?.dataset.esItem) data.append('before', next.dataset.esItem);
+      queue = queue.then(async () => {
+        let result = null;
+        try {
+          const response = await fetch(body.dataset.esOrderUrl, {
+            method: 'POST', body: data, credentials: 'same-origin', headers: { Accept: 'application/json' },
+          });
+          if ((response.headers.get('Content-Type') || '').includes('application/json')) result = await response.json();
+        } catch (e) {
+          result = null;
+        }
+        if (!result) throw new Error('Не удалось сохранить порядок: нет ответа от сервера или сессия закончилась.');
+        if (!result.ok) throw new Error(result.error);
+      }).catch((e) => {
+        queue = new Promise(() => {});
+        if (failure) {
+          failure.textContent = `${e.message} Список сейчас обновится.`;
+          failure.hidden = false;
+          failure.scrollIntoView({ block: 'nearest' });
+        }
+        window.setTimeout(() => window.location.reload(), 2500);
+      });
+    };
+
+    body.addEventListener('es:sorted', (event) => {
+      body.querySelectorAll('[data-es-order-row]').forEach((row, i) => {
+        row.querySelector('[data-es-order-pos]').textContent = String(firstPos + i);
+      });
+      save(event.detail.item);
+    });
+    body.addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-es-order-move]');
+      if (!btn) return;
+      sortable.move(btn.closest('[data-es-order-row]'), btn.dataset.esOrderMove === 'up' ? -1 : 1);
+      btn.focus();
+    });
+  };
+
+  /* ------------------------------------------- admin: rubrics of an item */
+
+  // The first rubric is the main one; it can be reassigned. At least one
+  // rubric must stay, so the last one cannot be removed. Each row carries a
+  // hidden rubrics[] input; the main one goes to main_rubric.
+  const initRubricPicker = () => {
+    const list = document.querySelector('[data-es-rubrics]');
+    if (!list) return;
+    const select = document.querySelector('[data-es-rubric-select]');
+    const template = document.querySelector('[data-es-rubric-template]');
+    const mainInput = document.querySelector('[data-es-rubric-main-input]');
+
+    const items = () => Array.from(list.querySelectorAll('[data-es-rubric]'));
+    const setMain = (main) => {
+      items().forEach((li) => {
+        const on = li === main;
+        li.classList.toggle('is-main', on);
+        li.querySelector('[data-es-rubric-badge]').hidden = !on;
+        li.querySelector('[data-es-rubric-main]').hidden = on;
+      });
+      if (mainInput) mainInput.value = main ? main.dataset.esRubric : '';
+    };
+    const sync = () => {
+      const all = items();
+      const main = all.find((li) => li.classList.contains('is-main')) || all[0] || null;
+      setMain(main);
+      all.forEach((li) => {
+        li.querySelector('[data-es-rubric-remove]').disabled = all.length === 1;
+      });
+    };
+
+    list.addEventListener('click', (event) => {
+      const li = event.target.closest('[data-es-rubric]');
+      if (!li) return;
+      if (event.target.closest('[data-es-rubric-main]')) setMain(li);
+      if (event.target.closest('[data-es-rubric-remove]')) li.remove();
+      sync();
+    });
+
+    document.querySelector('[data-es-rubric-add]')?.addEventListener('click', () => {
+      const option = select?.selectedOptions[0];
+      if (!option || !template || items().some((li) => li.dataset.esRubric === option.value)) return;
+      const li = template.content.firstElementChild.cloneNode(true);
+      const path = option.dataset.esPath || option.textContent.trim();
+      li.dataset.esRubric = option.value;
+      li.querySelector('input').value = option.value;
+      li.querySelector('.es-rubric-path').textContent = path;
+      li.querySelector('[data-es-rubric-remove] .visually-hidden').textContent = `Убрать из раздела «${path}»`;
+      list.appendChild(li);
+      sync();
+    });
+    sync();
+  };
+
+  // Rows of characteristics and variants: "add" clones the row template,
+  // the cross removes a row; rows are reordered by the sorting engine.
+  const initRowEditors = () => {
+    document.querySelectorAll('[data-es-row-add]').forEach((button) => {
+      const name = button.dataset.esRowAdd;
+      const rows = document.querySelector(`[data-es-rows="${name}"]`);
+      const template = document.querySelector(`[data-es-row-template="${name}"]`);
+      if (!rows || !template) return;
+      button.addEventListener('click', () => {
+        const row = template.content.firstElementChild.cloneNode(true);
+        row.querySelectorAll('[data-es-sortable-handle]').forEach((handle) => {
+          handle.setAttribute('aria-describedby', 'es-sortable-hint-list');
+        });
+        rows.appendChild(row);
+        row.querySelector('input')?.focus();
+      });
+    });
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-es-row-remove]');
+      if (!button) return;
+      const row = button.closest('.es-row');
+      const next = row?.nextElementSibling;
+      if (next?.classList.contains('invalid-feedback')) next.remove();
+      row?.remove();
+    });
+  };
+
   /* ------------------------------------------------------------------ boot */
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -603,6 +861,13 @@
       initRubricDelete,
       initSlugPrefix,
       initButtonLinks,
+      initRubricPicker,
+      initRowEditors,
+      initBulkSelection,
+      initAutoSubmit,
+      initOrderTable,
+      initCatalogView,
+      initCatalogSort,
     ].forEach((init) => init());
   });
 })();

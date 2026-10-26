@@ -13,6 +13,8 @@
  * @var string|null                         $notice    result of the last action
  * @var array<int, true>                    $open      expanded branches
  * @var list<array{id: int, label: string, prefix: string}> $parents
+ * @var array<int, array{items: int, shared: int}> $stats items linked directly, and how many of them have other rubrics
+ * @var list<array{id: int, label: string, path: string}> $targets rubrics to move items to
  * @var string                              $csrfToken
  */
 $csrf = '<input type="hidden" name="_csrf" value="' . $this->e($csrfToken) . '">';
@@ -57,7 +59,7 @@ $children = $rubric !== null ? \count($tree->children($rubric->id)) : 0;
         <p class="es-meta mb-0">Разделов пока нет. Добавьте первый с помощью формы.</p>
 <?php else: ?>
         <ul class="es-tree es-tree-admin" data-es-sortable="tree" data-es-rubric-tree data-es-move-url="/admin/rubrics/move/" data-es-csrf="<?= $this->e($csrfToken) ?>">
-<?= $this->partial('admin/rubric-branch', ['tree' => $tree, 'parent' => 0, 'selected' => $selected, 'open' => $open]) ?>
+<?= $this->partial('admin/rubric-branch', ['tree' => $tree, 'parent' => 0, 'selected' => $selected, 'open' => $open, 'stats' => $stats]) ?>
         </ul>
 <?php endif ?>
       </section>
@@ -131,14 +133,14 @@ $children = $rubric !== null ? \count($tree->children($rubric->id)) : 0;
           </div>
 
 <?php if ($rubric !== null): ?>
-          <p class="text-body-secondary small mt-3 mb-0">В разделе <?= $this->e(\Estables\Core\Text::plural($tree->node($rubric->id)['count'], 'предмет', 'предмета', 'предметов')) ?>, <?= $children === 0 ? 'подразделов нет' : 'подразделов: ' . $children ?>.</p>
+          <p class="text-body-secondary small mt-3 mb-0">В разделе <?= $this->e(\Estables\Core\Text::plural($stats[$rubric->id]['items'] ?? 0, 'предмет', 'предмета', 'предметов')) ?>, <?= $children === 0 ? 'подразделов нет' : 'подразделов: ' . $children ?>.</p>
 <?php endif ?>
 
           <div class="d-flex flex-wrap gap-2 border-top pt-3 mt-3">
 <?php if ($rubric !== null): ?>
             <button class="btn btn-primary" type="submit">Сохранить</button>
             <button class="btn btn-outline-secondary" type="reset">Отменить изменения</button>
-            <button class="btn btn-outline-danger ms-sm-auto" type="button" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="<?= $rubric->id ?>" data-es-rubric-name="<?= $this->e($rubric->name) ?>" data-es-rubric-children="<?= $children ?>"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить раздел</button>
+            <button class="btn btn-outline-danger ms-sm-auto" type="button" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="<?= $rubric->id ?>" data-es-rubric-name="<?= $this->e($rubric->name) ?>" data-es-rubric-children="<?= $children ?>" data-es-rubric-items="<?= $stats[$rubric->id]['items'] ?? 0 ?>" data-es-rubric-shared="<?= $stats[$rubric->id]['shared'] ?? 0 ?>"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить раздел</button>
 <?php else: ?>
             <button class="btn btn-primary" type="submit">Добавить раздел</button>
 <?php if (!$tree->isEmpty()): ?>
@@ -167,6 +169,24 @@ $children = $rubric !== null ? \count($tree->children($rubric->id)) : 0;
       <div class="modal-body">
         <p class="mb-0" data-es-rubric-delete-empty>В разделе нет ни предметов, ни подразделов. Удаление нельзя отменить.</p>
         <p class="mb-0" data-es-rubric-delete-busy hidden>У раздела есть подразделы. Сначала перенесите их в другой раздел (перетаскиванием в дереве) или удалите.</p>
+        <div data-es-rubric-delete-items hidden>
+          <p data-es-rubric-delete-summary></p>
+          <div data-es-rubric-delete-choice>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="items" id="delMove" value="move" checked>
+              <label class="form-check-label" for="delMove">Перенести в другой раздел</label>
+            </div>
+            <select class="form-select mb-3 ms-4 w-auto mw-100" name="target" aria-label="Раздел для переноса" data-es-rubric-delete-target>
+<?php foreach ($targets as $option): ?>
+              <option value="<?= $option['id'] ?>"><?= $this->e($option['label']) ?></option>
+<?php endforeach ?>
+            </select>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="items" id="delAll" value="delete">
+              <label class="form-check-label" for="delAll" data-es-rubric-delete-all>Удалить эти предметы</label>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
