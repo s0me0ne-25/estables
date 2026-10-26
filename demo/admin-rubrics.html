@@ -70,7 +70,7 @@
   <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
     <div>
       <h1 class="mb-1">Рубрикатор</h1>
-      <p class="text-body-secondary mb-0">Разделы каталога и их порядок. Перетащите раздел за значок слева, чтобы изменить порядок или вложенность.</p>
+      <p class="text-body-secondary mb-0">Разделы каталога и их порядок. Перетащите раздел за значок слева, чтобы изменить порядок или вложенность. С клавиатуры: на значке клавиши ↑ ↓ меняют порядок, ← → — вложенность.</p>
     </div>
     <button class="btn btn-primary" type="button"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить раздел</button>
   </div>
@@ -81,10 +81,10 @@
     <div class="col-lg-5">
       <section class="es-panel" aria-labelledby="treeTitle">
         <h2 id="treeTitle">Разделы</h2>
-        <ul class="es-tree es-tree-admin">
+        <ul class="es-tree es-tree-admin" data-es-sortable="tree">
           <li class="is-lineage">
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Фигурки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Фигурки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-0-0-7" aria-expanded="true" aria-controls="a-0-0-7" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
               <a href="#"><span>Фигурки</span> <span class="es-count">612</span></a>
               <div class="es-node-actions">
@@ -95,7 +95,7 @@
             <ul class="collapse show" id="a-0-0-7">
               <li class="is-lineage">
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Фарфор»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Фарфор»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-1-0-6" aria-expanded="true" aria-controls="a-1-0-6" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
                   <a href="#"><span>Фарфор</span> <span class="es-count">284</span></a>
                   <div class="es-node-actions">
@@ -106,7 +106,7 @@
                 <ul class="collapse show" id="a-1-0-6">
                   <li>
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Дулёвский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Дулёвский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#"><span>Дулёвский завод</span> <span class="es-count">71</span></a>
                       <div class="es-node-actions">
@@ -117,7 +117,7 @@
                   </li>
                   <li class="is-current">
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Ленинградский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Ленинградский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#" aria-current="true"><span>Ленинградский завод</span> <span class="es-count">48</span></a>
                       <div class="es-node-actions">
@@ -128,7 +128,7 @@
                   </li>
                   <li>
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Вербилки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Вербилки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#"><span>Вербилки</span> <span class="es-count">39</span></a>
                       <div class="es-node-actions">
@@ -139,7 +139,7 @@
                   </li>
                   <li>
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Европейские мануфактуры»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Европейские мануфактуры»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#"><span>Европейские мануфактуры</span> <span class="es-count">126</span></a>
                       <div class="es-node-actions">
@@ -152,7 +152,7 @@
               </li>
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Художественное литьё»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Художественное литьё»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-1-1-20" aria-expanded="false" aria-controls="a-1-1-20" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
                   <a href="#"><span>Художественное литьё</span> <span class="es-count">97</span></a>
                   <div class="es-node-actions">
@@ -163,7 +163,7 @@
                 <ul class="collapse" id="a-1-1-20">
                   <li>
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Чугун»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Чугун»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#"><span>Чугун</span> <span class="es-count">58</span></a>
                       <div class="es-node-actions">
@@ -174,7 +174,7 @@
                   </li>
                   <li>
                     <div class="es-node">
-                      <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Бронза»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                      <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Бронза»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                       <span class="es-toggle-spacer"></span>
                       <a href="#"><span>Бронза</span> <span class="es-count">39</span></a>
                       <div class="es-node-actions">
@@ -187,7 +187,7 @@
               </li>
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Пластик и смола»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Пластик и смола»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <span class="es-toggle-spacer"></span>
                   <a href="#"><span>Пластик и смола</span> <span class="es-count">231</span></a>
                   <div class="es-node-actions">
@@ -200,7 +200,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Медали и знаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Медали и знаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-0-1-14" aria-expanded="false" aria-controls="a-0-1-14" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
               <a href="#"><span>Медали и знаки</span> <span class="es-count">187</span></a>
               <div class="es-node-actions">
@@ -211,7 +211,7 @@
             <ul class="collapse" id="a-0-1-14">
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Конный спорт»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Конный спорт»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <span class="es-toggle-spacer"></span>
                   <a href="#"><span>Конный спорт</span> <span class="es-count">104</span></a>
                   <div class="es-node-actions">
@@ -222,7 +222,7 @@
               </li>
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Ипподромы»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Ипподромы»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <span class="es-toggle-spacer"></span>
                   <a href="#"><span>Ипподромы</span> <span class="es-count">52</span></a>
                   <div class="es-node-actions">
@@ -235,7 +235,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Филателия»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Филателия»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <span class="es-toggle-spacer"></span>
               <a href="#"><span>Филателия</span> <span class="es-count">344</span></a>
               <div class="es-node-actions">
@@ -246,7 +246,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Открытки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Открытки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <span class="es-toggle-spacer"></span>
               <a href="#"><span>Открытки</span> <span class="es-count">415</span></a>
               <div class="es-node-actions">
@@ -257,7 +257,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Графика и плакаты»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Графика и плакаты»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <span class="es-toggle-spacer"></span>
               <a href="#"><span>Графика и плакаты</span> <span class="es-count">88</span></a>
               <div class="es-node-actions">
@@ -268,7 +268,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Книги и каталоги»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Книги и каталоги»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <span class="es-toggle-spacer"></span>
               <a href="#"><span>Книги и каталоги<i class="bi bi-eye-slash es-hidden-mark" aria-hidden="true" title="Скрыт на сайте"></i><span class="visually-hidden">, скрыт на сайте</span></span> <span class="es-count">0</span></a>
               <div class="es-node-actions">
@@ -279,7 +279,7 @@
           </li>
           <li>
             <div class="es-node">
-              <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Тематические подборки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Тематические подборки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
               <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-0-sets" aria-expanded="false" aria-controls="a-0-sets" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
               <a href="#"><span>Тематические подборки</span> <span class="es-count">23</span></a>
               <div class="es-node-actions">
@@ -290,7 +290,7 @@
             <ul class="collapse" id="a-0-sets">
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Кони на дыбах»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Кони на дыбах»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <span class="es-toggle-spacer"></span>
                   <a href="#"><span>Кони на дыбах</span> <span class="es-count">14</span></a>
                   <div class="es-node-actions">
@@ -301,7 +301,7 @@
               </li>
               <li>
                 <div class="es-node">
-                  <button class="es-drag" type="button" title="Перетащить" aria-label="Переместить «Орловские рысаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+                  <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Орловские рысаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
                   <span class="es-toggle-spacer"></span>
                   <a href="#"><span>Орловские рысаки</span> <span class="es-count">11</span></a>
                   <div class="es-node-actions">

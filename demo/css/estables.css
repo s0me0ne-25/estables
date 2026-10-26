@@ -845,7 +845,7 @@ h3, .h3 { font-size: 1.25rem; }
   cursor: help;
 }
 
-/* Authorial order: position column and drag feedback */
+/* Authorial order: position column */
 .es-admin-table .es-col-order { width: 5.5rem; }
 .es-position {
   display: inline-block;
@@ -855,9 +855,7 @@ h3, .h3 { font-size: 1.25rem; }
   font-variant-numeric: tabular-nums;
   color: var(--es-muted);
 }
-.es-admin-table tr.is-dragging { opacity: .45; }
-.es-admin-table tr.is-drop-before > td { box-shadow: inset 0 2px 0 var(--es-focus); }
-.es-admin-table tr.is-drop-after > td { box-shadow: inset 0 -2px 0 var(--es-focus); }
+
 
 .es-status {
   display: inline-block;
@@ -909,6 +907,7 @@ h3, .h3 { font-size: 1.25rem; }
 .es-photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  align-items: start;
   gap: 1rem;
 }
 .es-photo {
@@ -972,6 +971,59 @@ h3, .h3 { font-size: 1.25rem; }
   .es-row-variant > :nth-child(3),
   .es-row-variant > :nth-child(4) { grid-column: 2; }
   .es-row-head { display: none; }
+}
+
+/* ---- Drag-and-drop sorting (initSortables in js/demo.js) */
+[data-es-sortable-handle] { touch-action: none; }
+.es-sorting,
+.es-sorting * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+[data-es-sortable] .is-dragging { opacity: .45; }
+
+/*
+ * Drop indicator: a line in the middle of the gap before or after the target
+ * (vertical in grids), or a frame around a tree node when nesting into it.
+ * Table rows draw the line on their cells, since rows cannot hold pseudo-elements.
+ */
+.es-rows[data-es-sortable] { --es-drop-gap: .5rem; }
+.es-photo-grid[data-es-sortable] { --es-drop-gap: 1rem; }
+
+[data-es-sortable] .is-drop-before:not(tr),
+[data-es-sortable] .is-drop-after:not(tr) { position: relative; }
+[data-es-sortable] .is-drop-before:not(tr)::before,
+[data-es-sortable] .is-drop-after:not(tr)::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--es-focus);
+  pointer-events: none;
+}
+[data-es-sortable] .is-drop-before:not(tr)::before { top: calc(var(--es-drop-gap, 0px) / -2 - 1px); }
+[data-es-sortable] .is-drop-after:not(tr)::before { bottom: calc(var(--es-drop-gap, 0px) / -2 - 1px); }
+
+[data-es-sortable="grid"] > .is-drop-before:not(tr)::before,
+[data-es-sortable="grid"] > .is-drop-after:not(tr)::before {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  height: auto;
+}
+[data-es-sortable="grid"] > .is-drop-before:not(tr)::before { left: calc(var(--es-drop-gap, 0px) / -2 - 1px); right: auto; }
+[data-es-sortable="grid"] > .is-drop-after:not(tr)::before { right: calc(var(--es-drop-gap, 0px) / -2 - 1px); left: auto; }
+
+[data-es-sortable] > tr.is-drop-before > td { box-shadow: inset 0 2px 0 var(--es-focus); }
+[data-es-sortable] > tr.is-drop-after > td { box-shadow: inset 0 -2px 0 var(--es-focus); }
+
+.es-tree .es-node.is-drop-into {
+  background: color-mix(in srgb, var(--es-focus) 18%, transparent);
+  box-shadow: inset 0 0 0 2px var(--es-focus);
+  border-radius: var(--bs-border-radius-sm);
 }
 
 /* ==================================================================

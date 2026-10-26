@@ -10,7 +10,8 @@
  * - grid / list toggle and remembered sort order for the catalogue
  * - item gallery: thumbnails switch the stage photo and the "download original"
  *   link, the stage opens GLightbox
- * - admin: authorial order of items in a rubric (drag and drop, up / down)
+ * - admin: drag-and-drop sorting with keyboard support for every reorderable
+ *   list (items of a rubric, rubricator tree, photos, attributes, variants)
  * - admin: rubrics of an item, like tags, with one main rubric
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -282,67 +283,420 @@
     }
   };
 
-  /* -------------------------------------------- admin: authorial order */
+  /* ------------------------------------------------- drag-and-drop sorting */
 
-  // Rows of [data-es-order] are reordered by drag and drop on the handle or by
-  // the up / down buttons; the position column is renumbered. The engine sends
-  // the new position of the moved item to the server.
-  const initOrderTable = () => {
-    const body = document.querySelector('[data-es-order]');
-    if (!body) return;
-    const firstPos = Number(body.querySelector('[data-es-order-pos]')?.textContent || 1);
-    const renumber = () => {
-      body.querySelectorAll('[data-es-order-row]').forEach((row, i) => {
-        row.querySelector('[data-es-order-pos]').textContent = String(firstPos + i);
+  /*
+   * One sorting engine for every reorderable admin list, built on Pointer
+   * Events so that mouse, touch and pen behave the same.
+   *
+   * Markup:
+   *   container  [data-es-sortable="list" | "grid" | "tree"]
+   *   handle     [data-es-sortable-handle], inside every movable item
+   * Items are the container's children that hold a handle ("list", "grid")
+   * or the <li> elements of the nested lists ("tree"). Other children, such
+   * as a header row or an upload zone, never move.
+   *
+   * Keyboard, on a focused handle: arrows move the item; in a tree, left and
+   * right change the nesting. Escape cancels a drag in progress.
+   *
+   * After every move the container fires "es:sorted" with { item }. Features
+   * renumber positions there; the engine will also send the new position to
+   * the server from that event.
+   */
+  const SORT_HANDLE = '[data-es-sortable-handle]';
+  const SORT_DRAG_THRESHOLD = 4; // px of movement before a press becomes a drag
+  const SORT_SCROLL_EDGE = 48;   // px from the viewport edge that starts auto-scroll
+  const SORT_SCROLL_STEP = 12;   // px per animation frame
+  const SORT_HINTS = {
+    list: 'Перетащите или нажимайте стрелки вверх и вниз.',
+    grid: 'Перетащите или нажимайте стрелки.',
+    tree: 'Перетащите или нажимайте стрелки: вверх и вниз меняют порядок, влево и вправо — вложенность.',
+  };
+
+  const sortables = new Map();
+  let sortableUid = 0;
+  let liveRegion = null;
+
+  // Screen reader announcement of the result of a move.
+  const announce = (text) => {
+    if (!liveRegion) {
+      liveRegion = document.createElement('div');
+      liveRegion.className = 'visually-hidden';
+      liveRegion.setAttribute('aria-live', 'polite');
+      document.body.appendChild(liveRegion);
+    }
+    liveRegion.textContent = text;
+  };
+
+  // A hidden description shared by all handles of one kind of container.
+  const sortHintId = (mode) => {
+    const id = `es-sortable-hint-${mode}`;
+    if (!document.getElementById(id)) {
+      const hint = document.createElement('p');
+      hint.id = id;
+      hint.className = 'visually-hidden';
+      hint.textContent = SORT_HINTS[mode];
+      document.body.appendChild(hint);
+    }
+    return id;
+  };
+
+  const makeSortable = (root) => {
+    const mode = root.dataset.esSortable;
+    const isTree = mode === 'tree';
+
+    // The movable item an element belongs to, or null.
+    const itemOf = (el) => {
+      if (!el || !root.contains(el)) return null;
+      if (isTree) {
+        const li = el.closest('li');
+        return li && root.contains(li) ? li : null;
+      }
+      let node = el;
+      while (node && node.parentElement !== root) node = node.parentElement;
+      return node && node.querySelector(SORT_HANDLE) ? node : null;
+    };
+    const siblingsOf = (item) => Array.from(item.parentElement.children)
+      .filter((el) => (isTree ? el.tagName === 'LI' : el.querySelector(SORT_HANDLE)));
+    // The visible row of an item: in a tree, the node without its subtree.
+    const rowOf = (item) => (isTree ? item.querySelector(':scope > .es-node') : item);
+
+    /* Tree structure: child lists and their expand / collapse toggles */
+    const childList = (li) => li.querySelector(':scope > ul');
+    const ensureChildList = (li) => {
+      let ul = childList(li);
+      if (ul) return ul;
+      sortableUid += 1;
+      ul = document.createElement('ul');
+      ul.id = `es-sortable-branch-${sortableUid}`;
+      ul.className = 'collapse show';
+      li.appendChild(ul);
+      const toggle = document.createElement('button');
+      toggle.className = 'es-toggle';
+      toggle.type = 'button';
+      toggle.setAttribute('data-bs-toggle', 'collapse');
+      toggle.setAttribute('data-bs-target', `#${ul.id}`);
+      toggle.setAttribute('aria-controls', ul.id);
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'Подразделы');
+      toggle.innerHTML = '<i class="bi bi-chevron-right" aria-hidden="true"></i>';
+      rowOf(li).querySelector('.es-toggle-spacer')?.replaceWith(toggle);
+      return ul;
+    };
+    const expand = (li) => {
+      childList(li)?.classList.add('show');
+      rowOf(li).querySelector('.es-toggle')?.setAttribute('aria-expanded', 'true');
+    };
+    // A branch that lost its last child turns back into a leaf.
+    const pruneEmpty = (ul) => {
+      if (!ul || ul === root || ul.querySelector(':scope > li')) return;
+      const li = ul.parentElement;
+      ul.remove();
+      const spacer = document.createElement('span');
+      spacer.className = 'es-toggle-spacer';
+      rowOf(li).querySelector('.es-toggle')?.replaceWith(spacer);
+    };
+
+    // True when the move would leave the item where it is.
+    const isNoop = (item, target, where) => {
+      if (target === item || item.contains(target)) return true;
+      if (where === 'before') return target.previousElementSibling === item;
+      if (where === 'after') return target.nextElementSibling === item;
+      const ul = childList(target);
+      return Boolean(ul && ul.lastElementChild === item);
+    };
+
+    // Moves the item before or after the target, or into it (tree only).
+    const place = (item, target, where) => {
+      const from = item.parentElement;
+      if (where === 'before') target.before(item);
+      else if (where === 'after') target.after(item);
+      else {
+        ensureChildList(target).appendChild(item);
+        expand(target);
+      }
+      if (isTree) pruneEmpty(from);
+      root.dispatchEvent(new CustomEvent('es:sorted', { detail: { item } }));
+    };
+
+    const describe = (item) => {
+      const siblings = siblingsOf(item);
+      let text = `Позиция ${siblings.indexOf(item) + 1} из ${siblings.length}`;
+      if (isTree) {
+        let level = 1;
+        for (let li = item.parentElement.closest('li'); li && root.contains(li); li = li.parentElement.closest('li')) {
+          level += 1;
+        }
+        text += `, уровень ${level}`;
+      }
+      return text;
+    };
+
+    // Moves the item by one position among its siblings; false at the edges.
+    const move = (item, delta) => {
+      const siblings = siblingsOf(item);
+      const target = siblings[siblings.indexOf(item) + delta];
+      if (!target) return false;
+      place(item, target, delta < 0 ? 'before' : 'after');
+      announce(describe(item));
+      return true;
+    };
+
+    root.querySelectorAll(SORT_HANDLE).forEach((handle) => {
+      handle.setAttribute('aria-describedby', sortHintId(mode));
+    });
+
+    /* Keyboard */
+    const PREV_KEYS = mode === 'grid' ? ['ArrowUp', 'ArrowLeft'] : ['ArrowUp'];
+    const NEXT_KEYS = mode === 'grid' ? ['ArrowDown', 'ArrowRight'] : ['ArrowDown'];
+    const NEST_KEYS = isTree ? ['ArrowLeft', 'ArrowRight'] : [];
+    let drag = null;
+
+    root.addEventListener('keydown', (event) => {
+      const handle = event.target.closest(SORT_HANDLE);
+      const item = handle && itemOf(handle);
+      if (!item || drag) return;
+      const key = event.key;
+      if (![...PREV_KEYS, ...NEXT_KEYS, ...NEST_KEYS].includes(key)) return;
+      event.preventDefault();
+
+      if (PREV_KEYS.includes(key)) move(item, -1);
+      else if (NEXT_KEYS.includes(key)) move(item, 1);
+      else if (key === 'ArrowRight') {
+        // Indent: become the last child of the previous sibling.
+        const siblings = siblingsOf(item);
+        const parent = siblings[siblings.indexOf(item) - 1];
+        if (parent) {
+          place(item, parent, 'into');
+          announce(describe(item));
+        }
+      } else if (key === 'ArrowLeft') {
+        // Outdent: follow the current parent.
+        const parent = item.parentElement.closest('li');
+        if (parent && root.contains(parent)) {
+          place(item, parent, 'after');
+          announce(describe(item));
+        }
+      }
+      handle.focus();
+    });
+
+    /* Pointer drag */
+    const clearMarks = () => {
+      root.querySelectorAll('.is-drop-before, .is-drop-after, .is-drop-into').forEach((el) => {
+        el.classList.remove('is-drop-before', 'is-drop-after', 'is-drop-into');
       });
     };
 
+    // Drop position under the pointer: { target, where }, { target: null }
+    // for "nowhere", or null to keep the previous one (pointer in a gap).
+    const hitTest = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      const target = itemOf(el);
+      if (!target) return null;
+      if (target === drag.item || drag.item.contains(target)) return { target: null };
+      const row = rowOf(target);
+      if (isTree && !row.contains(el)) return null;
+      const box = row.getBoundingClientRect();
+      let where;
+      if (mode === 'grid') {
+        where = x < box.left + box.width / 2 ? 'before' : 'after';
+      } else if (!isTree) {
+        where = y < box.top + box.height / 2 ? 'before' : 'after';
+      } else {
+        // Tree: upper third before, lower third after, the middle nests.
+        const rel = (y - box.top) / box.height;
+        where = rel < 0.3 ? 'before' : (rel > 0.7 ? 'after' : 'into');
+        // Below an expanded parent the next row is its first child, so the
+        // line there means "first child", not "after the whole branch".
+        const branch = childList(target);
+        if (where === 'after' && branch?.classList.contains('show') && branch.firstElementChild) {
+          return isNoop(drag.item, branch.firstElementChild, 'before')
+            ? { target: null }
+            : { target: branch.firstElementChild, where: 'before' };
+        }
+      }
+      return isNoop(drag.item, target, where) ? { target: null } : { target, where };
+    };
+
+    const update = () => {
+      const hit = hitTest(drag.x, drag.y);
+      if (!hit) return;
+      clearMarks();
+      drag.drop = hit.target ? hit : null;
+      if (drag.drop) rowOf(hit.target).classList.add(`is-drop-${hit.where}`);
+    };
+
+    const autoScroll = () => {
+      if (!drag?.active) return;
+      let dy = 0;
+      if (drag.y < SORT_SCROLL_EDGE) dy = -SORT_SCROLL_STEP;
+      else if (drag.y > window.innerHeight - SORT_SCROLL_EDGE) dy = SORT_SCROLL_STEP;
+      if (dy) {
+        window.scrollBy(0, dy);
+        update();
+      }
+      drag.raf = window.requestAnimationFrame(autoScroll);
+    };
+
+    const finish = (commit) => {
+      if (!drag) return;
+      const { item, handle, drop, active } = drag;
+      window.cancelAnimationFrame(drag.raf);
+      drag = null;
+      item.classList.remove('is-dragging');
+      document.body.classList.remove('es-sorting');
+      clearMarks();
+      if (commit && active && drop) {
+        place(item, drop.target, drop.where);
+        announce(describe(item));
+        handle.focus({ preventScroll: true });
+      }
+    };
+
+    root.addEventListener('pointerdown', (event) => {
+      const handle = event.target.closest(SORT_HANDLE);
+      const item = handle && itemOf(handle);
+      if (!item || drag || event.button !== 0) return;
+      drag = {
+        item,
+        handle,
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        x: event.clientX,
+        y: event.clientY,
+        active: false,
+        drop: null,
+        raf: 0,
+      };
+      handle.setPointerCapture(event.pointerId);
+    });
+
+    root.addEventListener('pointermove', (event) => {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+      if (!drag.active) {
+        if (Math.hypot(drag.x - drag.startX, drag.y - drag.startY) < SORT_DRAG_THRESHOLD) return;
+        drag.active = true;
+        drag.item.classList.add('is-dragging');
+        document.body.classList.add('es-sorting');
+        autoScroll();
+      }
+      update();
+    });
+
+    root.addEventListener('pointerup', (event) => {
+      if (drag && event.pointerId === drag.pointerId) finish(true);
+    });
+    root.addEventListener('pointercancel', (event) => {
+      if (drag && event.pointerId === drag.pointerId) finish(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && drag?.active) {
+        event.preventDefault();
+        finish(false);
+      }
+    });
+
+    return { move, place };
+  };
+
+  const initSortables = () => {
+    document.querySelectorAll('[data-es-sortable]').forEach((root) => {
+      sortables.set(root, makeSortable(root));
+    });
+  };
+
+  /* -------------------------------------------- admin: authorial order */
+
+  // Items of a rubric: drag and drop (see above) or the up / down buttons in
+  // each row; the position column is renumbered after every move.
+  const initOrderTable = () => {
+    const body = document.querySelector('[data-es-order]');
+    const sortable = body && sortables.get(body);
+    if (!sortable) return;
+    const firstPos = Number(body.querySelector('[data-es-order-pos]')?.textContent || 1);
+
+    body.addEventListener('es:sorted', () => {
+      body.querySelectorAll('[data-es-order-row]').forEach((row, i) => {
+        row.querySelector('[data-es-order-pos]').textContent = String(firstPos + i);
+      });
+    });
     body.addEventListener('click', (event) => {
       const btn = event.target.closest('[data-es-order-move]');
       if (!btn) return;
-      const row = btn.closest('[data-es-order-row]');
-      if (btn.dataset.esOrderMove === 'up' && row.previousElementSibling) {
-        row.previousElementSibling.before(row);
-      } else if (btn.dataset.esOrderMove === 'down' && row.nextElementSibling) {
-        row.nextElementSibling.after(row);
-      }
-      renumber();
+      sortable.move(btn.closest('[data-es-order-row]'), btn.dataset.esOrderMove === 'up' ? -1 : 1);
       btn.focus();
     });
+  };
 
-    let dragged = null;
-    const clearMarks = () => body.querySelectorAll('.is-drop-before, .is-drop-after')
-      .forEach((r) => r.classList.remove('is-drop-before', 'is-drop-after'));
-    const isAfter = (row, event) => {
-      const box = row.getBoundingClientRect();
-      return event.clientY > box.top + box.height / 2;
+  /* --------------------------------------------- admin: rubricator tree */
+
+  // After a move: the counts stay recursive totals and the highlighted path
+  // still leads to the current rubric.
+  const initRubricTree = () => {
+    const root = document.querySelector('.es-tree[data-es-sortable="tree"]');
+    if (!root) return;
+    const countOf = (li) => li.querySelector(':scope > .es-node .es-count');
+    const children = (li) => Array.from(li.querySelectorAll(':scope > ul > li'));
+    const number = (li) => Number(countOf(li)?.textContent || 0);
+
+    // Each count is a recursive total; keep the part that belongs to the node.
+    root.querySelectorAll('li').forEach((li) => {
+      const own = number(li) - children(li).reduce((sum, child) => sum + number(child), 0);
+      li.dataset.esOwnCount = String(Math.max(own, 0));
+    });
+    const recount = (li) => {
+      const total = Number(li.dataset.esOwnCount)
+        + children(li).reduce((sum, child) => sum + recount(child), 0);
+      const count = countOf(li);
+      if (count) count.textContent = String(total);
+      return total;
     };
 
-    body.addEventListener('dragstart', (event) => {
-      if (!event.target.closest('[data-es-order-handle]')) return;
-      dragged = event.target.closest('[data-es-order-row]');
-      dragged.classList.add('is-dragging');
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setDragImage(dragged, 16, 16);
+    root.addEventListener('es:sorted', () => {
+      Array.from(root.children).forEach(recount);
+      root.querySelectorAll('li.is-lineage').forEach((li) => li.classList.remove('is-lineage'));
+      const current = root.querySelector('li.is-current');
+      for (let li = current?.parentElement.closest('li'); li && root.contains(li); li = li.parentElement.closest('li')) {
+        li.classList.add('is-lineage');
+      }
     });
-    body.addEventListener('dragover', (event) => {
-      const row = event.target.closest('[data-es-order-row]');
-      if (!dragged || !row || row === dragged) return;
-      event.preventDefault();
-      clearMarks();
-      row.classList.add(isAfter(row, event) ? 'is-drop-after' : 'is-drop-before');
+  };
+
+  /* ------------------------------------------------ admin: item photos */
+
+  // The first photo is the cover. The star button moves a photo to the front.
+  const initPhotoManager = () => {
+    const grid = document.querySelector('[data-es-photos]');
+    const sortable = grid && sortables.get(grid);
+    if (!sortable) return;
+    const badge = grid.querySelector('[data-es-photo-cover-badge]');
+    const photos = () => Array.from(grid.querySelectorAll(':scope > .es-photo'));
+
+    grid.addEventListener('es:sorted', () => {
+      photos().forEach((photo, i) => {
+        const isCover = i === 0;
+        photo.classList.toggle('is-cover', isCover);
+        const star = photo.querySelector('[data-es-photo-cover-set]');
+        if (star) star.hidden = isCover;
+        if (isCover && badge) photo.querySelector('img').after(badge);
+        // Keep "фото N" in accessible names in step with the order.
+        photo.querySelectorAll('label, .visually-hidden').forEach((el) => {
+          el.textContent = el.textContent.replace(/фото \d+$/, `фото ${i + 1}`);
+        });
+      });
     });
-    body.addEventListener('drop', (event) => {
-      const row = event.target.closest('[data-es-order-row]');
-      if (!dragged || !row || row === dragged) return;
-      event.preventDefault();
-      if (isAfter(row, event)) row.after(dragged); else row.before(dragged);
-      renumber();
-    });
-    body.addEventListener('dragend', () => {
-      dragged?.classList.remove('is-dragging');
-      dragged = null;
-      clearMarks();
+
+    grid.addEventListener('click', (event) => {
+      const star = event.target.closest('[data-es-photo-cover-set]');
+      if (!star) return;
+      const photo = star.closest('.es-photo');
+      sortable.place(photo, photos()[0], 'before');
+      announce('Фото стало обложкой');
+      photo.querySelector(SORT_HANDLE)?.focus();
     });
   };
 
@@ -408,7 +762,10 @@
       initCatalogView,
       initCatalogSort,
       initItemGallery,
+      initSortables,
       initOrderTable,
+      initRubricTree,
+      initPhotoManager,
       initRubricPicker,
     ].forEach((init) => init());
   });

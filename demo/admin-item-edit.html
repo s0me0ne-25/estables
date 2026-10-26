@@ -149,17 +149,18 @@
       <section class="es-panel" aria-labelledby="sPhotos">
         <div class="d-flex flex-wrap gap-2 align-items-baseline justify-content-between mb-3">
           <h2 id="sPhotos" class="mb-0">Фотографии</h2>
-          <span class="small text-body-secondary">Перетащите фото, чтобы изменить порядок. Первое фото становится обложкой. Метаданные (EXIF, GPS) удаляются при загрузке.</span>
+          <span class="small text-body-secondary">Перетащите фото за значок, чтобы изменить порядок (с клавиатуры — стрелками на значке). Первое фото становится обложкой. Метаданные (EXIF, GPS) удаляются при загрузке.</span>
         </div>
-        <div class="es-photo-grid">
+        <div class="es-photo-grid" data-es-sortable="grid" data-es-photos>
           <div class="es-photo is-cover">
             <img src="img/lfz-1042.svg" alt="Вид слева">
-            <span class="es-photo-cover">Обложка</span>
+            <span class="es-photo-cover" data-es-photo-cover-badge>Обложка</span>
             <label class="visually-hidden" for="ph-0">Подпись к фото 1</label>
             <input class="form-control form-control-sm" type="text" id="ph-0" value="Вид слева" placeholder="Подпись">
             <div class="es-photo-tools">
-              <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 1</span></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 1</span></button>
               <span>
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой" data-es-photo-cover-set hidden><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
               <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить фото"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить фото 1</span></button>
               </span>
             </div>
@@ -169,9 +170,9 @@
             <label class="visually-hidden" for="ph-1">Подпись к фото 2</label>
             <input class="form-control form-control-sm" type="text" id="ph-1" value="Вид справа" placeholder="Подпись">
             <div class="es-photo-tools">
-              <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 2</span></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 2</span></button>
               <span>
-              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой"><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой" data-es-photo-cover-set><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
               <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить фото"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить фото 2</span></button>
               </span>
             </div>
@@ -181,9 +182,9 @@
             <label class="visually-hidden" for="ph-2">Подпись к фото 3</label>
             <input class="form-control form-control-sm" type="text" id="ph-2" value="Голова крупным планом" placeholder="Подпись">
             <div class="es-photo-tools">
-              <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 3</span></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 3</span></button>
               <span>
-              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой"><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой" data-es-photo-cover-set><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
               <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить фото"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить фото 3</span></button>
               </span>
             </div>
@@ -193,9 +194,9 @@
             <label class="visually-hidden" for="ph-3">Подпись к фото 4</label>
             <input class="form-control form-control-sm" type="text" id="ph-3" value="Клеймо на постаменте" placeholder="Подпись">
             <div class="es-photo-tools">
-              <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 4</span></button>
+              <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-horizontal" aria-hidden="true"></i><span class="visually-hidden">Переместить фото 4</span></button>
               <span>
-              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой"><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Сделать обложкой" data-es-photo-cover-set><i class="bi bi-star" aria-hidden="true"></i><span class="visually-hidden">Сделать обложкой</span></button>
               <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить фото"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить фото 4</span></button>
               </span>
             </div>
@@ -213,46 +214,46 @@
       <!-- Attributes -->
       <section class="es-panel" aria-labelledby="sAttrs">
         <h2 id="sAttrs">Характеристики</h2>
-        <div class="es-rows">
+        <div class="es-rows" data-es-sortable="list">
           <div class="es-row es-row-head" aria-hidden="true"><span></span><span>Характеристика</span><span>Значение</span><span></span></div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Производитель" aria-label="Характеристика 1">
             <input class="form-control" type="text" value="Ленинградский фарфоровый завод" aria-label="Значение: Производитель">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Производитель»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Автор модели" aria-label="Характеристика 2">
             <input class="form-control" type="text" value="Не установлен" aria-label="Значение: Автор модели">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Автор модели»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Годы выпуска" aria-label="Характеристика 3">
             <input class="form-control" type="text" value="1958–1979" aria-label="Значение: Годы выпуска">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Годы выпуска»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Материал" aria-label="Характеристика 4">
             <input class="form-control" type="text" value="Фарфор, бисквит" aria-label="Значение: Материал">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Материал»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Высота" aria-label="Характеристика 5">
             <input class="form-control" type="text" value="21 см" aria-label="Значение: Высота">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Высота»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Клеймо" aria-label="Характеристика 6">
             <input class="form-control" type="text" value="Зелёное подглазурное, тип 3" aria-label="Значение: Клеймо">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Клеймо»</span></button>
           </div>
           <div class="es-row">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить строку</span></button>
             <input class="form-control" type="text" list="attrNames" value="Встречаемость" aria-label="Характеристика 7">
             <input class="form-control" type="text" value="Редко" aria-label="Значение: Встречаемость">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить «Встречаемость»</span></button>
@@ -269,24 +270,24 @@
       <!-- Variants -->
       <section class="es-panel" aria-labelledby="sVariants">
         <h2 id="sVariants">Варианты</h2>
-        <div class="es-rows">
+        <div class="es-rows" data-es-sortable="list">
           <div class="es-row es-row-variant es-row-head" aria-hidden="true"><span></span><span>Номер</span><span>Исполнение</span><span>Годы</span><span></span></div>
           <div class="es-row es-row-variant">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
             <input class="form-control" type="text" value="1042-a" aria-label="Номер варианта">
             <input class="form-control" type="text" value="Белый бисквит" aria-label="Исполнение варианта 1042-a">
             <input class="form-control" type="text" value="1958–1965" aria-label="Годы варианта 1042-a">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить вариант 1042-a</span></button>
           </div>
           <div class="es-row es-row-variant">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
             <input class="form-control" type="text" value="1042-b" aria-label="Номер варианта">
             <input class="form-control" type="text" value="Подглазурная роспись, серая масть" aria-label="Исполнение варианта 1042-b">
             <input class="form-control" type="text" value="1962–1974" aria-label="Годы варианта 1042-b">
             <button class="btn es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить"><i class="bi bi-x-lg" aria-hidden="true"></i><span class="visually-hidden">Удалить вариант 1042-b</span></button>
           </div>
           <div class="es-row es-row-variant">
-            <button class="es-drag" type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
+            <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить вариант</span></button>
             <input class="form-control" type="text" value="1042-c" aria-label="Номер варианта">
             <input class="form-control" type="text" value="Надглазурная роспись, золочёный постамент" aria-label="Исполнение варианта 1042-c">
             <input class="form-control" type="text" value="1970–1979" aria-label="Годы варианта 1042-c">
