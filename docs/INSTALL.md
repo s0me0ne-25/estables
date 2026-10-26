@@ -1,6 +1,6 @@
 # Установка eStables
 
-Инструкция для Debian 13 (trixie) с nginx, php8.4-fpm и MariaDB 11.8. Её же удобно использовать для LNMP-песочницы, в которой проверяется каждая сборка.
+Инструкция для Debian 13 (trixie) с nginx, php8.4-fpm и MariaDB 11.8. Упрощённый вариант для песочницы, в которой проверяются сборки, — [SANDBOX.md](SANDBOX.md).
 
 Пути ниже предполагают каталог `/var/www/estables` и пользователя php-fpm `www-data`.
 
