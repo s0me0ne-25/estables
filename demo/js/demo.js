@@ -3,6 +3,8 @@
  * - colour theme switcher (light / dark / auto) persisted in localStorage
  * - grid / list toggle for the catalogue
  * - GLightbox and thumbnail switching on the item page
+ * - simulated administrator session (footer link, login form, logout)
+ * - admin helpers: password visibility, row selection with bulk actions
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
@@ -10,12 +12,17 @@
   'use strict';
 
   const THEME_KEY = 'estables-theme';
+  // Demo only: the real session will live on the server.
+  const ADMIN_KEY = 'estables-demo-admin';
 
   const readStored = (key) => {
     try { return localStorage.getItem(key); } catch (e) { return null; }
   };
   const writeStored = (key, value) => {
     try { localStorage.setItem(key, value); } catch (e) { /* storage unavailable */ }
+  };
+  const removeStored = (key) => {
+    try { localStorage.removeItem(key); } catch (e) { /* storage unavailable */ }
   };
 
   const systemTheme = () =>
@@ -52,6 +59,62 @@
         writeStored(THEME_KEY, value);
         applyTheme(value);
       });
+    });
+
+    // Simulated administrator session.
+    // Opening any admin page counts as being logged in.
+    if (document.body.dataset.esArea === 'admin') writeStored(ADMIN_KEY, '1');
+    const isAdmin = readStored(ADMIN_KEY) === '1' || document.body.dataset.esArea === 'admin';
+    document.querySelectorAll('[data-es-auth]').forEach((el) => {
+      el.hidden = (el.dataset.esAuth === 'admin') !== isAdmin;
+    });
+    document.querySelectorAll('[data-es-logout]').forEach((el) => {
+      el.addEventListener('click', () => removeStored(ADMIN_KEY));
+    });
+
+    // Login form: in the demo any input is accepted.
+    document.querySelectorAll('form[data-es-login]').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        writeStored(ADMIN_KEY, '1');
+        window.location.assign(form.getAttribute('action'));
+      });
+    });
+
+    // Show / hide password
+    document.querySelectorAll('[data-es-password-toggle]').forEach((btn) => {
+      const input = document.getElementById(btn.getAttribute('aria-controls'));
+      btn.addEventListener('click', () => {
+        if (!input) return;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        btn.querySelector('.bi').className = 'bi ' + (show ? 'bi-eye-slash' : 'bi-eye');
+      });
+    });
+
+    // Admin table: select rows, show the bulk action bar.
+    const selectAll = document.querySelector('[data-es-select-all]');
+    const rowChecks = document.querySelectorAll('[data-es-select]');
+    const bulk = document.querySelector('[data-es-bulk]');
+    const bulkCount = document.querySelector('[data-es-bulk-count]');
+    const updateBulk = () => {
+      const selected = Array.from(rowChecks).filter((c) => c.checked).length;
+      if (bulk) bulk.hidden = selected === 0;
+      if (bulkCount) bulkCount.textContent = String(selected);
+      if (selectAll) {
+        selectAll.checked = selected > 0 && selected === rowChecks.length;
+        selectAll.indeterminate = selected > 0 && selected < rowChecks.length;
+      }
+    };
+    selectAll?.addEventListener('change', () => {
+      rowChecks.forEach((c) => { c.checked = selectAll.checked; });
+      updateBulk();
+    });
+    rowChecks.forEach((c) => c.addEventListener('change', updateBulk));
+    document.querySelector('[data-es-bulk-clear]')?.addEventListener('click', () => {
+      rowChecks.forEach((c) => { c.checked = false; });
+      updateBulk();
     });
 
     // Grid / list toggle
