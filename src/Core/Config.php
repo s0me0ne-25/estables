@@ -36,6 +36,22 @@ final class Config
             'dump_binary' => 'mariadb-dump',
             'keep' => 10,
         ],
+        'session' => [
+            'remember_days' => 30,
+            'idle_hours' => 12,
+            'touch_minutes' => 5,
+            'rotate_hours' => 24,
+        ],
+        'login' => [
+            'max_failures_per_login' => 5,
+            'max_failures_per_ip' => 20,
+            'lockout_minutes' => 15,
+        ],
+        'captcha' => [
+            'provider' => 'stub',
+            'site_key' => '',
+            'secret_key' => '',
+        ],
     ];
 
     /** @var array<string, mixed> */
@@ -122,6 +138,18 @@ final class Config
         }
         if ($this->string('db.name') === '' || $this->string('db.user') === '') {
             $problems[] = 'db.name и db.user: укажите базу данных и пользователя MariaDB.';
+        }
+        $provider = $this->string('captcha.provider');
+        if (!\in_array($provider, ['stub', 'turnstile'], true)) {
+            $problems[] = 'captcha.provider: допустимы значения «stub» и «turnstile».';
+        } elseif ($provider === 'turnstile' && ($this->string('captcha.site_key') === '' || $this->string('captcha.secret_key') === '')) {
+            $problems[] = 'captcha: для Cloudflare Turnstile заполните site_key и secret_key.';
+        }
+        foreach (['session.remember_days', 'session.idle_hours', 'session.touch_minutes', 'session.rotate_hours',
+            'login.max_failures_per_login', 'login.max_failures_per_ip', 'login.lockout_minutes'] as $key) {
+            if ($this->int($key) < 1) {
+                $problems[] = "{$key}: нужно целое число больше нуля.";
+            }
         }
 
         return $problems;

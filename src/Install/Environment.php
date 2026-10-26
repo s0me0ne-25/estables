@@ -71,6 +71,13 @@ final class Environment
                 !$this->config->bool('backup.enabled') || self::findBinary($dump) !== null ? Check::OK : Check::ERROR,
                 'Нужна для резервной копии перед обновлением схемы: установите mariadb-client или отключите backup.enabled.',
             );
+            if ($this->config->string('captcha.provider') === 'turnstile') {
+                $checks[] = new Check(
+                    'Запросы к Cloudflare Turnstile',
+                    \filter_var(\ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOL) ? Check::OK : Check::ERROR,
+                    'Включите allow_url_fopen в php.ini: без него ответ капчи не проверить и вход невозможен.',
+                );
+            }
         }
 
         if ($this->db !== null) {

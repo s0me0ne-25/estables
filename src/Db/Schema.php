@@ -23,7 +23,7 @@ namespace Estables\Db;
  */
 final class Schema
 {
-    public const VERSION = 2;
+    public const VERSION = 4;
 
     /** Table options shared by every table. */
     private const TABLE_OPTIONS = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=' . Connection::COLLATION;
@@ -59,6 +59,41 @@ final class Schema
                     UNIQUE KEY uq_users_login (login)
                 ) ' . self::TABLE_OPTIONS);
                 $stepDone(2);
+                // no break
+            case 2:
+                // Build 2: login sessions. Only the SHA-256 of the cookie value is stored.
+                $this->db->exec('CREATE TABLE IF NOT EXISTS sessions (
+                    id_hash BINARY(32) NOT NULL PRIMARY KEY,
+                    previous_hash BINARY(32) NULL,
+                    previous_valid_until DATETIME NULL,
+                    user_id INT UNSIGNED NOT NULL,
+                    remember TINYINT(1) NOT NULL DEFAULT 0,
+                    csrf_secret BINARY(32) NOT NULL,
+                    created_at DATETIME NOT NULL,
+                    last_seen_at DATETIME NOT NULL,
+                    expires_at DATETIME NOT NULL,
+                    rotated_at DATETIME NOT NULL,
+                    ip VARCHAR(45) NOT NULL DEFAULT \'\',
+                    user_agent VARCHAR(255) NOT NULL DEFAULT \'\',
+                    KEY ix_sessions_previous (previous_hash),
+                    KEY ix_sessions_user (user_id),
+                    KEY ix_sessions_expires (expires_at),
+                    CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(3);
+                // no break
+            case 3:
+                // Build 2: login attempts for brute-force protection
+                $this->db->exec('CREATE TABLE IF NOT EXISTS login_attempts (
+                    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    login VARCHAR(64) NOT NULL,
+                    ip VARCHAR(45) NOT NULL,
+                    attempted_at DATETIME NOT NULL,
+                    success TINYINT(1) NOT NULL,
+                    KEY ix_login_attempts_login (login, attempted_at),
+                    KEY ix_login_attempts_ip (ip, attempted_at)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(4);
                 // no break
             default:
                 // Up to date.

@@ -6,6 +6,8 @@
  * an init function bound to data-es-* hooks:
  * - colour theme switcher (light / dark / auto), persisted in localStorage
  * - password visibility toggle
+ * - confirmation of destructive admin actions (form[data-es-confirm])
+ * - reopening a modal form that came back with errors ([data-es-modal-open])
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
@@ -101,12 +103,36 @@
     });
   };
 
+  /* ------------------------------------------------------------ admin forms */
+
+  const initConfirmations = () => {
+    document.querySelectorAll('form[data-es-confirm]').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        if (!window.confirm(form.dataset.esConfirm)) event.preventDefault();
+      });
+    });
+  };
+
+  // The server rendered the page again because a modal form had errors.
+  const initModalReopen = () => {
+    const holder = document.querySelector('[data-es-modal-open]');
+    const modal = holder && document.getElementById(holder.dataset.esModalOpen);
+    if (!modal || !window.bootstrap) return;
+    window.bootstrap.Modal.getOrCreateInstance(modal).show();
+    modal.addEventListener('shown.bs.modal', () => {
+      const field = modal.querySelector('.is-invalid') || modal.querySelector('input:not([type="hidden"]):not([hidden])');
+      if (field) field.focus();
+    }, { once: true });
+  };
+
   /* ------------------------------------------------------------------ boot */
 
   document.addEventListener('DOMContentLoaded', () => {
     [
       initThemeSwitcher,
       initPasswordToggles,
+      initConfirmations,
+      initModalReopen,
     ].forEach((init) => init());
   });
 })();

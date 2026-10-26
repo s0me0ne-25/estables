@@ -24,6 +24,7 @@ final class FormGuard
     private const TTL = 7200;
 
     private ?string $newCookie = null;
+    private bool $forget = false;
 
     public function __construct(
         private readonly string $secret,
@@ -53,11 +54,22 @@ final class FormGuard
     }
 
     /**
+     * Drops the cookie once the form has done its job.
+     */
+    public function forget(): void
+    {
+        $this->forget = isset($this->request->cookies[$this->cookieName()]);
+        $this->newCookie = null;
+    }
+
+    /**
      * Adds the cookie created during this request to the response.
      */
     public function apply(Response $response): Response
     {
-        if ($this->newCookie !== null) {
+        if ($this->forget) {
+            $response->setCookie($this->cookieName(), '', 0, $this->request->isHttps());
+        } elseif ($this->newCookie !== null) {
             $response->setCookie($this->cookieName(), $this->newCookie, self::TTL, $this->request->isHttps());
         }
 

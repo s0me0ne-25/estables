@@ -88,7 +88,19 @@ sudo -u www-data php bin/estables create-admin
 
 Проверить сервер можно командой `sudo -u www-data php bin/estables check`.
 
-## 7. Обновление до новой сборки
+Войти в панель управления: ссылка «Вход администратора» в подвале сайта или адрес `/login/`.
+
+## 7. Вход, сессии и капча
+
+Настройки — в разделах `session`, `login` и `captcha` файла `config/config.php` (пояснения в `config/config.template.php`).
+
+- В cookie сессии лежит только случайный идентификатор; в базе — его SHA-256. На HTTPS cookie называется `__Host-es_session`, по HTTP — `es_session`.
+- Без «Запомнить меня» вход живёт до закрытия браузера, а на сервере завершается после 12 часов без активности (`session.idle_hours`). С отметкой — 30 дней (`session.remember_days`), срок продлевается при каждом заходе.
+- После 5 неудачных попыток подряд для логина или 20 с одного IP форма входа блокируется на 15 минут (раздел `login`). Каждая неудача пишется в `var/log/estables.log` строкой `Login failed for "<логин>" from <IP>` — по ней можно настроить fail2ban. Снять блокировку логина досрочно: `bin/estables unlock <логин>`.
+- Капча: `stub` — простая галочка без настоящей проверки (для разработки или когда сайт закрыт Anubis/fail2ban); `turnstile` — [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/): создайте виджет в панели Cloudflare и впишите `site_key` и `secret_key`. Серверу нужен исходящий HTTPS к `challenges.cloudflare.com` и `allow_url_fopen = On` (в Debian включено по умолчанию).
+- Забытый пароль меняется из консоли: `sudo -u www-data php bin/estables passwd <логин>`; все сессии этого администратора при этом завершаются.
+
+## 8. Обновление до новой сборки
 
 ```sh
 cd /var/www/estables
@@ -107,6 +119,8 @@ sudo -u www-data php bin/estables migrate
 | `bin/estables migrate` | создаёт или обновляет схему базы |
 | `bin/estables status` | показывает версию схемы в базе и в коде |
 | `bin/estables create-admin [логин] [--name="Имя"] [--password-stdin]` | создаёт администратора |
+| `bin/estables passwd <логин> [--password-stdin]` | меняет пароль администратора и завершает все его сессии |
+| `bin/estables unlock <логин>` | сбрасывает неудачные попытки входа, снимая блокировку логина |
 
 ## Журнал и резервные копии
 

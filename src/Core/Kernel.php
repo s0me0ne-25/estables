@@ -6,15 +6,20 @@ declare(strict_types=1);
 
 namespace Estables\Core;
 
+use Estables\Auth\Auth;
 use Estables\Db\SchemaException;
 use Estables\Db\SchemaState;
+use Estables\Http\AdminController;
+use Estables\Http\AuthController;
 use Estables\Http\CatalogController;
 use Estables\Http\SetupController;
+use Estables\Http\UsersController;
 use Estables\Install\Environment;
+use Estables\Security\Csp;
 
 /**
  * Handles one web request: configuration, schema self-update, first-run
- * installer, routing, error pages and security headers.
+ * installer, login state, routing, error pages and security headers.
  */
 final class Kernel
 {
@@ -22,7 +27,12 @@ final class Kernel
 
     private readonly Logger $logger;
     private bool $debug = false;
-    private string $sourceUrl = self::DEFAULT_SOURCE_URL;
+
+    /** Login state of the current request, once the site is installed. */
+    private ?Auth $auth = null;
+
+    /** @var array<string, mixed> variables shared by every template, error pages included */
+    private array $globals = ['sourceUrl' => self::DEFAULT_SOURCE_URL];
 
     public function __construct(private readonly Paths $paths)
     {
@@ -35,10 +45,8 @@ final class Kernel
         $request = Request::fromGlobals();
         $response = $this->handle($request);
         if ($request->method === 'HEAD') {
-            $response = new Response('', $response->status(), array_filter([
-                'Content-Type' => $response->header('Content-Type') ?? '',
-                'Location' => $response->header('Location') ?? '',
-            ]));
+            // Same headers and cookies (a session may have been rotated), no body
+            $response->clearBody();
         }
         $response->send();
     }
@@ -63,18 +71,24 @@ final class Kernel
             ], 500);
         }
 
+        // Cookie changes (sign-in, rotation, sign-out) reach the browser
+        // whatever page the request ended with.
+        $this->auth?->apply($response);
+
         return self::withSecurityHeaders($response);
     }
 
     private function process(Request $request): Response
     {
+        $this->auth = null;
+
         // 1. Configuration
         $config = Config::load($this->paths->configFile());
         if ($config === null) {
             return $this->service('setup/config-missing', 'Установка', ['root' => $this->paths->root]);
         }
         $this->debug = $config->bool('app.debug');
-        $this->sourceUrl = $config->string('app.source_url') ?: self::DEFAULT_SOURCE_URL;
+        $this->globals['sourceUrl'] = $config->string('app.source_url') ?: self::DEFAULT_SOURCE_URL;
         if ($problems = $config->problems()) {
             return $this->service('setup/problems', 'Ошибка конфигурации', [
                 'heading' => 'Ошибка в конфигурации',
@@ -136,24 +150,53 @@ final class Kernel
             ]);
         }
 
-        // 3. Routing
-        $router = new Router();
-        $view = new View($this->paths->templates(), $this->paths->public(), $router, [
-            'sourceUrl' => $this->sourceUrl,
-        ]);
-        $setup = new SetupController($services, $view, $this->paths);
-        $catalog = new CatalogController($view);
-
-        $router->add('home', 'GET', '/', $catalog->home(...));
-        $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
-
-        // 4. First run: until an administrator exists, everything leads to the installer
+        // 3. First run: until an administrator exists, everything leads to the installer
         $installed = $services->installState()->isInstalled();
         if (!$installed && $request->path !== '/setup/') {
             return Response::redirect('/setup/');
         }
         if ($installed && $request->path === '/setup/') {
             throw HttpException::notFound();
+        }
+
+        // 4. Login state; the admin area is for signed-in administrators only
+        $auth = null;
+        if ($installed) {
+            $this->auth = $auth = new Auth($services->sessions(), $request);
+            $session = $auth->session();
+            $this->globals['authState'] = $session === null ? 'guest' : 'admin';
+            $this->globals['currentUser'] = $session?->user;
+            $this->globals['csrfToken'] = $session === null ? '' : $services->csrf()->token($session);
+
+            if ($request->path === '/admin' || str_starts_with($request->path, '/admin/')) {
+                if ($session === null) {
+                    $query = $request->query === [] ? '' : '?' . http_build_query($request->query);
+
+                    return Response::redirect('/login/?next=' . rawurlencode($request->path . $query));
+                }
+                if ($request->isPost() && !$services->csrf()->check($request, $session)) {
+                    throw new HttpException(403, 'CSRF');
+                }
+            }
+        }
+
+        // 5. Routing
+        $router = new Router();
+        $view = new View($this->paths->templates(), $this->paths->public(), $router, $this->globals);
+        $catalog = new CatalogController($view);
+        $router->add('home', 'GET', '/', $catalog->home(...));
+        if ($auth === null) {
+            $setup = new SetupController($services, $view, $this->paths);
+            $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
+        } else {
+            $login = new AuthController($services, $view, $auth);
+            $admin = new AdminController($view);
+            $users = new UsersController($services, $view, $auth);
+            $router->add('login', ['GET', 'POST'], '/login/', $login->login(...));
+            $router->add('logout', 'POST', '/logout/', $login->logout(...));
+            $router->add('admin', 'GET', '/admin/', $admin->items(...));
+            $router->add('admin.rubrics', 'GET', '/admin/rubrics/', $admin->rubrics(...));
+            $router->add('admin.users', ['GET', 'POST'], '/admin/users/', $users->handle(...));
         }
 
         return $router->dispatch($request);
@@ -173,6 +216,7 @@ final class Kernel
     private function httpError(int $status): Response
     {
         [$heading, $text] = match ($status) {
+            403 => ['Действие отклонено', 'Форма устарела или отправлена с другого сайта. Вернитесь назад, обновите страницу и повторите действие.'],
             404 => ['Страница не найдена', 'Возможно, адрес набран с ошибкой или страница была перемещена.'],
             405 => ['Действие недоступно', 'Эта страница не поддерживает такой запрос.'],
             default => ['Ошибка ' . $status, 'Запрос не может быть выполнен.'],
@@ -191,9 +235,7 @@ final class Kernel
      */
     private function page(string $template, array $vars, int $status): Response
     {
-        $view = new View($this->paths->templates(), $this->paths->public(), null, [
-            'sourceUrl' => $this->sourceUrl,
-        ]);
+        $view = new View($this->paths->templates(), $this->paths->public(), null, $this->globals);
 
         return Response::html($view->page($template, $vars), $status);
     }
@@ -205,10 +247,6 @@ final class Kernel
             ->defaultHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
             ->defaultHeader('X-Frame-Options', 'DENY')
             ->defaultHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-            ->defaultHeader(
-                'Content-Security-Policy',
-                "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; "
-                . "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
-            );
+            ->defaultHeader('Content-Security-Policy', Csp::header());
     }
 }

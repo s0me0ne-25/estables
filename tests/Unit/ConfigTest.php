@@ -36,6 +36,18 @@ final class ConfigTest extends TestCase
         self::assertStringContainsString('app.timezone', $problems);
     }
 
+    public function testReportsLoginAndCaptchaProblems(): void
+    {
+        $config = new Config([
+            'captcha' => ['provider' => 'turnstile'],
+            'session' => ['remember_days' => 0],
+        ]);
+        $problems = implode("\n", $config->problems());
+        self::assertStringContainsString('site_key и secret_key', $problems);
+        self::assertStringContainsString('session.remember_days', $problems);
+        self::assertStringContainsString('допустимы', implode("\n", new Config(['captcha' => ['provider' => 'recaptcha']])->problems()));
+    }
+
     public function testLoadReturnsNullWithoutFile(): void
     {
         self::assertNull(Config::load(sys_get_temp_dir() . '/no-such-estables-config.php'));

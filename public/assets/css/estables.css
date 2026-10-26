@@ -1089,3 +1089,14 @@ body {
 .es-footer { margin-top: auto; }
 /* The rubricator column reaches down to the footer */
 .es-layout { flex: 1 0 auto; }
+
+/* ---- Sign-out: a POST form whose button looks like the footer links */
+.es-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

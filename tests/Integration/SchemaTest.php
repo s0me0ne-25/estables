@@ -25,7 +25,7 @@ final class SchemaTest extends DatabaseTestCase
         self::assertSame(SchemaState::Current, $manager->ensureCurrent());
         self::assertSame(Schema::VERSION, $manager->databaseVersion());
         self::assertTrue($manager->isCachedCurrent());
-        self::assertSame(['schema_meta', 'users'], $this->tables());
+        self::assertSame(['login_attempts', 'schema_meta', 'sessions', 'users'], $this->tables());
     }
 
     public function testEveryStepCanRunTwice(): void
@@ -42,9 +42,10 @@ final class SchemaTest extends DatabaseTestCase
     {
         $this->manager()->ensureCurrent();
         $expected = $this->showCreateTables();
-        // Pretend the run stopped after step 0: version 1 stored, users missing.
-        $this->db->exec('DROP TABLE users');
-        $this->db->exec("UPDATE schema_meta SET value = '1' WHERE name = 'version'");
+        // Pretend the run stopped after step 1: version 2 stored, later tables missing.
+        $this->db->exec('DROP TABLE login_attempts');
+        $this->db->exec('DROP TABLE sessions');
+        $this->db->exec("UPDATE schema_meta SET value = '2' WHERE name = 'version'");
 
         $manager = $this->manager();
         $manager->invalidateCache();

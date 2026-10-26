@@ -23,9 +23,44 @@ final class UserRepository
         return (int) $this->db->value('SELECT COUNT(*) FROM users');
     }
 
+    public function find(int $id): ?User
+    {
+        $row = $this->db->row('SELECT * FROM users WHERE id = :id', ['id' => $id]);
+
+        return $row === null ? null : User::fromRow($row);
+    }
+
+    public function findByLogin(string $login): ?User
+    {
+        $row = $this->db->row('SELECT * FROM users WHERE login = :login', ['login' => $login]);
+
+        return $row === null ? null : User::fromRow($row);
+    }
+
     public function loginExists(string $login): bool
     {
         return $this->db->value('SELECT 1 FROM users WHERE login = :login', ['login' => $login]) !== null;
+    }
+
+    /**
+     * Every administrator with the number of live sessions, by login.
+     *
+     * @return list<array{user: User, sessions: int}>
+     */
+    public function allWithSessions(): array
+    {
+        $rows = $this->db->run(
+            'SELECT u.*, (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id AND s.expires_at > :now) AS session_count
+             FROM users u ORDER BY u.login',
+            ['now' => Connection::now()],
+        )->fetchAll();
+        $result = [];
+        foreach ($rows as $row) {
+            /** @var array<string, mixed> $row */
+            $result[] = ['user' => User::fromRow($row), 'sessions' => (int) $row['session_count']];
+        }
+
+        return $result;
     }
 
     /**
@@ -47,6 +82,24 @@ final class UserRepository
         return (int) $this->db->pdo()->lastInsertId();
     }
 
+    public function setPassword(int $id, string $password): void
+    {
+        $this->db->run('UPDATE users SET password_hash = :hash WHERE id = :id', [
+            'hash' => Passwords::hash($password),
+            'id' => $id,
+        ]);
+    }
+
+    public function setActive(int $id, bool $active): void
+    {
+        $this->db->run('UPDATE users SET is_active = :active WHERE id = :id', ['active' => (int) $active, 'id' => $id]);
+    }
+
+    public function recordLogin(int $id): void
+    {
+        $this->db->run('UPDATE users SET last_login_at = :now WHERE id = :id', ['now' => Connection::now(), 'id' => $id]);
+    }
+
     /**
      * Validates a new account; returns messages keyed by form field.
      *
@@ -60,15 +113,25 @@ final class UserRepository
         } elseif ($this->loginExists($login)) {
             $errors['login'] = 'Такой логин уже есть.';
         }
-        if (mb_strlen($password) < self::MIN_PASSWORD_LENGTH) {
-            $errors['password'] = 'Не короче ' . self::MIN_PASSWORD_LENGTH . ' символов.';
-        } elseif ($password !== $passwordAgain) {
-            $errors['password_again'] = 'Пароли не совпадают.';
-        }
         if (mb_strlen($displayName) > 128) {
             $errors['display_name'] = 'Не длиннее 128 символов.';
         }
 
-        return $errors;
+        return $errors + self::validatePassword($password, $passwordAgain);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function validatePassword(string $password, string $passwordAgain): array
+    {
+        if (mb_strlen($password) < self::MIN_PASSWORD_LENGTH) {
+            return ['password' => 'Не короче ' . self::MIN_PASSWORD_LENGTH . ' символов.'];
+        }
+        if ($password !== $passwordAgain) {
+            return ['password_again' => 'Пароли не совпадают.'];
+        }
+
+        return [];
     }
 }

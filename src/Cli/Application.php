@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Estables\Cli;
 
+use Estables\Auth\UserRepository;
 use Estables\Core\Config;
 use Estables\Core\Paths;
 use Estables\Core\Services;
@@ -25,6 +26,8 @@ final class Application
         'migrate' => 'создать или обновить схему базы данных',
         'status' => 'показать версию схемы базы и кода',
         'create-admin' => 'создать администратора: create-admin [логин] [--name="Имя"] [--password-stdin]',
+        'passwd' => 'сменить пароль и завершить все сессии: passwd <логин> [--password-stdin]',
+        'unlock' => 'снять блокировку входа после неудачных попыток: unlock <логин>',
     ];
 
     /** @var resource */
@@ -64,6 +67,8 @@ final class Application
                 'migrate' => $this->migrate(),
                 'status' => $this->status(),
                 'create-admin' => $this->createAdmin($args),
+                'passwd' => $this->passwd($args),
+                'unlock' => $this->unlock($args),
                 'help', '--help', '-h' => $this->help(),
                 default => $this->fail("Неизвестная команда «{$command}». Список: bin/estables help"),
             };
@@ -151,10 +156,7 @@ final class Application
      */
     private function createAdmin(array $args): int
     {
-        $services = $this->services();
-        if (!$services->schema()->isCachedCurrent() && $services->schema()->databaseVersion() !== Schema::VERSION) {
-            return $this->fail('Сначала создайте схему базы: bin/estables migrate');
-        }
+        $services = $this->currentServices();
 
         $login = '';
         $name = '';
@@ -196,6 +198,72 @@ final class Application
         $services->logger->info("Administrator \"{$login}\" created from the command line");
 
         return $this->ok("Администратор «{$login}» создан.");
+    }
+
+    /**
+     * @param list<string> $args
+     */
+    private function passwd(array $args): int
+    {
+        $passwordFromStdin = \in_array('--password-stdin', $args, true);
+        $logins = array_values(array_filter($args, static fn(string $arg): bool => !str_starts_with($arg, '--')));
+        if (\count($logins) !== 1 || \count($logins) + (int) $passwordFromStdin !== \count($args)) {
+            return $this->fail('Использование: bin/estables passwd <логин> [--password-stdin]');
+        }
+        $services = $this->currentServices();
+        $user = $services->users()->findByLogin($logins[0]);
+        if ($user === null) {
+            return $this->fail("Администратора «{$logins[0]}» нет.");
+        }
+
+        if ($passwordFromStdin) {
+            $password = rtrim((string) fgets($this->in), "\r\n");
+            $again = $password;
+        } else {
+            $password = $this->askHidden('Новый пароль: ');
+            $again = $this->askHidden('Новый пароль ещё раз: ');
+        }
+        $errors = UserRepository::validatePassword($password, $again);
+        if ($errors !== []) {
+            foreach ($errors as $message) {
+                $this->error($message);
+            }
+
+            return 1;
+        }
+        $services->users()->setPassword($user->id, $password);
+        $services->sessions()->deleteForUser($user->id);
+        $services->logger->info("Password of \"{$user->login}\" changed from the command line, sessions ended");
+
+        return $this->ok("Пароль «{$user->login}» изменён, все его сессии завершены."
+            . ($user->active ? '' : ' Учётная запись заблокирована: разблокируйте её в панели управления.'));
+    }
+
+    /**
+     * @param list<string> $args
+     */
+    private function unlock(array $args): int
+    {
+        if (\count($args) !== 1 || str_starts_with($args[0], '--')) {
+            return $this->fail('Использование: bin/estables unlock <логин>');
+        }
+        $count = $this->currentServices()->throttle()->clear($args[0]);
+
+        return $this->ok("Неудачных попыток входа «{$args[0]}» сброшено: {$count}. Блокировка по IP-адресу снимается сама через login.lockout_minutes.");
+    }
+
+    /**
+     * Services of an installation whose schema is up to date.
+     */
+    private function currentServices(): Services
+    {
+        $services = $this->services();
+        $schema = $services->schema();
+        if (!$schema->isCachedCurrent() && $schema->databaseVersion() !== Schema::VERSION) {
+            throw new CliException('Схема базы не актуальна: выполните bin/estables migrate');
+        }
+
+        return $services;
     }
 
     private function config(bool $required): ?Config

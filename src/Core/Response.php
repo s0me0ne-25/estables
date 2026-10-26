@@ -55,6 +55,13 @@ final class Response
         return $this->body;
     }
 
+    public function clearBody(): self
+    {
+        $this->body = '';
+
+        return $this;
+    }
+
     public function header(string $name): ?string
     {
         return $this->headers[strtolower($name)] ?? null;

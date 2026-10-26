@@ -6,6 +6,11 @@ declare(strict_types=1);
 
 namespace Estables\Core;
 
+use Estables\Auth\Captcha\Captcha;
+use Estables\Auth\Captcha\CaptchaFactory;
+use Estables\Auth\Csrf;
+use Estables\Auth\LoginThrottle;
+use Estables\Auth\SessionStore;
 use Estables\Auth\UserRepository;
 use Estables\Db\Backup;
 use Estables\Db\Connection;
@@ -45,6 +50,26 @@ final class Services
     public function users(): UserRepository
     {
         return $this->users ??= new UserRepository($this->db());
+    }
+
+    public function sessions(): SessionStore
+    {
+        return new SessionStore($this->db(), $this->config);
+    }
+
+    public function throttle(): LoginThrottle
+    {
+        return new LoginThrottle($this->db(), $this->config);
+    }
+
+    public function captcha(): Captcha
+    {
+        return CaptchaFactory::create($this->config, $this->logger);
+    }
+
+    public function csrf(): Csrf
+    {
+        return new Csrf($this->config->string('app.secret'));
     }
 
     public function installState(): InstallState

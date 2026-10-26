@@ -78,6 +78,20 @@ final class View
     }
 
     /**
+     * Date and time in the site's time zone, e.g. "26.10.2026, 09:14".
+     */
+    public function dateTime(?\DateTimeInterface $value, string $format = 'd.m.Y, H:i'): string
+    {
+        if ($value === null) {
+            return '';
+        }
+
+        return \DateTimeImmutable::createFromInterface($value)
+            ->setTimezone(new \DateTimeZone(date_default_timezone_get()))
+            ->format($format);
+    }
+
+    /**
      * URL of a file under public/assets/ with a version for cache busting.
      */
     public function asset(string $path): string

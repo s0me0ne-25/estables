@@ -50,4 +50,36 @@ return [
         // Number of dumps to keep.
         'keep' => 10,
     ],
+
+    // Login sessions.
+    'session' => [
+        // "Remember me": lifetime of the cookie and of the session, renewed on every visit.
+        'remember_days' => 30,
+        // Without "remember me" the cookie lives until the browser is closed;
+        // the server also ends the session after this much inactivity.
+        'idle_hours' => 12,
+        // Activity is written to the database at most this often.
+        'touch_minutes' => 5,
+        // The session identifier is replaced this often.
+        'rotate_hours' => 24,
+    ],
+
+    // Brute-force protection of the login form. Failures are counted over
+    // lockout_minutes; reaching a limit blocks the form for that login or IP.
+    // Every failure is logged to var/log/estables.log for fail2ban.
+    'login' => [
+        'max_failures_per_login' => 5,
+        'max_failures_per_ip' => 20,
+        'lockout_minutes' => 15,
+    ],
+
+    // Captcha on the login form.
+    //   'stub'      — an "I am human" checkbox without a real check (development,
+    //                 or when Anubis / fail2ban protect the site);
+    //   'turnstile' — Cloudflare Turnstile, keys from the Cloudflare dashboard.
+    'captcha' => [
+        'provider' => 'stub',
+        'site_key' => '',
+        'secret_key' => '',
+    ],
 ];
