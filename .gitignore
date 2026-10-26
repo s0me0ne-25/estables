@@ -1,21 +1,26 @@
 # Local configuration with secrets.
 # Every such file has a committed *.template.* counterpart that is copied
-# and filled in manually (e.g. config.template.php -> config.php).
+# and filled in manually (e.g. config/config.template.php -> config/config.php).
 config.php
 config.local.php
 .env
 .env.*
 !.env.template
 
-# Runtime data
-/uploads/
-/cache/
-/logs/
+# Runtime data: cache, logs, backups, install token (see docs/INSTALL.md)
+/var/
+# Uploaded images and their resized copies
+/public/media/
 *.log
 
 # Dependencies installed locally
 /vendor/
 /node_modules/
+
+# Local overrides of development tool configs
+/phpstan.neon
+/phpunit.xml
+/.php-cs-fixer.php
 
 # OS and editor files
 .DS_Store

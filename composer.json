@@ -1,0 +1,47 @@
+{
+    "name": "s0me0ne-25/estables",
+    "description": "eStables: a catalogue CMS for collectors with a hierarchical rubricator and photo galleries",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "homepage": "https://github.com/s0me0ne-25/estables",
+    "require": {
+        "php": ">=8.4",
+        "ext-fileinfo": "*",
+        "ext-intl": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^13.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Estables\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Estables\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "stan": "phpstan analyse --memory-limit=1G",
+        "test": "phpunit",
+        "check": [
+            "@cs",
+            "@stan",
+            "@test"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "8.4.11"
+        },
+        "sort-packages": true
+    }
+}

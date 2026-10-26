@@ -1,0 +1,9 @@
+# Static analysis configuration; a local phpstan.neon (ignored by git) may override it.
+parameters:
+    level: 8
+    paths:
+        - src
+        - bin/estables
+        - public/index.php
+        - tests
+    tmpDir: var/cache/phpstan
