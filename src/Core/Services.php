@@ -23,6 +23,7 @@ use Estables\Media\ImageRepository;
 use Estables\Media\Ingest;
 use Estables\Media\MediaStore;
 use Estables\Media\Thumbnailer;
+use Estables\Site\Settings;
 
 /**
  * Lazily built services of a configured installation, shared by the web
@@ -35,6 +36,7 @@ final class Services
     private ?RubricRepository $rubrics = null;
     private ?ItemRepository $items = null;
     private ?AuditLog $audit = null;
+    private ?Settings $settings = null;
 
     public function __construct(
         public readonly Paths $paths,
@@ -118,6 +120,11 @@ final class Services
     public function audit(): AuditLog
     {
         return $this->audit ??= new AuditLog($this->db(), $this->logger);
+    }
+
+    public function settings(): Settings
+    {
+        return $this->settings ??= new Settings($this->db());
     }
 
     public function installState(): InstallState

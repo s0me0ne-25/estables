@@ -25,7 +25,7 @@ final class SchemaTest extends DatabaseTestCase
         self::assertSame(SchemaState::Current, $manager->ensureCurrent());
         self::assertSame(Schema::VERSION, $manager->databaseVersion());
         self::assertTrue($manager->isCachedCurrent());
-        self::assertSame(['attribute_names', 'audit_log', 'images', 'items', 'item_attributes', 'item_photos', 'item_rubrics', 'item_variants', 'login_attempts', 'rubrics', 'schema_meta', 'sessions', 'slug_history', 'users'], $this->tables());
+        self::assertSame(['attribute_names', 'audit_log', 'images', 'items', 'item_attributes', 'item_photos', 'item_rubrics', 'item_variants', 'login_attempts', 'rubrics', 'schema_meta', 'sessions', 'settings', 'slug_history', 'users'], $this->tables());
     }
 
     public function testEveryStepCanRunTwice(): void

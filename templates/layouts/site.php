@@ -15,7 +15,9 @@
  * @var string              $canonical   address of the page to index (path), "" for none
  * @var string              $ogImage     picture for shared links (path), "" for none
  * @var string              $ogType      Open Graph type: "website" or "article"
+ * @var bool                $maintenance the site is closed for guests (set for administrators only)
  */
+$maintenance ??= false;
 $canonical ??= '';
 $ogImage ??= '';
 $ogType ??= 'website';
@@ -71,6 +73,11 @@ $header ??= 'site';
 <a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
 
 <?= $this->partial('partials/header-' . $header, ['activeNav' => $activeNav, 'searchQuery' => $searchQuery ?? '']) ?>
+<?php if ($maintenance): ?>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status">
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="/admin/users/#maintenanceTitle">Выключить</a>
+</div>
+<?php endif ?>
 
 <?= $content ?>
 

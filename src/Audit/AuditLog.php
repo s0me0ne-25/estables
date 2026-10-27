@@ -29,6 +29,7 @@ final class AuditLog
         'items' => ['Предметы и фото', ['item.', 'items.']],
         'rubrics' => ['Разделы', ['rubric.']],
         'users' => ['Администраторы', ['user.']],
+        'site' => ['Сайт', ['site.']],
     ];
 
     /** What an action is called in the journal. */
@@ -56,6 +57,8 @@ final class AuditLog
         'user.unblock' => 'Разблокирован',
         'user.sessions' => 'Завершены сеансы',
         'user.unlock' => 'Сброшены неудачные входы',
+        'site.maintenance-on' => 'Включён режим техработ',
+        'site.maintenance-off' => 'Выключен режим техработ',
     ];
 
     private const SUBJECT_MAX = 500;

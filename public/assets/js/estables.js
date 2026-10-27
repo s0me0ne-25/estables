@@ -703,8 +703,11 @@
   // Filter forms apply a choice at once; the search field on Enter.
   const initAutoSubmit = () => {
     document.querySelectorAll('form[data-es-autosubmit]').forEach((form) => {
-      form.querySelectorAll('select').forEach((select) => {
-        select.addEventListener('change', () => form.requestSubmit());
+      form.querySelectorAll('select, input[type="checkbox"]').forEach((field) => {
+        field.addEventListener('change', () => form.requestSubmit());
+      });
+      form.querySelectorAll('[data-es-autosubmit-button]').forEach((button) => {
+        button.hidden = true;
       });
     });
   };

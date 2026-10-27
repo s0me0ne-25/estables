@@ -39,6 +39,9 @@ final class Kernel
     /** Login state of the current request, once the site is installed. */
     private ?Auth $auth = null;
 
+    /** Addresses guests can open while the site is closed for maintenance. */
+    private const OPEN_DURING_MAINTENANCE = ['/login/', '/logout/', '/robots.txt'];
+
     /** @var array<string, mixed> variables shared by every template, error pages included */
     private array $globals = ['sourceUrl' => self::DEFAULT_SOURCE_URL];
 
@@ -179,6 +182,8 @@ final class Kernel
             $this->globals['currentUser'] = $session?->user;
             $this->globals['csrfToken'] = $session === null ? '' : $services->csrf()->token($session);
             $this->globals['media'] = $services->media();
+            // Administrators browse a closed site with a reminder on every page
+            $this->globals['maintenance'] = $session !== null && $services->settings()->maintenance();
 
             if ($request->path === '/admin' || str_starts_with($request->path, '/admin/')) {
                 if ($session === null) {
@@ -231,6 +236,19 @@ final class Kernel
             $router->add('admin.rubrics.move', 'POST', '/admin/rubrics/move/', $rubrics->move(...));
             $router->add('admin.users', ['GET', 'POST'], '/admin/users/', $users->handle(...));
             $router->add('admin.audit', 'GET', '/admin/audit/', new AuditController($services, $view)->index(...));
+        }
+
+        // Maintenance mode: guests get the stub everywhere except the sign-in
+        if ($auth !== null && $auth->session() === null
+            && !\in_array($request->path, self::OPEN_DURING_MAINTENANCE, true)
+            && $services->settings()->maintenance()) {
+            return Response::html($view->page('pages/maintenance', [
+                'title' => 'Технические работы',
+                'noindex' => true,
+                'activeNav' => '',
+            ]), 503)
+                ->setHeader('Retry-After', '3600')
+                ->setHeader('Cache-Control', 'no-store');
         }
 
         return $router->dispatch($request);

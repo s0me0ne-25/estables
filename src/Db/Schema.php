@@ -23,7 +23,7 @@ namespace Estables\Db;
  */
 final class Schema
 {
-    public const VERSION = 15;
+    public const VERSION = 16;
 
     /** Table options shared by every table. */
     private const TABLE_OPTIONS = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=' . Connection::COLLATION;
@@ -269,6 +269,15 @@ final class Schema
                     CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
                 ) ' . self::TABLE_OPTIONS);
                 $stepDone(15);
+                // no break
+            case 15:
+                // Maintenance mode: site-wide settings changed in the admin area
+                $this->db->exec('CREATE TABLE IF NOT EXISTS settings (
+                    name VARCHAR(64) CHARACTER SET ascii NOT NULL PRIMARY KEY,
+                    value TEXT NOT NULL,
+                    updated_at DATETIME NOT NULL
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(16);
                 // no break
             default:
                 // Up to date.

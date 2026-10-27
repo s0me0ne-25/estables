@@ -34,6 +34,8 @@ final class UsersController
         'sessions' => 'Сессии администратора завершены.',
         'session' => 'Сессия завершена.',
         'others' => 'Все сессии, кроме этой, завершены.',
+        'maintenance-on' => 'Режим техработ включён: посетители видят заглушку.',
+        'maintenance-off' => 'Режим техработ выключен: сайт открыт для посетителей.',
     ];
 
     public function __construct(
@@ -77,6 +79,7 @@ final class UsersController
             'openModal' => $openModal,
             'minPassword' => UserRepository::MIN_PASSWORD_LENGTH,
             'idleHours' => $this->services->config->int('session.idle_hours'),
+            'maintenance' => $this->services->settings()->maintenance(),
         ]), $errors === [] ? 200 : 422);
     }
 
@@ -107,6 +110,16 @@ final class UsersController
             $audit->record('user.sessions', $me->user->login, $me->user->id, 'свои сеансы, кроме текущего');
 
             return self::done('others');
+        }
+        if ($action === 'maintenance') {
+            $on = $request->input('maintenance') === '1';
+            $settings = $this->services->settings();
+            if ($settings->maintenance() !== $on) {
+                $settings->setMaintenance($on);
+                $audit->record($on ? 'site.maintenance-on' : 'site.maintenance-off', 'Режим техработ');
+            }
+
+            return self::done($on ? 'maintenance-on' : 'maintenance-off');
         }
         if ($action === 'add') {
             $old = ['login' => $request->input('login'), 'display_name' => $request->input('display_name')];

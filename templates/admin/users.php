@@ -14,6 +14,7 @@
  * @var string|null                                            $openModal modal to reopen after a failed submission
  * @var int                                                    $minPassword
  * @var int                                                    $idleHours
+ * @var bool                                                   $maintenance site closed for guests
  * @var string                                                 $csrfToken
  */
 $csrf = '<input type="hidden" name="_csrf" value="' . $this->e($csrfToken) . '">';
@@ -140,6 +141,20 @@ $value = function (string $modal, string $name) use ($old, $openModal): string {
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section class="mt-5" aria-labelledby="maintenanceTitle">
+    <h2 id="maintenanceTitle" class="mb-1">Режим техработ</h2>
+    <p class="es-meta">Пока режим включён, посетители вместо сайта видят заглушку «Ведутся технические работы». Администраторы входят как обычно, по ссылке в подвале, и видят сайт целиком.</p>
+    <form method="post" action="/admin/users/" data-es-autosubmit>
+      <?= $csrf ?><input type="hidden" name="action" value="maintenance"><input type="hidden" name="maintenance" value="0">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="maintenance" name="maintenance" value="1"<?= $maintenance ? ' checked' : '' ?>>
+        <label class="form-check-label" for="maintenance">Сайт закрыт для посетителей</label>
+      </div>
+      <!-- Without JavaScript the switch is applied with this button; with it, by the switch itself -->
+      <button class="btn btn-sm btn-outline-secondary mt-2" type="submit" data-es-autosubmit-button>Применить</button>
+    </form>
   </section>
 </main>
 
