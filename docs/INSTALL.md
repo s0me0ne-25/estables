@@ -7,9 +7,11 @@
 ## 1. Пакеты
 
 ```sh
-apt install nginx php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-intl php8.4-imagick \
-    mariadb-server mariadb-client libjpeg-turbo-progs composer git
+apt install sudo nginx php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-intl php8.4-imagick \
+    mariadb-server mariadb-client libjpeg-turbo-progs composer git certbot
 ```
+
+`sudo` в минимальной установке Debian нет, а консольные команды движка ниже запускаются через `sudo -u www-data`. `certbot` нужен для сертификата HTTPS (п. 5).
 
 `php8.4-imagick` обязателен: без него не обработать фотографии. `libjpeg-turbo-progs` (утилита `jpegtran`) желателен: с ним JPEG очищается от метаданных и поворачивается без пересжатия; без него движок пересжимает только повёрнутые снимки, а проверка сервера об этом предупреждает.
 
@@ -47,7 +49,7 @@ chmod 640 config/config.php
 
 В `config/config.php` заполните:
 
-- `app.base_url` — адрес сайта, например `https://estables.example.org`;
+- `app.base_url` — адрес сайта, например `https://example.org` (пока нет сертификата — `http://…`);
 - `app.secret` — случайная строка: `php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'`;
 - `db.socket` — `/run/mysqld/mysqld.sock` (или `db.host`/`db.port`), `db.name`, `db.user`, `db.password`.
 
@@ -59,15 +61,32 @@ chmod 640 config/config.php
 cp deploy/php-fpm/estables.conf /etc/php/8.4/fpm/pool.d/estables.conf
 systemctl reload php8.4-fpm
 
-cp deploy/nginx/estables.conf /etc/nginx/sites-available/estables
-# поправьте server_name и root
+# Общая часть сайта: корень, статика, фото, PHP
+cp deploy/nginx/estables-app.conf /etc/nginx/snippets/estables-app.conf
+
+# Сначала сайт по HTTP: на нём certbot подтвердит домен
+cp deploy/nginx/estables-http.conf /etc/nginx/sites-available/estables
+# в файле замените example.org на свой домен
 ln -s ../sites-available/estables /etc/nginx/sites-enabled/estables
+mkdir -p /var/www/acme-stub
 nginx -t && systemctl reload nginx
 ```
 
-Если на сервере нет IPv6, уберите из конфигурации nginx строку `listen [::]:80;`.
+Если сайт лежит не в `/var/www/estables`, поправьте `root` в `/etc/nginx/snippets/estables-app.conf`. Если у сервера есть IPv6, добавьте в блоки `server` строки `listen [::]:80;` и `listen [::]:443 ssl;`.
 
-HTTPS: `certbot --nginx --redirect -d <домен>`. Certbot добавит блок с сертификатом и будет перенаправлять HTTP на HTTPS. По HTTPS движок отправляет заголовок HSTS (`security.hsts_max_age`, по умолчанию год): после первого захода браузер больше не откроет сайт по HTTP. Если HTTPS пока временный, поставьте `0`.
+**HTTPS.** Когда домен указывает на сервер и сайт открывается по HTTP:
+
+```sh
+certbot certonly --webroot -w /var/www/acme-stub -d example.org -d www.example.org
+
+cp deploy/nginx/estables.conf /etc/nginx/sites-available/estables
+# снова замените example.org на свой домен (в server_name, в пути к сертификату и в адресе перенаправления)
+nginx -t && systemctl reload nginx
+```
+
+Certbot конфигурацию nginx не трогает: он кладёт файлы проверки в `/var/www/acme-stub`, а сертификаты — в `/etc/letsencrypt/live/<домен>/`. HTTP после этого отвечает только на проверки Let's Encrypt и перенаправляет всё остальное на `https://<домен>`. Продление — строкой в `/etc/crontab` (п. 9). В `config/config.php` поменяйте `app.base_url` на `https://…`.
+
+По HTTPS движок отправляет заголовок HSTS (`security.hsts_max_age`, по умолчанию год): после первого захода браузер больше не откроет сайт по HTTP. Пока HTTPS временный, поставьте `0`.
 
 ## 6. Первый запуск
 
@@ -110,26 +129,26 @@ sudo -u www-data php bin/estables create-admin
 - Уменьшенные копии (`thumb_size` 400 и `large_size` 1600 по длинной стороне) делаются при первом запросе и складываются в `public/media/<размер>/`; дальше их отдаёт nginx без PHP. Сделать все копии заранее, например после смены размеров: `sudo -u www-data php bin/estables media:warm`. После смены размеров старые каталоги копий можно удалить.
 - «Скачать оригинал» идёт через `/download/…`: движок проверяет файл, а отдаёт его nginx (`X-Accel-Redirect`).
 - Предел файла — `max_upload_mb` (50 МБ). Он должен укладываться в `upload_max_filesize` пула php-fpm и `client_max_body_size` nginx: в конфигурациях из `deploy/` это 50 и 64 МБ.
-- Удалённые из предметов фото и файлы без записи в базе убирает `bin/estables gc` — не раньше чем через `gc_delay_hours` (24 часа) после загрузки. Его запускает таймер systemd (п. 9).
+- Удалённые из предметов фото и файлы без записи в базе убирает `bin/estables gc` — не раньше чем через `gc_delay_hours` (24 часа) после загрузки. Его запускает cron (п. 9).
 
 Каталог `public/media/` в git не попадает; в резервную копию сайта его нужно включать вместе с базой (п. 10).
 
-## 9. Обслуживание: таймеры, журнал, fail2ban
+## 9. Обслуживание: cron, журнал, fail2ban
 
 Готовые файлы лежат в `deploy/`; пути в них — `/var/www/estables` и пользователь `www-data`.
 
-**Таймеры systemd** — ночная резервная копия базы (`bin/estables backup`, около 03:40) и уборка (`bin/estables gc`, около 04:20):
+**cron.** Все задания — в общем `/etc/crontab`, строки для него лежат в `deploy/crontab`:
 
-```sh
-cp deploy/systemd/estables-* /etc/systemd/system/
-systemctl daemon-reload
-systemctl enable --now estables-backup.timer estables-gc.timer
-systemctl list-timers 'estables-*'          # когда следующий запуск
-systemctl start estables-gc.service         # запустить сейчас
-journalctl -u estables-gc.service -n 5      # что вышло
+```
+37  3  *   *   *   www-data  /usr/bin/php /var/www/estables/bin/estables backup > /dev/null
+17  4  *   *   *   www-data  /usr/bin/php /var/www/estables/bin/estables gc > /dev/null
+0   3  *   *   *   root      /usr/bin/certbot renew -w /var/www/acme-stub --post-hook "/usr/bin/systemctl reload nginx"
 ```
 
-`gc` удаляет ненужные фото, истёкшие сессии, старые попытки входа и записи «Журнала» старше `audit.keep_days` (два года). Если раньше вы ставили задание cron из сборки 5, удалите его: `rm /etc/cron.d/estables`.
+Допишите их в конец `/etc/crontab` редактором (`nano /etc/crontab`); строку certbot — когда настроен HTTPS (п. 5). cron перечитывает `/etc/crontab` сам. Ошибки уходят в почту cron, обычный вывод отбрасывается. Проверить вручную: `sudo -u www-data php bin/estables backup` и `… gc`.
+
+- `backup` — дамп базы в `var/backups/` (п. 10);
+- `gc` удаляет ненужные фото, истёкшие сессии, старые попытки входа и записи «Журнала» старше `audit.keep_days` (два года).
 
 **Ротация журнала** `var/log/estables.log` — раз в неделю, полгода истории:
 
@@ -155,7 +174,7 @@ fail2ban-client status estables
 
 ## 10. Резервные копии
 
-- `var/backups/` — дампы базы: перед каждым обновлением схемы (хранятся последние `backup.keep`, 10) и ежесуточные от таймера (`backup.keep_daily`, 14). Дампы содержат хеши паролей: права `0600`.
+- `var/backups/` — дампы базы: перед каждым обновлением схемы (хранятся последние `backup.keep`, 10) и ежесуточные от cron (`backup.keep_daily`, 14). Дампы содержат хеши паролей: права `0600`.
 - `public/media/originals/` — оригиналы фото. Они не меняются после загрузки, поэтому копировать их удобно инкрементально. Каталоги уменьшенных копий копировать не нужно: они пересоздаются (`bin/estables media:warm`).
 - `config/config.php` — секрет и пароль базы.
 
@@ -177,7 +196,7 @@ composer install --no-dev --optimize-autoloader
 sudo -u www-data php bin/estables migrate
 ```
 
-Если в новой сборке менялись `deploy/nginx/estables.conf` или `deploy/php-fpm/estables.conf`, скопируйте их заново, как в п. 5 (в сборке 5 добавился блок `location ^~ /media/`, в сборке 6 — `server_tokens off`). Файлы из `deploy/systemd`, `deploy/logrotate` и `deploy/fail2ban` появились в сборке 6 — см. п. 9.
+Если в новой сборке менялись файлы `deploy/nginx/` или `deploy/php-fpm/estables.conf`, скопируйте их заново, как в п. 5. В сборке 5 добавился блок `location ^~ /media/`, в сборке 6 — `server_tokens off`, в сборке 6.1 конфигурация nginx разделена на общую часть (`snippets/estables-app.conf`) и сайты по HTTP и HTTPS. Файлы `deploy/crontab`, `deploy/logrotate` и `deploy/fail2ban` появились в сборке 6 — см. п. 9.
 
 Перед обновлением схемы делается резервная копия базы в `var/backups/`. Если `migrate` забыть, схема обновится сама при первом запросе к сайту; на эти секунды посетители увидят страницу «Идёт обновление».
 
@@ -191,9 +210,9 @@ sudo -u www-data php bin/estables migrate
 | `bin/estables create-admin [логин] [--name="Имя"] [--password-stdin]` | создаёт администратора |
 | `bin/estables passwd <логин> [--password-stdin]` | меняет пароль администратора и завершает все его сессии |
 | `bin/estables unlock <логин>` | сбрасывает неудачные попытки входа, снимая блокировку логина |
-| `bin/estables gc` | удаляет неиспользуемые фото, файлы без записи в базе, истёкшие сессии, старые попытки входа и записи журнала (запускает таймер) |
+| `bin/estables gc` | удаляет неиспользуемые фото, файлы без записи в базе, истёкшие сессии, старые попытки входа и записи журнала (запускает cron) |
 | `bin/estables media:warm` | делает все уменьшенные копии фото заранее |
-| `bin/estables backup` | делает резервную копию базы в `var/backups/` (запускает таймер) |
+| `bin/estables backup` | делает резервную копию базы в `var/backups/` (запускает cron) |
 
 ## Файлы на сервере
 

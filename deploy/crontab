@@ -1,0 +1,13 @@
+# eStables lines for /etc/crontab: append them at its end with an editor
+# (nano /etc/crontab) and change the times if needed. The certbot line is
+# for a site with HTTPS only. cron picks up /etc/crontab by itself.
+#
+# Errors go to cron's mail (stderr is kept); normal output is dropped.
+# The certificate line is for a site with HTTPS (deploy/nginx/estables.conf).
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# m  h  dom mon dow user      command
+37  3  *   *   *   www-data  /usr/bin/php /var/www/estables/bin/estables backup > /dev/null
+17  4  *   *   *   www-data  /usr/bin/php /var/www/estables/bin/estables gc > /dev/null
+0   3  *   *   *   root      /usr/bin/certbot renew -w /var/www/acme-stub --post-hook "/usr/bin/systemctl reload nginx"

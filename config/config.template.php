@@ -44,7 +44,7 @@ return [
     ],
 
     // Database dumps into var/backups/: one before every schema upgrade, and
-    // a daily one made by "bin/estables backup" (systemd timer in deploy/).
+    // a daily one made by "bin/estables backup" (a line of /etc/crontab, see deploy/crontab).
     'backup' => [
         // Dump before a schema upgrade; the daily command ignores this switch.
         'enabled' => true,

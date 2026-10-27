@@ -42,11 +42,12 @@ cd /var/www/estables
 cp deploy/php-fpm/estables.conf /etc/php/8.4/fpm/pool.d/
 systemctl restart php8.4-fpm
 
-# Конфиг из репозитория: без IPv6, отвечает на любой адрес и IP
-sed -e '/listen \[::\]:80;/d' \
-    -e 's/listen 80;/listen 80 default_server;/' \
-    -e 's/server_name estables.example.org;/server_name _;/' \
-    deploy/nginx/estables.conf > /etc/nginx/sites-available/estables
+# Сайт по HTTP из репозитория; отвечает на любой адрес и IP
+cp deploy/nginx/estables-app.conf /etc/nginx/snippets/estables-app.conf
+sed -e 's/listen 80;/listen 80 default_server;/' \
+    -e 's/server_name example.org www.example.org;/server_name _;/' \
+    deploy/nginx/estables-http.conf > /etc/nginx/sites-available/estables
+mkdir -p /var/www/acme-stub
 ln -sf /etc/nginx/sites-available/estables /etc/nginx/sites-enabled/estables
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx

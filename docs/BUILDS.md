@@ -332,3 +332,24 @@
 
 - Страницы «Журнал» в демо нет; она сделана по образцу списка предметов.
 - Неудачные попытки входа в «Журнал» не попадают: их пишет только `var/log/estables.log` (для fail2ban). Иначе боты могли бы засорить журнал.
+
+## Сборка 6.1. cron и Let's Encrypt
+
+**Схема БД:** без изменений (версия 15).
+
+### Что изменилось
+
+- Вместо таймеров systemd — строки для общего `/etc/crontab` в `deploy/crontab`: `backup`, `gc` и продление сертификата (`certbot renew -w /var/www/acme-stub`). Каталог `deploy/systemd/` удалён.
+- Конфигурация nginx разделена на три файла:
+  - `estables-app.conf` — общая часть (корень, статика, фото, PHP), ставится в `/etc/nginx/snippets/`;
+  - `estables-http.conf` — сайт по HTTP: песочница и новый сервер, пока нет сертификата;
+  - `estables.conf` — сайт по HTTPS: на порту 80 только проверки Let's Encrypt из `/var/www/acme-stub` и перенаправление на `https://<домен>`, на 443 — сайт с сертификатом из `/etc/letsencrypt/live/<домен>/`.
+- Сертификат получается командой `certbot certonly --webroot`, без правки конфигурации nginx.
+- В списке пакетов INSTALL.md добавлены `sudo` (в минимальной Debian его нет) и `certbot`.
+- Код движка не менялся, кроме подсказок `bin/estables help`.
+
+### Как проверить
+
+1. Песочница: заново выполнить п. 4 SANDBOX.md — теперь он ставит `snippets/estables-app.conf` и `estables-http.conf`. Сайт открывается по HTTP, как раньше; `http://<IP>/.well-known/acme-challenge/<файл>` отдаёт файл из `/var/www/acme-stub`.
+2. `cat deploy/crontab` — строки для `/etc/crontab`. В песочнице cron ставить не обязательно: `runuser -u www-data -- php bin/estables backup` и `… gc` проверяются вручную.
+3. HTTPS проверяется на боевом сервере по INSTALL.md, п. 5.

@@ -66,7 +66,7 @@ templates/            PHP-шаблоны: layouts/, partials/ (шапка, фу�
 config/               config.template.php (в git), config.php (в .gitignore)
 var/                  cache/, log/, backups/ (в .gitignore)
 bin/estables          CLI: migrate, create-admin, passwd, gc, check, backup
-deploy/               конфиги nginx и php-fpm pool, systemd timer для gc и бэкапа, logrotate, фильтр fail2ban
+deploy/               конфиги nginx (общая часть, сайт по HTTP, сайт по HTTPS) и php-fpm pool, строки для /etc/crontab, logrotate, фильтр fail2ban
 tests/                PHPUnit, визуальные тесты
 docs/                 INSTALL.md, UPGRADE.md, ARCHITECTURE.md
 demo/                 статичное демо, остаётся на GitHub Pages
@@ -350,9 +350,10 @@ Document root указывает на `public/`, остальное снаруж
   - `git clone`, `composer install --no-dev`;
   - заполнение `config.php`;
   - `bin/estables migrate`, `bin/estables create-admin`;
-  - пакеты: `nginx`, `php8.4-fpm`, `php8.4-mysql`, `php8.4-mbstring`, `php8.4-intl`, `php8.4-imagick`, `libjpeg-turbo-progs`, `mariadb-server`, `composer`;
+  - пакеты: `sudo`, `nginx`, `php8.4-fpm`, `php8.4-mysql`, `php8.4-mbstring`, `php8.4-intl`, `php8.4-imagick`, `libjpeg-turbo-progs`, `mariadb-server`, `composer`, `certbot`;
   - конфиги nginx и php-fpm из `deploy/`, HTTPS через Let's Encrypt (certbot);
-  - таймеры systemd для `bin/estables gc` и ежесуточной резервной копии `bin/estables backup`; logrotate; fail2ban по строкам неудачного входа (время с поясом, логин экранирован).
+  - строки общего `/etc/crontab` для `bin/estables gc`, ежесуточной резервной копии `bin/estables backup` и продления сертификата; logrotate; fail2ban по строкам неудачного входа (время с поясом, логин экранирован);
+  - HTTPS: сертификат Let's Encrypt через `certbot certonly --webroot` (каталог `/var/www/acme-stub`), конфигурацию nginx certbot не меняет; HTTP отвечает на проверки и перенаправляет на HTTPS.
 - **Обновление** (`docs/UPGRADE.md`): `git pull`, `composer install --no-dev`, `bin/estables migrate`. Если последнюю команду забыть, схема обновится сама на первом запросе.
 - **Резервные копии**: ежесуточный `mariadb-dump` и копия `public/media/originals/`. Папки уменьшенных копий бэкапить не нужно: они пересоздаются.
 - **Диск**: исходники бывают крупными; объём под `public/media/originals/` стоит заложить с запасом и следить за ним.
@@ -380,7 +381,7 @@ Document root указывает на `public/`, остальное снаруж
 | 3. Рубрикатор | разделы: создание, правка, видимость, удаление, перетаскивание с сохранением, адреса и 301 при смене slug; публичный рубрикатор в боковой панели, страницы разделов (пока без предметов), корень каталога | дерево в админке и на сайте, вложенность, порядок, скрытые разделы, хлебные крошки |
 | 4. Предметы | редактор (поля, несколько разделов с главным, характеристики, варианты, статус, автономер), список с фильтрами и массовыми действиями, авторский порядок; публичные страницы раздела и предмета (пока с заглушкой вместо фото), сортировка с cookie, фильтр по десятилетиям, поиск | полный цикл «создать предмет → увидеть на сайте», сортировки, порядок, поиск |
 | 5. Фото | загрузка с очисткой метаданных, конвертацией и дедупликацией, порядок и обложка, уменьшенные копии по запросу через nginx, «Скачать оригинал», галерея и полноэкранный просмотр, `gc` | загрузка JPEG/PNG/GIF/WebP, повторная загрузка того же файла, обложка, просмотр и скачивание |
-| 6. Укрепление | заголовки безопасности и CSP в полном объёме, журнал аудита, `sitemap.xml`, `robots.txt`, Open Graph, systemd timer для `gc` и бэкапа, logrotate, fail2ban | заголовки в инструментах разработчика, карта сайта, журнал аудита в админке |
+| 6. Укрепление | заголовки безопасности и CSP в полном объёме, журнал аудита, `sitemap.xml`, `robots.txt`, Open Graph, cron для `gc` и бэкапа, logrotate, fail2ban | заголовки в инструментах разработчика, карта сайта, журнал аудита в админке |
 | 7. Выпуск | `docs/INSTALL.md` и `docs/UPGRADE.md` в финальном виде, установка на целевой VPS | установка с нуля и обновление с предыдущей сборки |
 
 Параллельно и независимо: редизайн тёмной темы. Позже: CLI-импортёр, автоподбор значений характеристик, алгоритм автогенерации каталожного номера, правка текста страницы «О справочнике» в админке (HTML-фрагмент в базе вместо шаблона).
