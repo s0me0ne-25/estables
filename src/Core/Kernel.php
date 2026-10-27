@@ -244,8 +244,9 @@ final class Kernel
             && $services->settings()->maintenance()) {
             return Response::html($view->page('pages/maintenance', [
                 'title' => 'Технические работы',
+                // Only the logo and the theme switcher: the menu and search would lead to the stub anyway
+                'header' => 'minimal',
                 'noindex' => true,
-                'activeNav' => '',
             ]), 503)
                 ->setHeader('Retry-After', '3600')
                 ->setHeader('Cache-Control', 'no-store');

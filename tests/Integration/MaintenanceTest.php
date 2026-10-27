@@ -64,6 +64,9 @@ final class MaintenanceTest extends DatabaseTestCase
         self::assertSame('3600', $stub->header('Retry-After'));
         self::assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $stub->body());
         self::assertStringContainsString('href="/login/">Вход администратора</a>', $stub->body(), 'The sign-in link stays in the footer');
+        self::assertStringContainsString('data-es-theme-value="dark"', $stub->body(), 'The theme switcher stays in the header');
+        self::assertStringNotContainsString('id="mainNav"', $stub->body(), 'No menu');
+        self::assertStringNotContainsString('action="/search/"', $stub->body(), 'No search');
         self::assertSame(200, $this->guest->get('/login/')->status());
         self::assertSame(200, $this->guest->get('/robots.txt')->status());
 

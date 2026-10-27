@@ -2,7 +2,8 @@
 
 /**
  * What guests see while the site is closed for maintenance (the switch is
- * on the admin page "Users"). Laid out like the "About" page.
+ * on the admin page "Users"). Laid out like the "About" page, under the
+ * reduced header: the logo and the theme switcher only.
  *
  * @var \Estables\Core\View $this
  */
