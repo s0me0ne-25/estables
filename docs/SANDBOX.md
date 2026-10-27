@@ -10,6 +10,9 @@
 apt update
 apt install -y nginx php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-intl php8.4-imagick \
     mariadb-server mariadb-client libjpeg-turbo-progs composer git unzip
+
+# Службы — в автозапуск: в Debian это делается не всегда
+systemctl enable --now nginx php8.4-fpm mariadb
 ```
 
 Проверка: `php -v` показывает 8.4, `mariadb --version` — 11.8.

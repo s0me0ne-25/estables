@@ -6,7 +6,7 @@
 
 - все команды выполняются под root;
 - сайт живёт в `/var/www/estables`, php-fpm работает от `www-data`;
-- `example.org` в командах и файлах — замените на свой домен; DNS-записи A (и AAAA, если есть IPv6) для `example.org` и `www.example.org` уже указывают на сервер;
+- DNS-записи A (и AAAA, если есть IPv6) для домена и `www.`-домена уже указывают на сервер. Команды с доменом начинаются строкой `DOMAIN=example.org` — впишите в неё свой домен, дальше он подставится сам; в файлах `deploy/` вместо домена стоит `example.org`;
 - консольные команды движка запускаются от `www-data` (`sudo -u www-data php bin/estables …`), иначе файлы в `var/` станут принадлежать root и сайт не сможет в них писать.
 
 ## 1. Пакеты
@@ -14,13 +14,20 @@
 ```sh
 apt update
 apt install sudo nginx php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-intl php8.4-imagick \
-    mariadb-server mariadb-client libjpeg-turbo-progs composer git unzip certbot
+    mariadb-server mariadb-client libjpeg-turbo-progs composer git unzip certbot cron fail2ban
+
+# Службы — включить в автозапуск и запустить: в Debian это делается не всегда,
+# и тогда после перезагрузки сайт не поднимется
+systemctl enable --now nginx php8.4-fpm mariadb cron fail2ban
+systemctl is-enabled nginx php8.4-fpm mariadb cron fail2ban    # пять раз «enabled»
+systemctl is-active nginx php8.4-fpm mariadb cron fail2ban     # пять раз «active»
 ```
 
 - `sudo` в минимальной установке Debian нет, а он нужен для команд от `www-data`.
 - `php8.4-imagick` обязателен: без него не обработать фотографии.
 - `libjpeg-turbo-progs` (утилита `jpegtran`) очищает JPEG от метаданных и поворачивает без пересжатия; без него движок работает, но пересжимает повёрнутые снимки.
 - `certbot` выдаёт и продлевает сертификат HTTPS (п. 6).
+- `cron` запускает ночные задания (п. 8); `fail2ban` закрывает адреса, подбирающие пароль (п. 8).
 
 Проверка: `php -v` показывает 8.4, `mariadb --version` — 11.8.
 
@@ -64,7 +71,7 @@ nano config/config.php
 
 Заполните:
 
-- `app.base_url` — `https://example.org` (без косой черты в конце);
+- `app.base_url` — `https://<ваш домен>` (без косой черты в конце);
 - `app.secret` — строка из команды выше;
 - `db.password` — пароль из п. 2 (`db.name` и `db.user` в шаблоне уже `estables`).
 
@@ -81,9 +88,10 @@ systemctl reload php8.4-fpm
 cp deploy/nginx/estables-app.conf /etc/nginx/snippets/estables-app.conf
 
 # Пока нет сертификата — сайт по HTTP; на нём Let's Encrypt проверит домен
+DOMAIN=example.org          # ← ваш домен, без www
 mkdir -p /var/www/acme-stub
 cp deploy/nginx/estables-http.conf /etc/nginx/sites-available/estables
-sed -i 's/example\.org/ВАШ-ДОМЕН/g' /etc/nginx/sites-available/estables
+sed -i "s/example\.org/$DOMAIN/g" /etc/nginx/sites-available/estables
 ln -s ../sites-available/estables /etc/nginx/sites-enabled/estables
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
@@ -91,15 +99,16 @@ nginx -t && systemctl reload nginx
 
 Если у сервера есть IPv6, добавьте в каждый блок `server` строку `listen [::]:80;` (а в п. 6 — ещё `listen [::]:443 ssl;`). Если сайт лежит не в `/var/www/estables`, поправьте `root` в `/etc/nginx/snippets/estables-app.conf`.
 
-Откройте `http://example.org/` — должна появиться страница «Первый администратор». Администратора пока не создавайте: пароль не должен идти по открытому HTTP.
+Откройте `http://<ваш домен>/` — должна появиться страница «Первый администратор». Администратора пока не создавайте: пароль не должен идти по открытому HTTP.
 
 ## 6. HTTPS
 
 ```sh
-certbot certonly --webroot -w /var/www/acme-stub -d example.org -d www.example.org
+DOMAIN=example.org          # ← ваш домен, без www
+certbot certonly --webroot -w /var/www/acme-stub -d "$DOMAIN" -d "www.$DOMAIN"
 
 cp /var/www/estables/deploy/nginx/estables.conf /etc/nginx/sites-available/estables
-sed -i 's/example\.org/ВАШ-ДОМЕН/g' /etc/nginx/sites-available/estables
+sed -i "s/example\.org/$DOMAIN/g" /etc/nginx/sites-available/estables
 nginx -t && systemctl reload nginx
 
 # У пакета certbot есть свой таймер продления; продлевать будет строка в /etc/crontab (п. 8)
@@ -122,7 +131,7 @@ sudo -u www-data php bin/estables migrate
 sudo -u www-data php bin/estables create-admin
 ```
 
-**Через браузер** (только по HTTPS): `https://example.org/` покажет форму «Первый администратор». Она защищена одноразовым токеном, который лежит только на сервере:
+**Через браузер** (только по HTTPS): `https://<ваш домен>/` покажет форму «Первый администратор». Она защищена одноразовым токеном, который лежит только на сервере:
 
 ```sh
 cat /var/www/estables/var/install.token
@@ -153,10 +162,9 @@ cp /var/www/estables/deploy/logrotate/estables /etc/logrotate.d/estables
 logrotate --debug /etc/logrotate.d/estables     # проверка без изменений
 ```
 
-**fail2ban** закрывает на час адрес, с которого за 10 минут было 10 неудачных входов:
+**fail2ban** (установлен в п. 1) закрывает на час адрес, с которого за 10 минут было 10 неудачных входов:
 
 ```sh
-apt install fail2ban
 cp /var/www/estables/deploy/fail2ban/filter.d/estables.conf /etc/fail2ban/filter.d/
 cp /var/www/estables/deploy/fail2ban/jail.d/estables.conf /etc/fail2ban/jail.d/
 fail2ban-client reload
@@ -168,10 +176,10 @@ fail2ban-client status estables
 ## 9. Проверка после установки
 
 - `sudo -u www-data php bin/estables check` — все строки «ok»;
-- `http://example.org/` перенаправляет на `https://example.org/`, в браузере замок без предупреждений;
+- `http://<ваш домен>/` перенаправляет на `https://<ваш домен>/`, в браузере замок без предупреждений;
 - в панели управления: создать раздел, предмет, загрузить фото — фото видно на сайте, «Скачать оригинал» отдаёт файл;
 - «Журнал» в панели показывает эти действия;
-- `https://example.org/robots.txt` и `/sitemap.xml` открываются, адреса в них начинаются с `https://example.org`;
+- `https://<ваш домен>/robots.txt` и `/sitemap.xml` открываются, адреса в них начинаются с `https://<ваш домен>`;
 - `ls /var/www/estables/var/backups/` на следующее утро — дамп `…-daily.sql.gz`.
 
 ## 10. Резервные копии
@@ -185,9 +193,10 @@ fail2ban-client status estables
 Держите копию на другой машине, например так (с машины для копий, по SSH):
 
 ```sh
-rsync -a --delete root@example.org:/var/www/estables/var/backups/ ~/estables-backup/db/
-rsync -a root@example.org:/var/www/estables/public/media/originals/ ~/estables-backup/originals/
-scp root@example.org:/var/www/estables/config/config.php ~/estables-backup/
+DOMAIN=example.org          # ← ваш домен
+rsync -a --delete "root@$DOMAIN:/var/www/estables/var/backups/" ~/estables-backup/db/
+rsync -a "root@$DOMAIN:/var/www/estables/public/media/originals/" ~/estables-backup/originals/
+scp "root@$DOMAIN:/var/www/estables/config/config.php" ~/estables-backup/
 ```
 
 **Восстановление** на новом сервере: пп. 1–3 и 5–6, затем вернуть `config/config.php` (п. 4 — права), загрузить дамп и фото:
