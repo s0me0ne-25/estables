@@ -1,0 +1,23 @@
+# logrotate rules for the eStables log.
+#
+# Install:
+#   cp deploy/logrotate/estables /etc/logrotate.d/estables
+# Check:
+#   logrotate --debug /etc/logrotate.d/estables
+#
+# The engine opens the file for every line it writes, so rotating by
+# renaming is safe and no signal is needed.
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+/var/www/estables/var/log/estables.log {
+    # var/log/ belongs to www-data
+    su www-data www-data
+    weekly
+    rotate 26
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 www-data www-data
+}

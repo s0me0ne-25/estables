@@ -9,12 +9,14 @@ namespace Estables\Core;
 use Estables\Auth\Auth;
 use Estables\Db\SchemaException;
 use Estables\Db\SchemaState;
+use Estables\Http\AuditController;
 use Estables\Http\AuthController;
 use Estables\Http\CatalogController;
 use Estables\Http\ItemsController;
 use Estables\Http\MediaController;
 use Estables\Http\RubricsController;
 use Estables\Http\SetupController;
+use Estables\Http\SitemapController;
 use Estables\Http\UsersController;
 use Estables\Install\Environment;
 use Estables\Security\Csp;
@@ -29,6 +31,7 @@ final class Kernel
 
     private readonly Logger $logger;
     private bool $debug = false;
+    private int $hstsMaxAge = 0;
 
     /** Routes of the current request, so error pages link like the rest of the site. */
     private ?Router $router = null;
@@ -80,7 +83,7 @@ final class Kernel
         // whatever page the request ended with.
         $this->auth?->apply($response);
 
-        return self::withSecurityHeaders($response);
+        return $this->withSecurityHeaders($response, $request);
     }
 
     private function process(Request $request): Response
@@ -103,6 +106,8 @@ final class Kernel
             ]);
         }
         date_default_timezone_set($config->string('app.timezone'));
+        $this->hstsMaxAge = $config->int('security.hsts_max_age');
+        $this->globals['siteUrl'] = self::siteUrl($config, $request);
         $services = new Services($this->paths, $config, $this->logger);
 
         // 2. Database schema: cached check, self-upgrade when the code is newer
@@ -184,6 +189,7 @@ final class Kernel
                 if ($request->isPost() && !$services->csrf()->check($request, $session)) {
                     throw new HttpException(403, 'CSRF');
                 }
+                $services->audit()->actAs($session->user, $request->ip());
             }
         }
 
@@ -200,6 +206,11 @@ final class Kernel
         $media = new MediaController($services);
         $router->add('media.copy', 'GET', '/media/{size:\d+}/{dir:[0-9a-f][0-9a-f]}/{sha:[0-9a-f]+}.{ext:jpg|png|gif}', $media->copy(...));
         $router->add('media.download', 'GET', '/download/{sha:[0-9a-f]+}/{name}', $media->download(...));
+        $sitemap = new SitemapController($services, (string) $this->globals['siteUrl']);
+        $router->add('robots', 'GET', '/robots.txt', $sitemap->robots(...));
+        $router->add('sitemap', 'GET', '/sitemap.xml', $sitemap->index(...));
+        $router->add('sitemap.pages', 'GET', '/sitemap-pages.xml', $sitemap->pages(...));
+        $router->add('sitemap.items', 'GET', '/sitemap-items-{n:\d+}.xml', $sitemap->items(...));
         if ($auth === null) {
             $setup = new SetupController($services, $view, $this->paths);
             $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
@@ -219,6 +230,7 @@ final class Kernel
             $router->add('admin.rubrics', ['GET', 'POST'], '/admin/rubrics/', $rubrics->handle(...));
             $router->add('admin.rubrics.move', 'POST', '/admin/rubrics/move/', $rubrics->move(...));
             $router->add('admin.users', ['GET', 'POST'], '/admin/users/', $users->handle(...));
+            $router->add('admin.audit', 'GET', '/admin/audit/', new AuditController($services, $view)->index(...));
         }
 
         return $router->dispatch($request);
@@ -262,13 +274,40 @@ final class Kernel
         return Response::html($view->page($template, $vars), $status);
     }
 
-    private static function withSecurityHeaders(Response $response): Response
+    /**
+     * Headers every response gets unless the page set its own.
+     */
+    private function withSecurityHeaders(Response $response, Request $request): Response
     {
-        return $response
+        $response
             ->defaultHeader('X-Content-Type-Options', 'nosniff')
             ->defaultHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
             ->defaultHeader('X-Frame-Options', 'DENY')
-            ->defaultHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+            ->defaultHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()')
+            ->defaultHeader('Cross-Origin-Opener-Policy', 'same-origin')
+            ->defaultHeader('Cross-Origin-Resource-Policy', 'same-origin')
             ->defaultHeader('Content-Security-Policy', Csp::header());
+        if ($this->hstsMaxAge > 0 && $request->isHttps()) {
+            // Plain HTTP stays possible for the first visit only; nginx redirects it.
+            $response->defaultHeader('Strict-Transport-Security', 'max-age=' . $this->hstsMaxAge);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Absolute address of the site for canonical links, Open Graph and the
+     * sitemap: app.base_url, or the address of this request when it is empty.
+     */
+    private static function siteUrl(Config $config, Request $request): string
+    {
+        $base = $config->string('app.base_url');
+        if ($base !== '') {
+            return $base;
+        }
+        $host = $request->server['HTTP_HOST'] ?? '';
+        $host = \is_string($host) && preg_match('~^[a-z0-9.-]+(:\d+)?$~i', $host) ? strtolower($host) : 'localhost';
+
+        return ($request->isHttps() ? 'https://' : 'http://') . $host;
     }
 }

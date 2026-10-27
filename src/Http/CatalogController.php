@@ -13,6 +13,7 @@ use Estables\Core\Request;
 use Estables\Core\Response;
 use Estables\Core\Services;
 use Estables\Core\View;
+use Estables\Media\Image;
 use Estables\Security\Csp;
 
 /**
@@ -54,6 +55,7 @@ final class CatalogController
         return Response::html($this->view->page('pages/home', [
             'title' => 'Каталог',
             'description' => 'eStables — справочник коллекционера.',
+            'canonical' => '/',
             'activeNav' => 'catalog',
             'tree' => $tree,
             'top' => $this->shownChildren($tree, 0),
@@ -100,6 +102,9 @@ final class CatalogController
         return Response::html($this->view->page('pages/rubric', [
             'title' => $rubric->heading(),
             'description' => self::summary($rubric->description),
+            // Filters and sorting show the same items: the plain list is the one to index.
+            'canonical' => $tree->url($id) . ($decade === null && $pager->page > 1 ? '?page=' . $pager->page : ''),
+            'ogImage' => $this->ogImage(Image::unpack($tree->node($id)['cover'])),
             'activeNav' => 'catalog',
             'noindex' => !$tree->isShown($id),
             'tree' => $tree,
@@ -147,6 +152,9 @@ final class CatalogController
         $response = Response::html($this->view->page('pages/item', [
             'title' => $item->catno . ' ' . $item->name,
             'description' => self::summary($item->summary !== '' ? $item->summary : $item->description),
+            'canonical' => $item->url(),
+            'ogImage' => $this->ogImage($photos[0]['image'] ?? null),
+            'ogType' => 'article',
             'activeNav' => 'catalog',
             'noindex' => !$public,
             'tree' => $tree,
@@ -223,8 +231,17 @@ final class CatalogController
         return Response::html($this->view->page('pages/about', [
             'title' => 'О справочнике',
             'description' => 'eStables — свободная программа для каталога коллекции.',
+            'canonical' => '/about/',
             'activeNav' => 'about',
         ]));
+    }
+
+    /**
+     * Picture for links shared in messengers and social networks.
+     */
+    private function ogImage(?Image $image): string
+    {
+        return $image === null ? '' : $this->services->media()->largeUrl($image);
     }
 
     private function visible(RubricTree $tree, int $id): bool

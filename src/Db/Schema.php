@@ -23,7 +23,7 @@ namespace Estables\Db;
  */
 final class Schema
 {
-    public const VERSION = 14;
+    public const VERSION = 15;
 
     /** Table options shared by every table. */
     private const TABLE_OPTIONS = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=' . Connection::COLLATION;
@@ -249,6 +249,26 @@ final class Schema
                     ADD COLUMN IF NOT EXISTS cover_image CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
                     ADD FOREIGN KEY IF NOT EXISTS fk_rubrics_cover (cover_image) REFERENCES images (sha256) ON DELETE SET NULL');
                 $stepDone(14);
+                // no break
+            case 14:
+                // Build 6: who changed what. actor keeps the login as it was, so
+                // the entry stays readable whatever happens to the account later.
+                $this->db->exec('CREATE TABLE IF NOT EXISTS audit_log (
+                    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    created_at DATETIME(3) NOT NULL,
+                    user_id INT UNSIGNED NULL,
+                    actor VARCHAR(100) NOT NULL,
+                    ip VARCHAR(45) CHARACTER SET ascii NOT NULL,
+                    action VARCHAR(40) CHARACTER SET ascii NOT NULL,
+                    object_id INT UNSIGNED NULL,
+                    subject VARCHAR(500) NOT NULL,
+                    details TEXT NOT NULL,
+                    KEY ix_audit_created (created_at),
+                    KEY ix_audit_user (user_id, created_at),
+                    KEY ix_audit_action (action, created_at),
+                    CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(15);
                 // no break
             default:
                 // Up to date.

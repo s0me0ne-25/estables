@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Estables\Http;
 
+use Estables\Audit\Changes;
 use Estables\Catalog\Rubric;
 use Estables\Catalog\RubricException;
 use Estables\Catalog\RubricTree;
@@ -23,6 +24,7 @@ use Estables\Media\MediaException;
  * /admin/rubrics/move/. The kernel has already checked the CSRF token.
  *
  * @phpstan-import-type RubricInput from \Estables\Catalog\RubricRepository
+ * @phpstan-import-type RubricState from Changes
  */
 final class RubricsController
 {
@@ -64,6 +66,7 @@ final class RubricsController
                     if ($target !== null && ($target === $id || !$tree->has($target))) {
                         throw new RubricException('Выберите другой раздел, куда перенести предметы.');
                     }
+                    $name = $tree->has($id) ? $tree->node($id)['name'] : "№{$id}";
                     $released = $this->services->db()->transaction(function () use ($rubrics, $id, $target): array {
                         if ($rubrics->tree()->children($id) !== []) {
                             throw new RubricException('Сначала перенесите или удалите подразделы этого раздела.');
@@ -74,7 +77,7 @@ final class RubricsController
                         return $released;
                     });
                     $rubrics->invalidate();
-                    $this->services->logger->info("Rubric {$id} deleted; items moved {$released['moved']}, deleted {$released['deleted']}, unlinked {$released['unlinked']}");
+                    $this->services->audit()->record('rubric.delete', $name, $id, self::releasedText($released, $target, $tree));
 
                     return Response::redirect(self::PATH . ($parent !== 0 ? "?id={$parent}&" : '?') . 'done=deleted', 303);
                 } catch (RubricException $e) {
@@ -86,6 +89,8 @@ final class RubricsController
                 $errors = $rubrics->validate($input, $id > 0 ? $id : null);
                 $cover = $this->cover($request, $errors);
                 if ($errors === []) {
+                    $existing = $id > 0 ? $rubrics->find($id) : null;
+                    $before = $existing === null ? null : self::state($existing);
                     if ($id > 0) {
                         $rubrics->update($id, $input);
                     } else {
@@ -96,6 +101,7 @@ final class RubricsController
                     } elseif ($request->input('remove_cover') === '1') {
                         $rubrics->setCover($id, null);
                     }
+                    $this->auditSave($id, $before);
 
                     return Response::redirect(self::PATH . "?id={$id}&done=" . ($request->input('id') === '0' ? 'created' : 'saved'), 303);
                 }
@@ -179,12 +185,77 @@ final class RubricsController
     {
         $id = (int) $request->input('id');
         try {
-            $this->services->rubrics()->move($id, (int) $request->input('parent'), (int) $request->input('index'));
+            $rubrics = $this->services->rubrics();
+            $from = $rubrics->tree()->has($id) ? $rubrics->tree()->node($id)['parent'] : null;
+            $rubrics->move($id, (int) $request->input('parent'), (int) $request->input('index'));
         } catch (RubricException $e) {
             return Response::json(['ok' => false, 'error' => $e->getMessage()], 409);
         }
+        $tree = $rubrics->tree();
+        if ($tree->has($id)) {
+            $parent = $tree->node($id)['parent'];
+            $where = $parent > 0 ? 'в «' . $tree->node($parent)['name'] . '»' : 'на верхний уровень';
+            $this->services->audit()->record('rubric.move', $tree->node($id)['name'], $id, ($from === $parent ? 'новое место ' : 'перенесён ') . $where . ', позиция ' . ((int) $request->input('index') + 1));
+        }
 
         return Response::json(['ok' => true]);
+    }
+
+    /**
+     * @return RubricState
+     */
+    private static function state(Rubric $rubric): array
+    {
+        return [
+            'parent' => $rubric->parentId ?? 0,
+            'name' => $rubric->name,
+            'title' => $rubric->title,
+            'slug' => $rubric->slug,
+            'description' => $rubric->description,
+            'visible' => $rubric->visible,
+            'cover' => $rubric->cover,
+        ];
+    }
+
+    /**
+     * @param RubricState|null $before null for a new rubric
+     */
+    private function auditSave(int $id, ?array $before): void
+    {
+        $rubric = $this->services->rubrics()->find($id);
+        if ($rubric === null) {
+            return;
+        }
+        $tree = $this->services->rubrics()->tree();
+        if ($before === null) {
+            $parent = $rubric->parentId !== null && $tree->has($rubric->parentId) ? 'в «' . $tree->node($rubric->parentId)['name'] . '»' : 'на верхнем уровне';
+            $this->services->audit()->record('rubric.create', $rubric->name, $id, $parent . ($rubric->visible ? '' : ', скрыт'));
+
+            return;
+        }
+        $changes = Changes::rubric($before, self::state($rubric), $tree);
+        if ($changes !== '') {
+            $this->services->audit()->record('rubric.update', $rubric->name, $id, $changes);
+        }
+    }
+
+    /**
+     * @param array{moved: int, deleted: int, unlinked: int} $released
+     */
+    private static function releasedText(array $released, ?int $target, RubricTree $tree): string
+    {
+        $parts = [];
+        if ($released['moved'] > 0) {
+            $parts[] = 'перенесено предметов: ' . $released['moved'] . ($target !== null && $tree->has($target) ? ' в «' . $tree->node($target)['name'] . '»' : '');
+        }
+        if ($released['deleted'] > 0) {
+            $parts[] = 'удалено предметов: ' . $released['deleted'];
+        }
+        if ($released['unlinked'] > 0) {
+            $parts[] = 'остались в других разделах: ' . $released['unlinked'];
+        }
+
+        return implode('; ', $parts);
     }
 
     /**

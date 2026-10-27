@@ -9,6 +9,7 @@ namespace Estables\Http;
 use Estables\Auth\Auth;
 use Estables\Auth\Passwords;
 use Estables\Core\HttpException;
+use Estables\Core\Logger;
 use Estables\Core\Request;
 use Estables\Core\Response;
 use Estables\Core\Services;
@@ -90,7 +91,9 @@ final class AuthController
             if (!$this->services->csrf()->check($request, $session)) {
                 throw new HttpException(403, 'CSRF');
             }
-            $this->services->logger->info("Logout of \"{$session->user->login}\" from {$request->ip()}");
+            $audit = $this->services->audit();
+            $audit->actAs($session->user, $request->ip());
+            $audit->record('logout', $session->user->login, $session->user->id);
             $this->auth->logout();
         }
 
@@ -111,7 +114,7 @@ final class AuthController
         $throttle = $this->services->throttle();
         $locked = $throttle->lockedFor($login, $ip);
         if ($locked > 0) {
-            $this->services->logger->warning("Login failed for \"{$login}\" from {$ip}: locked out");
+            $this->services->logger->warning('Login failed for ' . Logger::quote($login) . " from {$ip}: locked out");
 
             return 'Слишком много неудачных попыток. Попробуйте снова через ' . self::minutes($locked) . '.';
         }
@@ -126,13 +129,13 @@ final class AuthController
         $valid = Passwords::verify($password, $user->passwordHash ?? self::DUMMY_HASH);
         if ($user === null || !$valid) {
             $throttle->recordFailure($login, $ip);
-            $this->services->logger->warning("Login failed for \"{$login}\" from {$ip}");
+            $this->services->logger->warning('Login failed for ' . Logger::quote($login) . " from {$ip}");
 
             return 'Неверный логин или пароль.';
         }
         if (!$user->active) {
             $throttle->recordFailure($login, $ip);
-            $this->services->logger->warning("Login failed for \"{$login}\" from {$ip}: account blocked");
+            $this->services->logger->warning('Login failed for ' . Logger::quote($login) . " from {$ip}: account blocked");
 
             return 'Учётная запись заблокирована. Обратитесь к другому администратору.';
         }
@@ -143,7 +146,9 @@ final class AuthController
         }
         $users->recordLogin($user->id);
         $this->auth->login($user, $remember);
-        $this->services->logger->info("Login of \"{$user->login}\" from {$ip}" . ($remember ? ' (remembered)' : ''));
+        $audit = $this->services->audit();
+        $audit->actAs($user, $ip);
+        $audit->record('login', $user->login, $user->id, $remember ? 'с «Запомнить меня»' : '');
 
         return null;
     }

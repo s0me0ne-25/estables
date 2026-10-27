@@ -45,6 +45,8 @@ final class MediaController
         return new Response((string) file_get_contents($path), 200, [
             'Content-Type' => $image->mime(),
             'Cache-Control' => self::LONG_CACHE,
+            // Like the copies nginx serves later: other sites may show them.
+            'Cross-Origin-Resource-Policy' => 'cross-origin',
         ]);
     }
 

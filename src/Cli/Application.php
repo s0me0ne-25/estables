@@ -10,6 +10,7 @@ use Estables\Auth\UserRepository;
 use Estables\Core\Config;
 use Estables\Core\Paths;
 use Estables\Core\Services;
+use Estables\Db\Backup;
 use Estables\Db\Schema;
 use Estables\Db\SchemaException;
 use Estables\Db\SchemaState;
@@ -29,8 +30,9 @@ final class Application
         'create-admin' => 'создать администратора: create-admin [логин] [--name="Имя"] [--password-stdin]',
         'passwd' => 'сменить пароль и завершить все сессии: passwd <логин> [--password-stdin]',
         'unlock' => 'снять блокировку входа после неудачных попыток: unlock <логин>',
-        'gc' => 'удалить неиспользуемые фото, истёкшие сессии и старые попытки входа (для cron)',
+        'gc' => 'удалить неиспользуемые фото, истёкшие сессии, старые попытки входа и записи журнала (для таймера)',
         'media:warm' => 'заранее сделать уменьшенные копии всех фото',
+        'backup' => 'сделать резервную копию базы в var/backups/ (для таймера)',
     ];
 
     /** @var resource */
@@ -74,6 +76,7 @@ final class Application
                 'unlock' => $this->unlock($args),
                 'gc' => $this->gc(),
                 'media:warm' => $this->warm(),
+                'backup' => $this->backup(),
                 'help', '--help', '-h' => $this->help(),
                 default => $this->fail("Неизвестная команда «{$command}». Список: bin/estables help"),
             };
@@ -198,9 +201,9 @@ final class Application
 
             return 1;
         }
-        $users->create($login, $password, $name);
+        $id = $users->create($login, $password, $name);
         $services->installState()->markInstalled();
-        $services->logger->info("Administrator \"{$login}\" created from the command line");
+        $services->audit()->record('user.create', $login, $id, $name);
 
         return $this->ok("Администратор «{$login}» создан.");
     }
@@ -238,7 +241,7 @@ final class Application
         }
         $services->users()->setPassword($user->id, $password);
         $services->sessions()->deleteForUser($user->id);
-        $services->logger->info("Password of \"{$user->login}\" changed from the command line, sessions ended");
+        $services->audit()->record('user.password', $user->login, $user->id, 'сеансы завершены');
 
         return $this->ok("Пароль «{$user->login}» изменён, все его сессии завершены."
             . ($user->active ? '' : ' Учётная запись заблокирована: разблокируйте её в панели управления.'));
@@ -252,7 +255,10 @@ final class Application
         if (\count($args) !== 1 || str_starts_with($args[0], '--')) {
             return $this->fail('Использование: bin/estables unlock <логин>');
         }
-        $count = $this->currentServices()->throttle()->clear($args[0]);
+        $services = $this->currentServices();
+        $count = $services->throttle()->clear($args[0]);
+        $user = $services->users()->findByLogin($args[0]);
+        $services->audit()->record('user.unlock', $args[0], $user?->id, "попыток: {$count}");
 
         return $this->ok("Неудачных попыток входа «{$args[0]}» сброшено: {$count}. Блокировка по IP-адресу снимается сама через login.lockout_minutes.");
     }
@@ -263,10 +269,26 @@ final class Application
         $media = new GarbageCollector($services->images(), $services->media(), $services->config->int('media.gc_delay_hours'))->run();
         $sessions = $services->sessions()->purgeExpired();
         $attempts = $services->throttle()->purgeOld();
-        $services->logger->info("gc: {$media['images']} images, {$media['files']} files, {$sessions} sessions, {$attempts} login attempts");
+        $audit = $services->audit()->purge($services->config->int('audit.keep_days'));
+        $services->logger->info("gc: {$media['images']} images, {$media['files']} files, {$sessions} sessions, {$attempts} login attempts, {$audit} audit entries");
 
         return $this->ok("Удалено: изображений {$media['images']}, файлов без записи в базе {$media['files']}, "
-            . "истёкших сессий {$sessions}, старых попыток входа {$attempts}.");
+            . "истёкших сессий {$sessions}, старых попыток входа {$attempts}, старых записей журнала {$audit}.");
+    }
+
+    private function backup(): int
+    {
+        $services = $this->currentServices();
+        try {
+            $file = new Backup($services->config, $this->paths)->daily();
+        } catch (\RuntimeException $e) {
+            $services->logger->error('Daily backup failed', $e);
+
+            return $this->fail('Резервная копия не сделана: ' . $e->getMessage());
+        }
+        $services->logger->info("Daily backup written to {$file}");
+
+        return $this->ok("Резервная копия базы: {$file}. Фото из public/media/originals/ копируйте отдельно (см. docs/INSTALL.md).");
     }
 
     private function warm(): int

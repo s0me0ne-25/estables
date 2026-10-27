@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Estables\Http;
 
+use Estables\Audit\Changes;
 use Estables\Auth\Auth;
 use Estables\Catalog\Item;
 use Estables\Catalog\ItemRepository;
@@ -26,6 +27,7 @@ use Estables\Media\MediaException;
  * checked the CSRF token of every POST.
  *
  * @phpstan-import-type ItemInput from ItemRepository
+ * @phpstan-import-type ItemState from Changes
  */
 final class ItemsController
 {
@@ -109,8 +111,8 @@ final class ItemsController
         $action = $request->input('action');
         // Each dialog has its own rubric picker
         $target = (int) $request->input($action === 'remove-rubric' ? 'target_remove' : 'target_add');
-        $log = $this->services->logger;
-        $actor = $this->auth->user()->login ?? '?';
+        // Labels are taken first: deleted items have none afterwards.
+        $labels = $items->labels($ids);
 
         $done = match ($action) {
             'publish' => ['done' => 'published', 'n' => $items->setPublished($ids, true, $user)],
@@ -140,7 +142,7 @@ final class ItemsController
                 : throw new HttpException(400, 'No rubric'),
             default => throw new HttpException(400, 'Unknown action'),
         };
-        $log->info("\"{$actor}\" bulk {$action} on items " . implode(',', $ids) . ($target > 0 ? " (rubric {$target})" : ''));
+        $this->auditBulk($action, $labels, $done, $rubric, $target, (int) $request->input('position'));
 
         return Response::redirect(self::withNotice($back, array_map('strval', $done)), 303);
     }
@@ -164,6 +166,8 @@ final class ItemsController
         } catch (RubricException $e) {
             return Response::json(['ok' => false, 'error' => $e->getMessage()], 409);
         }
+        $item = (int) $request->input('item');
+        $this->services->audit()->record('item.order', $this->services->items()->labels([$item])[$item] ?? "№{$item}", $item, 'в разделе ' . $this->rubricName((int) $request->input('rubric')));
 
         return Response::json(['ok' => true]);
     }
@@ -186,7 +190,7 @@ final class ItemsController
         if ($request->isPost()) {
             if ($item !== null && $request->input('action') === 'delete') {
                 $items->delete([$item->id]);
-                $this->services->logger->info('"' . ($this->auth->user()->login ?? '?') . "\" deleted item {$item->id} ({$item->catno})");
+                $this->services->audit()->record('item.delete', $item->catno . ' ' . $item->name, $item->id);
 
                 return Response::redirect(self::LIST_PATH . '?done=deleted&n=1', 303);
             }
@@ -194,29 +198,19 @@ final class ItemsController
             $photos = self::photoInput($request);
             $errors = $items->validate($input, $item?->id);
             if ($errors === []) {
+                $images = $this->services->images();
+                $before = $item === null ? null : [$this->state($item), self::photoState($images->photos($item->id))];
                 $saved = $items->save($item?->id, $input, $this->auth->user()?->id);
                 if ($item !== null) {
-                    $this->services->images()->arrange($saved, $photos);
+                    $images->arrange($saved, $photos);
                     $this->services->rubrics()->invalidate();
                 }
+                $this->auditSave($saved, $before);
 
                 return Response::redirect("/admin/items/{$saved}/?done=" . ($item === null ? 'created' : 'saved'), 303);
             }
         } elseif ($item !== null) {
-            $rubrics = $items->rubricsOf($item->id);
-            $input = [
-                'catno' => $item->catno,
-                'name' => $item->name,
-                'summary' => $item->summary,
-                'description' => $item->description,
-                'yearFrom' => $item->yearFrom === null ? '' : (string) $item->yearFrom,
-                'yearTo' => $item->yearTo === null ? '' : (string) $item->yearTo,
-                'published' => $item->published,
-                'rubrics' => $rubrics,
-                'main' => $rubrics[0] ?? 0,
-                'attributes' => $items->attributes($item->id),
-                'variants' => $items->variants($item->id),
-            ];
+            $input = $this->state($item);
         } else {
             $tree = $this->services->rubrics()->tree();
             $rubric = (int) self::query($request, 'rubric');
@@ -300,7 +294,7 @@ final class ItemsController
             return Response::json(['ok' => false, 'error' => 'Это фото уже есть у предмета.'], 409);
         }
         $this->services->rubrics()->invalidate();
-        $this->services->logger->info('"' . ($this->auth->user()->login ?? '?') . "\" added photo {$image->sha} to item {$item->id}");
+        $this->services->audit()->record('item.photo', $item->catno . ' ' . $item->name, $item->id, $file['name'] . ': ' . $image->label());
 
         return Response::json([
             'ok' => true,
@@ -311,6 +305,96 @@ final class ItemsController
                 'item' => $item,
             ]),
         ]);
+    }
+
+    /**
+     * The item as the editor shows it; also what the journal compares.
+     *
+     * @return ItemState
+     */
+    private function state(Item $item): array
+    {
+        $items = $this->services->items();
+        $rubrics = $items->rubricsOf($item->id);
+
+        return [
+            'catno' => $item->catno,
+            'name' => $item->name,
+            'summary' => $item->summary,
+            'description' => $item->description,
+            'yearFrom' => $item->yearFrom === null ? '' : (string) $item->yearFrom,
+            'yearTo' => $item->yearTo === null ? '' : (string) $item->yearTo,
+            'published' => $item->published,
+            'rubrics' => $rubrics,
+            'main' => $rubrics[0] ?? 0,
+            'attributes' => $items->attributes($item->id),
+            'variants' => $items->variants($item->id),
+        ];
+    }
+
+    /**
+     * @param list<array{image: \Estables\Media\Image, caption: string}> $photos
+     *
+     * @return list<array{sha: string, caption: string}>
+     */
+    private static function photoState(array $photos): array
+    {
+        return array_map(static fn(array $p): array => ['sha' => $p['image']->sha, 'caption' => $p['caption']], $photos);
+    }
+
+    /**
+     * A journal entry for a saved item: a new one, or what changed in it.
+     *
+     * @param array{0: ItemState, 1: list<array{sha: string, caption: string}>}|null $before
+     */
+    private function auditSave(int $id, ?array $before): void
+    {
+        $item = $this->services->items()->find($id);
+        if ($item === null) {
+            return;
+        }
+        $label = $item->catno . ' ' . $item->name;
+        $audit = $this->services->audit();
+        if ($before === null) {
+            $audit->record('item.create', $label, $id, $item->published ? '' : 'черновик');
+
+            return;
+        }
+        $changes = Changes::item($before[0], $this->state($item), $before[1], self::photoState($this->services->images()->photos($id)), $this->services->rubrics()->tree());
+        if ($changes !== '') {
+            $audit->record('item.update', $label, $id, $changes);
+        }
+    }
+
+    /**
+     * One journal entry for a bulk action, naming the items.
+     *
+     * @param array<int, string>    $labels items by id, taken before the action
+     * @param array<string, int|string> $done result of the action
+     */
+    private function auditBulk(string $action, array $labels, array $done, int $rubric, int $target, int $position): void
+    {
+        $where = match ($action) {
+            'add-rubric', 'remove-rubric' => 'раздел ' . $this->rubricName($target),
+            'top' => 'в начало раздела ' . $this->rubricName($rubric),
+            'bottom' => 'в конец раздела ' . $this->rubricName($rubric),
+            'position' => 'на позицию ' . max(1, $position) . ' в разделе ' . $this->rubricName($rubric),
+            default => '',
+        };
+        $kept = (int) ($done['kept'] ?? 0);
+        $list = \array_slice($labels, 0, 30);
+        $details = ($where !== '' ? $where . '. ' : '') . implode('; ', $list)
+            . (\count($labels) > \count($list) ? '; и ещё ' . (\count($labels) - \count($list)) : '')
+            . ($kept > 0 ? '. Оставлены в единственном разделе: ' . $kept : '');
+        $key = \in_array($action, ['top', 'bottom', 'position'], true) ? 'items.order' : 'items.' . $action;
+        $this->services->audit()->record($key, Text::plural(\count($labels), 'предмет', 'предмета', 'предметов'), null, $details);
+    }
+
+    private function rubricName(int $id): string
+    {
+        $tree = $this->services->rubrics()->tree();
+
+        return $tree->has($id) ? '«' . $tree->node($id)['name'] . '»' : "№{$id}";
     }
 
     /**

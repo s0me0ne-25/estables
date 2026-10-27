@@ -109,7 +109,7 @@ final class SchemaManager
     {
         if ($from > 0 && $this->backup->enabled()) {
             try {
-                $file = $this->backup->create('before-v' . Schema::VERSION);
+                $file = $this->backup->beforeUpgrade(Schema::VERSION);
                 $this->logger->info("Schema backup written to {$file}");
             } catch (\RuntimeException $e) {
                 throw new SchemaException('Не удалось сделать резервную копию базы перед обновлением схемы, обновление отменено.', 0, $e);

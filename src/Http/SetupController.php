@@ -62,9 +62,15 @@ final class SetupController
             }
 
             if ($errors === []) {
-                $this->services->users()->create($old['login'], $password, $old['display_name']);
+                $users = $this->services->users();
+                $id = $users->create($old['login'], $password, $old['display_name']);
                 $state->markInstalled();
-                $this->services->logger->info("First administrator \"{$old['login']}\" created via the web installer");
+                $first = $users->find($id);
+                if ($first !== null) {
+                    $audit = $this->services->audit();
+                    $audit->actAs($first, $request->ip());
+                    $audit->record('user.create', $first->login, $first->id, 'первый администратор, через мастер установки');
+                }
 
                 return $this->noStore(Response::html($this->view->page('setup/done', [
                     'title' => 'Установка завершена',

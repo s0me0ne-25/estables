@@ -135,6 +135,8 @@ final class Response
     public function send(): void
     {
         if (!headers_sent()) {
+            // The PHP version is nobody's business.
+            header_remove('X-Powered-By');
             http_response_code($this->status);
             foreach ($this->headers as $name => $value) {
                 header(self::canonicalName($name) . ': ' . $value);

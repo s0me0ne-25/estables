@@ -289,6 +289,77 @@ final class ItemRepository
     }
 
     /**
+     * Number of items guests can see: published and in a shown rubric.
+     *
+     * @param list<int> $rubrics shown rubrics
+     */
+    public function publicCount(array $rubrics): int
+    {
+        if ($rubrics === []) {
+            return 0;
+        }
+        [$in, $params] = self::in($rubrics);
+
+        return (int) $this->db->value(
+            "SELECT COUNT(*) FROM items i WHERE i.is_published = 1
+               AND EXISTS (SELECT 1 FROM item_rubrics r WHERE r.item_id = i.id AND r.rubric_id IN ({$in}))",
+            $params,
+        );
+    }
+
+    /**
+     * A slice of the items guests can see, by id, for the sitemap.
+     *
+     * @param list<int> $rubrics shown rubrics
+     *
+     * @return list<array{slug: string, name: string, updatedAt: \DateTimeImmutable, cover: ?Image}>
+     */
+    public function publicSlice(array $rubrics, int $offset, int $limit): array
+    {
+        if ($rubrics === []) {
+            return [];
+        }
+        [$in, $params] = self::in($rubrics);
+        $rows = $this->db->rows(
+            'SELECT i.slug, i.name, i.updated_at,
+                (SELECT ' . Image::PACKED . " FROM item_photos p JOIN images im ON im.sha256 = p.image_sha
+                    WHERE p.item_id = i.id ORDER BY p.position, p.id LIMIT 1) AS cover
+             FROM items i WHERE i.is_published = 1
+               AND EXISTS (SELECT 1 FROM item_rubrics r WHERE r.item_id = i.id AND r.rubric_id IN ({$in}))
+             ORDER BY i.id LIMIT " . max(1, $limit) . ' OFFSET ' . max(0, $offset),
+            $params,
+        );
+
+        return array_map(static fn(array $row): array => [
+            'slug' => (string) $row['slug'],
+            'name' => (string) $row['name'],
+            'updatedAt' => new \DateTimeImmutable((string) $row['updated_at'], new \DateTimeZone('UTC')),
+            'cover' => Image::unpack(\is_string($row['cover']) ? $row['cover'] : null),
+        ], $rows);
+    }
+
+    /**
+     * "Number Name" of the given items in catalogue order, for the journal.
+     *
+     * @param list<int> $ids
+     *
+     * @return array<int, string> id => label
+     */
+    public function labels(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+        [$in, $params] = self::in($ids);
+        $labels = [];
+        foreach ($this->db->rows("SELECT id, catno, name FROM items WHERE id IN ({$in}) ORDER BY catno_sort, id", $params) as $row) {
+            $labels[(int) $row['id']] = $row['catno'] . ' ' . $row['name'];
+        }
+
+        return $labels;
+    }
+
+    /**
      * @param list<int> $ids
      */
     public function delete(array $ids): int

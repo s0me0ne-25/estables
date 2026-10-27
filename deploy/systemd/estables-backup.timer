@@ -1,0 +1,14 @@
+# Starts estables-backup.service every night, before the clean-up.
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[Unit]
+Description=eStables: nightly database backup
+
+[Timer]
+OnCalendar=*-*-* 03:37
+RandomizedDelaySec=20m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Estables\Core;
 
+use Estables\Audit\AuditLog;
 use Estables\Auth\Captcha\Captcha;
 use Estables\Auth\Captcha\CaptchaFactory;
 use Estables\Auth\Csrf;
@@ -33,6 +34,7 @@ final class Services
     private ?UserRepository $users = null;
     private ?RubricRepository $rubrics = null;
     private ?ItemRepository $items = null;
+    private ?AuditLog $audit = null;
 
     public function __construct(
         public readonly Paths $paths,
@@ -108,6 +110,14 @@ final class Services
     public function csrf(): Csrf
     {
         return new Csrf($this->config->string('app.secret'));
+    }
+
+    /**
+     * Shared, so the actor set by the kernel applies to every entry of the request.
+     */
+    public function audit(): AuditLog
+    {
+        return $this->audit ??= new AuditLog($this->db(), $this->logger);
     }
 
     public function installState(): InstallState

@@ -35,6 +35,7 @@ final class Config
             'enabled' => true,
             'dump_binary' => 'mariadb-dump',
             'keep' => 10,
+            'keep_daily' => 14,
         ],
         'session' => [
             'remember_days' => 30,
@@ -62,6 +63,12 @@ final class Config
             'imagick_memory_mb' => 256,
             'imagick_map_mb' => 1024,
             'gc_delay_hours' => 24,
+        ],
+        'audit' => [
+            'keep_days' => 730,
+        ],
+        'security' => [
+            'hsts_max_age' => 31536000,
         ],
     ];
 
@@ -159,12 +166,16 @@ final class Config
         foreach (['session.remember_days', 'session.idle_hours', 'session.touch_minutes', 'session.rotate_hours',
             'login.max_failures_per_login', 'login.max_failures_per_ip', 'login.lockout_minutes',
             'media.max_upload_mb', 'media.max_megapixels', 'media.thumb_size', 'media.large_size', 'media.original_max',
-            'media.imagick_memory_mb', 'media.imagick_map_mb', 'media.gc_delay_hours'] as $key) {
+            'media.imagick_memory_mb', 'media.imagick_map_mb', 'media.gc_delay_hours',
+            'backup.keep', 'backup.keep_daily', 'audit.keep_days'] as $key) {
             if ($this->int($key) < 1) {
                 $problems[] = "{$key}: нужно целое число больше нуля.";
             }
         }
 
+        if ($this->int('security.hsts_max_age') < 0) {
+            $problems[] = 'security.hsts_max_age: нужно целое число секунд, 0 — без HSTS.';
+        }
         if ($this->int('media.thumb_size') >= $this->int('media.large_size')) {
             $problems[] = 'media.thumb_size должен быть меньше media.large_size.';
         }

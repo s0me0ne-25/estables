@@ -9,6 +9,7 @@ namespace Estables\Tests\Integration;
 use Estables\Cli\Application;
 use Estables\Core\Logger;
 use Estables\Core\Services;
+use Estables\Install\Environment;
 
 /**
  * Account commands of bin/estables.
@@ -58,6 +59,29 @@ final class CliTest extends DatabaseTestCase
         self::assertSame(0, $code, $out);
         self::assertStringContainsString('сброшено: 5', $out);
         self::assertSame(0, $throttle->lockedFor('keeper', '198.51.100.1'));
+    }
+
+    public function testDailyBackupKeepsItsOwnNumberOfDumps(): void
+    {
+        if (Environment::findBinary('mariadb-dump') === null) {
+            self::markTestSkipped('mariadb-dump is not installed');
+        }
+        $dir = $this->site->paths->ensureDir($this->site->paths->backups());
+        // Older dumps: an upgrade one and more daily ones than backup.keep_daily
+        touch($dir . '/estables-20200101-000000-before-v14.sql.gz');
+        for ($day = 1; $day <= 20; $day++) {
+            touch($dir . \sprintf('/estables-202002%02d-033700-daily.sql.gz', $day));
+        }
+
+        [$code, $out] = $this->cli(['backup']);
+        self::assertSame(0, $code, $out);
+        self::assertStringContainsString('-daily.sql.gz', $out);
+        $daily = glob($dir . '/estables-*-daily.sql.gz') ?: [];
+        self::assertCount(14, $daily);
+        rsort($daily);
+        self::assertStringContainsString('CREATE TABLE `audit_log`', (string) gzdecode((string) file_get_contents($daily[0])), 'The newest is the real dump');
+        self::assertFileExists($dir . '/estables-20200101-000000-before-v14.sql.gz', 'Daily dumps never push out an upgrade one');
+        self::assertFileDoesNotExist($dir . '/estables-20200201-033700-daily.sql.gz');
     }
 
     /**

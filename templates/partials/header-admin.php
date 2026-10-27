@@ -11,6 +11,7 @@ $items = [
     'items' => ['Предметы', $this->url('admin'), 'bi-collection'],
     'rubrics' => ['Рубрикатор', $this->url('admin.rubrics'), 'bi-diagram-3'],
     'users' => ['Пользователи', $this->url('admin.users'), 'bi-people'],
+    'audit' => ['Журнал', $this->url('admin.audit'), 'bi-journal-text'],
 ];
 ?>
 <header class="es-header">

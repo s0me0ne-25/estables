@@ -33,9 +33,31 @@ final class Logger
         $this->write('ERROR', $message);
     }
 
+    /**
+     * A value typed by someone, safe inside a log line: in double quotes, with
+     * quotes, backslashes and line breaks escaped, so it can neither end the
+     * quotes nor forge a line of its own (fail2ban reads these lines).
+     */
+    public static function quote(string $value): string
+    {
+        $value = mb_scrub($value, 'UTF-8');
+
+        return '"' . preg_replace_callback(
+            '~[\x00-\x1f\x7f"\\\\]~',
+            static fn(array $m): string => match ($m[0]) {
+                '"' => '\\"',
+                '\\' => '\\\\',
+                default => \sprintf('\\x%02x', \ord($m[0])),
+            },
+            $value,
+        ) . '"';
+    }
+
     private function write(string $level, string $message): void
     {
-        $line = \sprintf("[%s] %s: %s\n", date('Y-m-d H:i:s'), $level, $message);
+        // With the UTC offset: fail2ban compares the time with its own clock,
+        // and app.timezone may differ from the server's.
+        $line = \sprintf("[%s] %s: %s\n", date('Y-m-d H:i:s O'), $level, $message);
         $dir = \dirname($this->file);
         if ((is_dir($dir) || @mkdir($dir, 0o775, true)) && @file_put_contents($this->file, $line, FILE_APPEND | LOCK_EX) !== false) {
             return;

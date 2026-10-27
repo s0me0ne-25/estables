@@ -90,8 +90,7 @@ final class UsersController
     {
         $users = $this->services->users();
         $sessions = $this->services->sessions();
-        $log = $this->services->logger;
-        $actor = $me->user->login;
+        $audit = $this->services->audit();
 
         $action = $request->input('action');
         if ($action === 'end-session') {
@@ -99,12 +98,13 @@ final class UsersController
                 throw new HttpException(400, 'Use logout for the current session');
             }
             $sessions->deleteByHandle($me->user->id, $request->input('session'));
+            $audit->record('user.sessions', $me->user->login, $me->user->id, 'один из своих сеансов');
 
             return self::done('session');
         }
         if ($action === 'end-others') {
             $sessions->deleteForUser($me->user->id, $me->idHash);
-            $log->info("\"{$actor}\" ended own other sessions");
+            $audit->record('user.sessions', $me->user->login, $me->user->id, 'свои сеансы, кроме текущего');
 
             return self::done('others');
         }
@@ -114,8 +114,8 @@ final class UsersController
             if ($errors !== []) {
                 return ['addUserModal', $errors, $old];
             }
-            $users->create($old['login'], $request->rawInput('password'), $old['display_name']);
-            $log->info("\"{$actor}\" added administrator \"{$old['login']}\"");
+            $created = $users->create($old['login'], $request->rawInput('password'), $old['display_name']);
+            $audit->record('user.create', $old['login'], $created, $old['display_name']);
 
             return self::done('added');
         }
@@ -141,7 +141,7 @@ final class UsersController
                 if ($endSessions) {
                     $sessions->deleteForUser($target->id, $self ? $me->idHash : null);
                 }
-                $log->info("\"{$actor}\" changed the password of \"{$target->login}\"" . ($endSessions ? ' and ended the sessions' : ''));
+                $audit->record('user.password', $target->login, $target->id, $endSessions ? ($self ? 'другие сеансы завершены' : 'сеансы завершены') : '');
 
                 return self::done('password');
 
@@ -154,13 +154,13 @@ final class UsersController
                 if ($action === 'block') {
                     $sessions->deleteForUser($target->id);
                 }
-                $log->info("\"{$actor}\" {$action}ed \"{$target->login}\"");
+                $audit->record('user.' . $action, $target->login, $target->id);
 
                 return self::done($action === 'block' ? 'blocked' : 'unblocked');
 
             case 'end-sessions':
                 $sessions->deleteForUser($target->id);
-                $log->info("\"{$actor}\" ended all sessions of \"{$target->login}\"");
+                $audit->record('user.sessions', $target->login, $target->id, 'все сеансы');
                 if ($self) {
                     // Including this one: the administrator is signed out everywhere.
                     $this->auth->forgetCookie();

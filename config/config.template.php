@@ -43,12 +43,15 @@ return [
         'password' => '',
     ],
 
-    // Database dump before every schema upgrade, into var/backups/.
+    // Database dumps into var/backups/: one before every schema upgrade, and
+    // a daily one made by "bin/estables backup" (systemd timer in deploy/).
     'backup' => [
+        // Dump before a schema upgrade; the daily command ignores this switch.
         'enabled' => true,
         'dump_binary' => 'mariadb-dump',
-        // Number of dumps to keep.
+        // Number of dumps to keep: before upgrades and daily ones, separately.
         'keep' => 10,
+        'keep_daily' => 14,
     ],
 
     // Login sessions.
@@ -102,5 +105,18 @@ return [
         'imagick_map_mb' => 1024,
         // bin/estables gc deletes images nobody uses after this delay.
         'gc_delay_hours' => 24,
+    ],
+
+    // Journal of administrators' actions ("Журнал" in the admin area);
+    // bin/estables gc deletes older entries.
+    'audit' => [
+        'keep_days' => 730,
+    ],
+
+    'security' => [
+        // Strict-Transport-Security sent over HTTPS: browsers stop using plain
+        // HTTP for this site for that many seconds. 0 turns it off; set it
+        // only once HTTPS works for good.
+        'hsts_max_age' => 31536000,
     ],
 ];

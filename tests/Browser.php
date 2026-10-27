@@ -33,7 +33,7 @@ final class Browser
     }
 
     /**
-     * @param array<string, string> $fields
+     * @param array<string, string|list<string>> $fields
      */
     public function post(string $url, array $fields): Response
     {
@@ -43,7 +43,7 @@ final class Browser
     /**
      * A multipart form: files are local paths sent under the given field names.
      *
-     * @param array<string, string> $fields
+     * @param array<string, string|list<string>> $fields
      * @param array<string, string> $files  field name => path of the file to send
      */
     public function upload(string $url, array $fields, array $files): Response
@@ -58,7 +58,7 @@ final class Browser
     }
 
     /**
-     * @param array<string, string>                                              $fields
+     * @param array<string, string|list<string>>                                $fields
      * @param array<string, array{name: string, tmp: string, error: int, size: int}> $files
      */
     public function request(string $method, string $url, array $fields = [], array $files = []): Response
