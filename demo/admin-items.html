@@ -1,41 +1,33 @@
 <!doctype html>
-<!--
-  eStables demo: admin, items list.
-  Static mock-up for design review; all data and images are placeholders.
-  SPDX-License-Identifier: AGPL-3.0-or-later
--->
 <html lang="ru" data-bs-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Предметы — администрирование eStables</title>
+  <title>Предметы — eStables</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="eStables: справочник коллекционера конной тематики. Демонстрационная страница.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" integrity="sha384-nWN3KqaaVcbEsCjLSV+2jMjh62Iny/+mN3srM8TZeM8N6aj7eDl5wwYggjAJ4/sJ" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/estables.css">
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
 
   <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="admin">
   <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
 </head>
-<body data-es-area="admin">
+<body>
 
 <a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
 
-<!-- ============================ Header ============================ -->
 <header class="es-header">
   <nav class="navbar navbar-expand-md" aria-label="Навигация администратора">
     <div class="container-fluid px-3 px-lg-4">
       <a class="navbar-brand" href="admin-items.html">
-        <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
-        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
-        eStables <span class="es-brand-role">администрирование</span>
-      </a>
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables <span class="es-brand-role">администрирование</span>
+</a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
         <span class="navbar-toggler-icon"></span>
@@ -43,308 +35,596 @@
 
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
-          <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
-          <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
-        </ul>
+                                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-audit.html"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Журнал</a></li>
+                              </ul>
         <div class="d-flex gap-2 align-items-center">
           <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
           <div class="dropdown">
-            <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
-              <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
-            </ul>
-          </div>
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
         </div>
       </div>
     </div>
   </nav>
 </header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
 
 <main id="main" class="container-xxl px-3 px-lg-4 py-4">
+
+  <div class="alert alert-danger" role="alert" data-es-order-error hidden></div>
 
   <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
     <div>
       <h1 class="mb-1">Предметы</h1>
-      <p class="text-body-secondary mb-0">1 996 предметов в каталоге, из них 14 черновиков</p>
+      <p class="text-body-secondary mb-0">32 предмета в каталоге, из них 1 черновик</p>
     </div>
-    <a class="btn btn-primary" href="admin-item-edit.html"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить предмет</a>
+    <a class="btn btn-primary" href="admin-item-new.html"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить предмет</a>
   </div>
 
   <!-- Filters -->
-  <form class="row g-2 align-items-end mb-3" role="search" aria-label="Фильтр предметов">
+  <form class="row g-2 align-items-end mb-3" role="search" aria-label="Фильтр предметов" method="get" action="admin-items.html" data-es-autosubmit>
     <div class="col-12 col-md-5 col-xl-4">
       <label class="form-label small" for="f-q">Поиск</label>
       <div class="input-group">
         <span class="input-group-text bg-transparent"><i class="bi bi-search" aria-hidden="true"></i></span>
-        <input class="form-control" type="search" id="f-q" placeholder="Название или номер">
+        <input class="form-control" type="search" id="f-q" name="q" value="" placeholder="Название или номер">
       </div>
     </div>
     <div class="col-12 col-sm-6 col-md-4 col-xl-3">
       <label class="form-label small" for="f-rubric">Раздел</label>
-      <select class="form-select" id="f-rubric">
-        <option>Все разделы</option>
-        <option>Фигурки</option>
-        <option>&nbsp;&nbsp;Фарфор</option>
-        <option selected>&nbsp;&nbsp;&nbsp;&nbsp;Ленинградский завод</option>
-        <option>&nbsp;&nbsp;&nbsp;&nbsp;Дулёвский завод</option>
-        <option>Медали и знаки</option>
-        <option>Филателия</option>
-        <option>Тематические подборки</option>
+      <select class="form-select" id="f-rubric" name="rubric">
+        <option value="">Все разделы</option>
+        <option value="1">Фигурки</option>
+        <option value="2">  Фарфор</option>
+        <option value="3">    Дулёвский завод</option>
+        <option value="4">    Ленинградский завод</option>
+        <option value="5">    Вербилки</option>
+        <option value="6">    Европейские мануфактуры</option>
+        <option value="7">  Художественное литьё</option>
+        <option value="8">    Чугун</option>
+        <option value="9">    Бронза</option>
+        <option value="10">  Пластик и смола</option>
+        <option value="11">Медали и знаки</option>
+        <option value="12">  Конный спорт</option>
+        <option value="13">  Ипподромы</option>
+        <option value="14">  Конные заводы</option>
+        <option value="15">Филателия</option>
+        <option value="16">  Марки</option>
+        <option value="17">  Конверты и карточки</option>
+        <option value="18">Открытки</option>
+        <option value="19">Графика и плакаты</option>
+        <option value="20">Книги и каталоги</option>
+        <option value="21">Тематические подборки</option>
+        <option value="22">  Кони на дыбах</option>
+        <option value="23">  Орловские рысаки</option>
       </select>
     </div>
     <div class="col-6 col-sm-3 col-md-3 col-xl-2">
       <label class="form-label small" for="f-status">Статус</label>
-      <select class="form-select" id="f-status">
-        <option>Любой</option>
-        <option>Опубликован</option>
-        <option>Черновик</option>
+      <select class="form-select" id="f-status" name="status">
+        <option value="">Любой</option>
+        <option value="published">Опубликован</option>
+        <option value="draft">Черновик</option>
       </select>
     </div>
     <div class="col-6 col-sm-3 col-xl-3">
       <label class="form-label small" for="f-sort">Сортировка</label>
       <!-- "Авторский порядок" is offered only when a single rubric is selected -->
-      <select class="form-select" id="f-sort">
-        <option selected>Авторский порядок</option>
-        <option>Изменены недавно</option>
-        <option>По номеру</option>
-        <option>По названию</option>
+      <select class="form-select" id="f-sort" name="sort">
+        <option value="recent" selected>Изменены недавно</option>
+        <option value="number">По номеру</option>
+        <option value="title">По названию</option>
       </select>
+    </div>
+    <button class="visually-hidden" type="submit">Показать</button>
+  </form>
+
+
+  <form id="bulkForm" method="post" action="#">
+    <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">
+    <input type="hidden" name="back" value="/admin/?sort=recent">
+    <input type="hidden" name="rubric" value="0">
+
+    <!-- Bulk actions: shown when rows are selected -->
+    <div class="es-bulk mb-3" data-es-bulk hidden>
+      <span>Выбрано: <strong data-es-bulk-count>0</strong></span>
+      <div class="d-flex flex-wrap gap-2" role="group" aria-label="Разделы">
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addRubricModal"><i class="bi bi-folder-plus me-1" aria-hidden="true"></i>Добавить в раздел</button>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#removeRubricModal"><i class="bi bi-folder-minus me-1" aria-hidden="true"></i>Убрать из раздела</button>
+      </div>
+      <div class="d-flex flex-wrap gap-2" role="group" aria-label="Публикация">
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="publish"><i class="bi bi-eye me-1" aria-hidden="true"></i>Опубликовать</button>
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="unpublish"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i>Снять с публикации</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteItemsModal"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить</button>
+      </div>
+      <button class="btn btn-sm btn-link ms-auto" type="button" data-es-bulk-clear>Снять выделение</button>
+    </div>
+
+    <div class="table-responsive border-top">
+      <table class="table table-hover es-admin-table">
+        <thead>
+          <tr>
+            <th scope="col" class="ps-2 es-col-check">
+              <input class="form-check-input" type="checkbox" data-es-select-all aria-label="Выбрать все на странице">
+            </th>
+            <th scope="col" class="es-col-thumb"><span class="visually-hidden">Фото</span></th>
+            <th scope="col">Номер</th>
+            <th scope="col">Название и разделы</th>
+            <th scope="col">Годы</th>
+            <th scope="col">Фото</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Изменён</th>
+            <th scope="col" class="text-end">Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="32" data-es-select aria-label="Выбрать КН-01"></td>
+            <td><img class="es-thumb" src="media/400/16/160eea34b70cf282d4a6161c3f028093d3c233dcdafdf2b894b70a08aa3e7728.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">КН-01</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-32.html">Каталог продукции ЛФЗ</a><span class="es-path">Книги и каталоги</span></td>
+            <td class="text-nowrap">1960</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">25.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-32.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать КН-01</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-kn-01.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть КН-01 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="11" data-es-select aria-label="Выбрать ЛФЗ-1042"></td>
+            <td><img class="es-thumb" src="media/400/71/71238c4eb541109e4d70a328236985a65127e95f4aab131669a101ace6e7092a.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1042</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-11.html">Конь вздыбленный</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод <span class="es-more" title="Также: Тематические подборки / Кони на дыбах">+1<span class="visually-hidden"> раздел: Тематические подборки / Кони на дыбах</span></span></span></td>
+            <td class="text-nowrap">1958–1979</td>
+            <td>4</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">24.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-11.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1042</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1042.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1042 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="31" data-es-select aria-label="Выбрать Г-12"></td>
+            <td><img class="es-thumb" src="media/400/94/94ce666ae1331cfe01f2990cce83433d089dbeacf4c628db2fd60f944beea59d.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">Г-12</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-31.html">Плакат «Развивайте коневодство»</a><span class="es-path">Графика и плакаты</span></td>
+            <td class="text-nowrap">1954</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">23.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-31.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать Г-12</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-g-12.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть Г-12 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="30" data-es-select aria-label="Выбрать О-301"></td>
+            <td><img class="es-thumb" src="media/400/32/32dec55ff22211899d8ed63d60c191dc5a95b6887194a345a06ea681c166396b.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">О-301</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-30.html">Открытка «Тройка»</a><span class="es-path">Открытки</span></td>
+            <td class="text-nowrap">1955</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">21.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-30.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать О-301</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-o-301.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть О-301 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="29" data-es-select aria-label="Выбрать О-415"></td>
+            <td><img class="es-thumb" src="media/400/68/68b6b84281bb6cff0f747e1e11ad53158668ec01a9f508af5386db4f76fa9bfb.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">О-415</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-29.html">Набор открыток «Лошади»</a><span class="es-path">Открытки</span></td>
+            <td class="text-nowrap">1972</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">19.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-29.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать О-415</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-o-415.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть О-415 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="28" data-es-select aria-label="Выбрать К-88"></td>
+            <td><img class="es-thumb" src="media/400/2d/2dd24a2fe5b2440ef15dd2f7132371c19cb171909dfa93451dffa685e6d84ac7.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">К-88</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-28.html">Конверт «Орловский рысак»</a><span class="es-path">Филателия / Конверты и карточки</span></td>
+            <td class="text-nowrap">1988</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">17.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-28.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать К-88</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-k-88.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть К-88 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="27" data-es-select aria-label="Выбрать М-1976"></td>
+            <td><img class="es-thumb" src="media/400/82/82ba2034d5f7902a32b066484f1c35c492383caa0cd5bf0b6a79439ac8f6c274.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">М-1976</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-27.html">Марка «Конный спорт»</a><span class="es-path">Филателия / Марки</span></td>
+            <td class="text-nowrap">1976</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">15.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-27.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать М-1976</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-m-1976.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть М-1976 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="26" data-es-select aria-label="Выбрать М-1964"></td>
+            <td><img class="es-thumb" src="media/400/20/20ee347a308544cb44baebab38a0340c7d0708da63137725b4062fb9be5e8217.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">М-1964</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-26.html">Серия «Породы лошадей»</a><span class="es-path">Филателия / Марки</span></td>
+            <td class="text-nowrap">1964</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">13.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-26.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать М-1964</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-m-1964.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть М-1964 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="25" data-es-select aria-label="Выбрать МД-14"></td>
+            <td><img class="es-thumb" src="media/400/62/62871cd75aa6927530faa76913150563357b44b4138b0698f78897de2e23a0ff.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">МД-14</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-25.html">Настольная медаль конного завода</a><span class="es-path">Медали и знаки / Конные заводы</span></td>
+            <td class="text-nowrap">1976</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">11.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-25.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать МД-14</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-md-14.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть МД-14 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="24" data-es-select aria-label="Выбрать ЗН-612"></td>
+            <td><img class="es-thumb" src="media/400/e5/e5f812821f03cb3a4fe8bddc6f34c6ecc41a630b7eca7628116d53f9171b40e6.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЗН-612</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-24.html">Жетон Центрального московского ипподрома</a><span class="es-path">Медали и знаки / Ипподромы</span></td>
+            <td class="text-nowrap">1957</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">09.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-24.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЗН-612</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-zn-612.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЗН-612 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="23" data-es-select aria-label="Выбрать ЗН-501"></td>
+            <td><img class="es-thumb" src="media/400/0a/0a1732b46b5902dc14eebaf814794749fecfbd1d8700e92cb22f776fb52bf011.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЗН-501</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-23.html">Знак «Мастер спорта» по конному спорту</a><span class="es-path">Медали и знаки / Конный спорт</span></td>
+            <td class="text-nowrap">1965</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">07.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-23.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЗН-501</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-zn-501.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЗН-501 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="22" data-es-select aria-label="Выбрать ПЛ-03"></td>
+            <td><img class="es-thumb" src="media/400/4f/4f22dc4409d5bb5bc39a72b750cebaa4dc712160450a16fdf0b6ee51be4e58b6.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ПЛ-03</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-22.html">Пони-игрушка</a><span class="es-path">Фигурки / Пластик и смола</span></td>
+            <td class="text-nowrap">1978–1984</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">05.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-22.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ПЛ-03</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-pl-03.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ПЛ-03 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="21" data-es-select aria-label="Выбрать БР-07"></td>
+            <td><img class="es-thumb" src="media/400/72/72eaa25c82ab92e1f37f250b742cdeebb107e57fedd5da0f82f34f144de303ec.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">БР-07</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-21.html">Скачущий конь</a><span class="es-path">Фигурки / Художественное литьё / Бронза</span></td>
+            <td class="text-nowrap">1974</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">03.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-21.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать БР-07</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-br-07.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть БР-07 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="20" data-es-select aria-label="Выбрать КЧЗ-118"></td>
+            <td><img class="es-thumb" src="media/400/a7/a713091b0f7ef3b974fa3b48064385386aaccbf799ece918c035b81e99035cab.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">КЧЗ-118</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-20.html">Конь на дыбах</a><span class="es-path">Фигурки / Художественное литьё / Чугун <span class="es-more" title="Также: Тематические подборки / Кони на дыбах">+1<span class="visually-hidden"> раздел: Тематические подборки / Кони на дыбах</span></span></span></td>
+            <td class="text-nowrap">1959–1985</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">01.10.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-20.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать КЧЗ-118</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-kchz-118.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть КЧЗ-118 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="19" data-es-select aria-label="Выбрать КЧЗ-140"></td>
+            <td><img class="es-thumb" src="media/400/56/56d15e1158890b3923772b6f94c7b6795da33cded656225e20319e8d76a14763.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">КЧЗ-140</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-19.html">Упряжка</a><span class="es-path">Фигурки / Художественное литьё / Чугун</span></td>
+            <td class="text-nowrap">1965</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">29.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-19.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать КЧЗ-140</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-kchz-140.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть КЧЗ-140 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="18" data-es-select aria-label="Выбрать ЕМ-12"></td>
+            <td><img class="es-thumb" src="media/400/00/006a370e59a6b23023887b7cb3c2b65f3eab5944d1872c56a5fa0c7809cd9e9c.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЕМ-12</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-18.html">Липицианская лошадь</a><span class="es-path">Фигурки / Фарфор / Европейские мануфактуры</span></td>
+            <td class="text-nowrap">1962</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">27.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-18.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЕМ-12</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-em-12.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЕМ-12 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="17" data-es-select aria-label="Выбрать ЕМ-27"></td>
+            <td><img class="es-thumb" src="media/400/35/35d50e2a8441bd45818c7d0e968da2c13bc4ecc2b58c059050b46d900dda0eab.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЕМ-27</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-17.html">Кобыла с жеребёнком</a><span class="es-path">Фигурки / Фарфор / Европейские мануфактуры</span></td>
+            <td class="text-nowrap">1965–1978</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">25.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-17.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЕМ-27</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-em-27.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЕМ-27 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="16" data-es-select aria-label="Выбрать ВФЗ-31"></td>
+            <td><img class="es-thumb" src="media/400/c1/c1d3266049bbd4bee7d8ee86759ffa0d35f86b55b37750647473f56b709e4ca8.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ВФЗ-31</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-16.html">Тройка с бубенцами</a><span class="es-path">Фигурки / Фарфор / Вербилки</span></td>
+            <td class="text-nowrap">1960</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">22.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-16.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ВФЗ-31</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-vfz-31.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ВФЗ-31 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="15" data-es-select aria-label="Выбрать ДФЗ-210"></td>
+            <td><img class="es-thumb" src="media/400/fb/fb67412202f36e6e962442be691e48dd5f37765612f56856cf5b52434df3008f.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ДФЗ-210</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-15.html">Орловский рысак в яблоках</a><span class="es-path">Фигурки / Фарфор / Дулёвский завод <span class="es-more" title="Также: Тематические подборки / Орловские рысаки">+1<span class="visually-hidden"> раздел: Тематические подборки / Орловские рысаки</span></span></span></td>
+            <td class="text-nowrap">1958–1966</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">20.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-15.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ДФЗ-210</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-dfz-210.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ДФЗ-210 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="14" data-es-select aria-label="Выбрать ДФЗ-245"></td>
+            <td><img class="es-thumb" src="media/400/fe/fe2f1800749018c98d379f7fb7a3b45e9e894d6283a4b6830128cae7e311104e.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ДФЗ-245</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-14.html">Конь-качалка</a><span class="es-path">Фигурки / Фарфор / Дулёвский завод</span></td>
+            <td class="text-nowrap">1971</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">18.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-14.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ДФЗ-245</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-dfz-245.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ДФЗ-245 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="13" data-es-select aria-label="Выбрать ЛФЗ-1078"></td>
+            <td><img class="es-thumb" src="media/400/96/96b88fab86ac6421a557028caa97f7ca9e352c1c2f6325f617cdf1cc6c6ebe49.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1078</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-13.html">Конь в попоне</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1972–1988</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">16.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-13.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1078</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1078.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1078 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="12" data-es-select aria-label="Выбрать ЛФЗ-1039"></td>
+            <td><img class="es-thumb" src="media/400/81/81ef76419906573c34ec3ff0fa8424f6b3dc2df288cd1d0774601dd30f87b399.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1039</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-12.html">Тройка, настольная композиция</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1956–1963</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">14.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-12.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1039</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1039.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1039 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="10" data-es-select aria-label="Выбрать ЛФЗ-1043"></td>
+            <td><img class="es-thumb" src="media/400/bd/bd0516dd3589319ec0d46dc891b608e27bce08096b304798cf556d852fb237bc.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1043</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-10.html">Голова арабского скакуна</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1961–1970</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">10.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-10.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1043</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1043.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1043 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="9" data-es-select aria-label="Выбрать ЛФЗ-1051"></td>
+            <td><img class="es-thumb" src="media/400/ae/ae3a39f9a0deb26e2a9c2692512e401e128d75272730cc5961339e88106d3761.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1051</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-9.html">Орловский рысак</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод <span class="es-more" title="Также: Тематические подборки / Орловские рысаки">+1<span class="visually-hidden"> раздел: Тематические подборки / Орловские рысаки</span></span></span></td>
+            <td class="text-nowrap">1962–1975</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">08.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-9.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1051</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1051.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1051 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="8" data-es-select aria-label="Выбрать ЛФЗ-1064"></td>
+            <td><img class="es-thumb" src="media/400/c3/c37974932070a42be8ac4462c73a805f2188c2a494fa7f22210722c54e55255a.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1064</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-8.html">Вороной на скаку</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1967–1981</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">06.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-8.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1064</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1064.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1064 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="7" data-es-select aria-label="Выбрать ЛФЗ-1080"></td>
+            <td><img class="es-thumb" src="media/400/f4/f4819f0bdefcb824d473fb0808c3b163fd14a6732bdd5193fdaf407656276a13.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1080</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-7.html">Будённовская кобыла</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1974–1980</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">04.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-7.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1080</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1080.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1080 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="6" data-es-select aria-label="Выбрать ЛФЗ-1057"></td>
+            <td><img class="es-thumb" src="media/400/fa/fa906ef263be6bd39525bbb422bd727ab316c9433f88337e8ed14d1a78f66683.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1057</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-6.html">Жеребёнок</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1964–1972</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">02.09.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-6.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1057</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1057.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1057 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="5" data-es-select aria-label="Выбрать ЛФЗ-1085"></td>
+            <td><img class="es-thumb" src="media/400/34/341cb61b5de6da378cc667d1f4c8b586d276bb76ccfb991d174e31cfd4cb7039.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1085</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-5.html">Белая лошадь</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1976</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">31.08.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-5.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1085</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1085.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1085 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="4" data-es-select aria-label="Выбрать ЛФЗ-1060"></td>
+            <td><img class="es-thumb" src="media/400/62/6271c0b3595537b19faa77b28dc472c9fefa4d95059cef517bece31a58141acd.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1060</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-4.html">Голова коня, рельеф</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1966</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">29.08.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-4.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1060</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1060.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1060 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="3" data-es-select aria-label="Выбрать ЛФЗ-1071"></td>
+            <td><img class="es-thumb" src="media/400/70/700d2c2f06fcaad97b5eea7bf3d9911b2ab72ad664d5b498ac82dde74f65f6b7.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1071</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-3.html">Конь с золочением</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1969–1974</td>
+            <td>1</td>
+            <td><span class="es-status es-status-draft">Черновик</span></td>
+            <td class="text-nowrap small text-body-secondary">27.08.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-3.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1071</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1071.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1071 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="2" data-es-select aria-label="Выбрать ЛФЗ-1090"></td>
+            <td><img class="es-thumb" src="media/400/e0/e09ca7800a3ebf868691f26441184105445ea1c93ebc9468c5d4b37901012d44.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1090</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-2.html">Голова тяжеловоза</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1981–1988</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">25.08.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-2.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1090</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1090.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1090 на сайте</span></a>
+            </td>
+          </tr>
+          <tr>
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="1" data-es-select aria-label="Выбрать ЛФЗ-1094"></td>
+            <td><img class="es-thumb" src="media/400/c0/c0a144f2e3c6263e60b1b023bcdba727fab616d2897d5758d82bdc40f528296a.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">ЛФЗ-1094</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-1.html">Пони</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
+            <td class="text-nowrap">1985–1991</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">23.08.2026</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-1.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1094</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-lfz-1094.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1094 на сайте</span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </form>
 
-  <p class="es-meta mb-3"><i class="bi bi-arrow-down-up me-1" aria-hidden="true"></i>Авторский порядок раздела «Ленинградский завод»: перетащите строку за значок, используйте стрелки в строке или клавиши ↑ ↓ на значке. Новые предметы встают в начало.</p>
-
-  <!-- Bulk actions: shown when rows are selected -->
-  <div class="es-bulk mb-3" data-es-bulk hidden>
-    <span>Выбрано: <strong data-es-bulk-count>0</strong></span>
-    <div class="d-flex flex-wrap gap-2" role="group" aria-label="Разделы">
-      <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addRubricModal"><i class="bi bi-folder-plus me-1" aria-hidden="true"></i>Добавить в раздел</button>
-      <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#removeRubricModal"><i class="bi bi-folder-minus me-1" aria-hidden="true"></i>Убрать из раздела</button>
-    </div>
-    <div class="d-flex flex-wrap gap-2" role="group" aria-label="Порядок в разделе">
-      <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-chevron-bar-up me-1" aria-hidden="true"></i>В начало</button>
-      <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-chevron-bar-down me-1" aria-hidden="true"></i>В конец</button>
-      <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#positionModal"><i class="bi bi-123 me-1" aria-hidden="true"></i>На позицию…</button>
-    </div>
-    <div class="d-flex flex-wrap gap-2" role="group" aria-label="Публикация">
-      <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-eye me-1" aria-hidden="true"></i>Опубликовать</button>
-      <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i>Снять с публикации</button>
-      <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteItemsModal"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить</button>
-    </div>
-    <button class="btn btn-sm btn-link ms-auto" type="button" data-es-bulk-clear>Снять выделение</button>
-  </div>
-
-  <div class="table-responsive border-top">
-    <table class="table table-hover es-admin-table">
-      <thead>
-        <tr>
-          <th scope="col" class="ps-2 es-col-check">
-            <input class="form-check-input" type="checkbox" data-es-select-all aria-label="Выбрать все на странице">
-          </th>
-          <th scope="col" class="es-col-order">Порядок</th>
-          <th scope="col" class="es-col-thumb"><span class="visually-hidden">Фото</span></th>
-          <th scope="col">Номер</th>
-          <th scope="col">Название и разделы</th>
-          <th scope="col">Годы</th>
-          <th scope="col">Фото</th>
-          <th scope="col">Статус</th>
-          <th scope="col">Изменён</th>
-          <th scope="col" class="text-end">Действия</th>
-        </tr>
-      </thead>
-      <tbody data-es-order data-es-sortable="list">
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1078"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1078</span></button><span class="es-position" data-es-order-pos>1</span></td>
-          <td><img class="es-thumb" src="img/lfz-1078.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1078</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Конь в попоне</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1972–1988</td>
-          <td>6</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">09.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1078</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1078</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1078</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1078 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1042"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1042</span></button><span class="es-position" data-es-order-pos>2</span></td>
-          <td><img class="es-thumb" src="img/lfz-1042.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1042</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Конь вздыбленный</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод <span class="es-more" title="Также: Тематические подборки / Кони на дыбах">+1<span class="visually-hidden"> раздел: Тематические подборки / Кони на дыбах</span></span></span></td>
-          <td class="text-nowrap">1958–1979</td>
-          <td>4</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">24.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1042</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1042</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1042</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1042 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1051"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1051</span></button><span class="es-position" data-es-order-pos>3</span></td>
-          <td><img class="es-thumb" src="img/lfz-1051.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1051</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Орловский рысак</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод <span class="es-more" title="Также: Тематические подборки / Орловские рысаки">+1<span class="visually-hidden"> раздел: Тематические подборки / Орловские рысаки</span></span></span></td>
-          <td class="text-nowrap">1962–1975</td>
-          <td>5</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">21.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1051</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1051</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1051</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1051 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1064"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1064</span></button><span class="es-position" data-es-order-pos>4</span></td>
-          <td><img class="es-thumb" src="img/lfz-1064.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1064</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Вороной на скаку</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1967–1981</td>
-          <td>3</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">15.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1064</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1064</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1064</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1064 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1043"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1043</span></button><span class="es-position" data-es-order-pos>5</span></td>
-          <td><img class="es-thumb" src="img/lfz-1043.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1043</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Голова арабского скакуна</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1961–1970</td>
-          <td>3</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">22.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1043</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1043</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1043</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1043 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1080"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1080</span></button><span class="es-position" data-es-order-pos>6</span></td>
-          <td><img class="es-thumb" src="img/lfz-1080.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1080</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Будённовская кобыла</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1974–1980</td>
-          <td>2</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">02.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1080</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1080</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1080</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1080 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1057"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1057</span></button><span class="es-position" data-es-order-pos>7</span></td>
-          <td><img class="es-thumb" src="img/lfz-1057.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1057</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Жеребёнок</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1964–1972</td>
-          <td>2</td>
-          <td><span class="es-status es-status-draft">Черновик</span></td>
-          <td class="text-nowrap small text-body-secondary">20.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1057</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1057</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1057</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1057 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1085"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1085</span></button><span class="es-position" data-es-order-pos>8</span></td>
-          <td><img class="es-thumb" src="img/lfz-1085.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1085</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Белая лошадь</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1976</td>
-          <td>1</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">28.09.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1085</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1085</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1085</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1085 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1060"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1060</span></button><span class="es-position" data-es-order-pos>9</span></td>
-          <td><img class="es-thumb" src="img/lfz-1060.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1060</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Голова коня, рельеф</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1966</td>
-          <td>1</td>
-          <td><span class="es-status es-status-published">Опубликован</span></td>
-          <td class="text-nowrap small text-body-secondary">17.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1060</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1060</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1060</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1060 на сайте</span></a>
-          </td>
-        </tr>
-        <tr data-es-order-row>
-          <td class="ps-2"><input class="form-check-input" type="checkbox" data-es-select aria-label="Выбрать ЛФЗ-1071"></td>
-          <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить ЛФЗ-1071</span></button><span class="es-position" data-es-order-pos>10</span></td>
-          <td><img class="es-thumb" src="img/lfz-1071.svg" alt="" loading="lazy"></td>
-          <td class="es-catno">ЛФЗ-1071</td>
-          <td class="es-col-title"><a class="es-title" href="admin-item-edit.html">Конь с золочением</a><span class="es-path">Фигурки / Фарфор / Ленинградский завод</span></td>
-          <td class="text-nowrap">1969–1974</td>
-          <td>2</td>
-          <td><span class="es-status es-status-draft">Черновик</span></td>
-          <td class="text-nowrap small text-body-secondary">11.10.2026</td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять ЛФЗ-1071</span></button>
-            <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить ЛФЗ-1071</span></button>
-            <a class="btn btn-sm btn-outline-secondary" href="admin-item-edit.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать ЛФЗ-1071</span></a>
-            <a class="btn btn-sm btn-outline-secondary" href="item.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть ЛФЗ-1071 на сайте</span></a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
   <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-4">
-    <span class="text-body-secondary small">Показаны 1–10 из 48</span>
-    <nav aria-label="Страницы списка">
-      <ul class="pagination mb-0">
-        <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Назад</span></span></li>
-        <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">4</a></li>
-        <li class="page-item"><a class="page-link" href="#">5</a></li>
-        <li class="page-item"><a class="page-link" href="#"><i class="bi bi-chevron-right" aria-hidden="true"></i><span class="visually-hidden">Вперёд</span></a></li>
-      </ul>
-    </nav>
+    <span class="text-body-secondary small">Показаны 1–32 из 32</span>
   </div>
 </main>
 
@@ -358,22 +638,36 @@
       </div>
       <div class="modal-body">
         <label class="form-label" for="addRubricTarget">Раздел</label>
-        <select class="form-select" id="addRubricTarget">
-          <option>Фигурки</option>
-          <option>&nbsp;&nbsp;Фарфор</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Дулёвский завод</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Ленинградский завод</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Вербилки</option>
-          <option>&nbsp;&nbsp;Художественное литьё</option>
-          <option>Тематические подборки</option>
-          <option selected>&nbsp;&nbsp;Кони на дыбах</option>
-          <option>&nbsp;&nbsp;Орловские рысаки</option>
+        <select class="form-select" id="addRubricTarget" name="target_add" form="bulkForm">
+          <option value="1">Фигурки</option>
+          <option value="2">  Фарфор</option>
+          <option value="3">    Дулёвский завод</option>
+          <option value="4">    Ленинградский завод</option>
+          <option value="5">    Вербилки</option>
+          <option value="6">    Европейские мануфактуры</option>
+          <option value="7">  Художественное литьё</option>
+          <option value="8">    Чугун</option>
+          <option value="9">    Бронза</option>
+          <option value="10">  Пластик и смола</option>
+          <option value="11">Медали и знаки</option>
+          <option value="12">  Конный спорт</option>
+          <option value="13">  Ипподромы</option>
+          <option value="14">  Конные заводы</option>
+          <option value="15">Филателия</option>
+          <option value="16">  Марки</option>
+          <option value="17">  Конверты и карточки</option>
+          <option value="18">Открытки</option>
+          <option value="19">Графика и плакаты</option>
+          <option value="20">Книги и каталоги</option>
+          <option value="21">Тематические подборки</option>
+          <option value="22">  Кони на дыбах</option>
+          <option value="23">  Орловские рысаки</option>
         </select>
         <p class="form-text mb-0">Предметы останутся и в своих нынешних разделах; главный раздел у них не изменится. В новом разделе они встанут в начало авторского порядка.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+        <button type="submit" class="btn btn-primary" form="bulkForm" name="action" value="add-rubric">Добавить</button>
       </div>
     </div>
   </div>
@@ -389,47 +683,41 @@
       </div>
       <div class="modal-body">
         <label class="form-label" for="removeRubricTarget">Раздел</label>
-        <select class="form-select" id="removeRubricTarget">
-          <option>Фигурки</option>
-          <option>&nbsp;&nbsp;Фарфор</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Дулёвский завод</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Ленинградский завод</option>
-          <option>&nbsp;&nbsp;&nbsp;&nbsp;Вербилки</option>
-          <option>&nbsp;&nbsp;Художественное литьё</option>
-          <option>Тематические подборки</option>
-          <option>&nbsp;&nbsp;Кони на дыбах</option>
-          <option>&nbsp;&nbsp;Орловские рысаки</option>
+        <select class="form-select" id="removeRubricTarget" name="target_remove" form="bulkForm">
+          <option value="1">Фигурки</option>
+          <option value="2">  Фарфор</option>
+          <option value="3">    Дулёвский завод</option>
+          <option value="4">    Ленинградский завод</option>
+          <option value="5">    Вербилки</option>
+          <option value="6">    Европейские мануфактуры</option>
+          <option value="7">  Художественное литьё</option>
+          <option value="8">    Чугун</option>
+          <option value="9">    Бронза</option>
+          <option value="10">  Пластик и смола</option>
+          <option value="11">Медали и знаки</option>
+          <option value="12">  Конный спорт</option>
+          <option value="13">  Ипподромы</option>
+          <option value="14">  Конные заводы</option>
+          <option value="15">Филателия</option>
+          <option value="16">  Марки</option>
+          <option value="17">  Конверты и карточки</option>
+          <option value="18">Открытки</option>
+          <option value="19">Графика и плакаты</option>
+          <option value="20">Книги и каталоги</option>
+          <option value="21">Тематические подборки</option>
+          <option value="22">  Кони на дыбах</option>
+          <option value="23">  Орловские рысаки</option>
         </select>
         <p class="form-text mb-0">Если раздел у предмета единственный, предмет в нём останется: у каждого предмета должен быть хотя бы один раздел. Если убран главный раздел, главным станет следующий по дате добавления.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Убрать</button>
+        <button type="submit" class="btn btn-primary" form="bulkForm" name="action" value="remove-rubric">Убрать</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Move selected items to a position in the authorial order -->
-<div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title h4" id="positionModalTitle">Поставить на позицию</h2>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-      </div>
-      <div class="modal-body">
-        <label class="form-label" for="positionTarget">Позиция в разделе «Ленинградский завод»</label>
-        <input class="form-control" type="number" id="positionTarget" min="1" max="48" value="1">
-        <p class="form-text mb-0">От 1 до 48. Выбранные предметы встанут подряд, начиная с этой позиции, в нынешнем взаимном порядке.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Переставить</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Delete items -->
 <div class="modal fade" id="deleteItemsModal" tabindex="-1" aria-labelledby="deleteItemsModalTitle" aria-hidden="true">
@@ -440,26 +728,26 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-0">Предметы будут удалены из всех разделов вместе с вариантами; фотографии, которые не используются у других предметов, удалятся автоматически. Это действие нельзя отменить. Чтобы только убрать предметы с сайта, снимите их с публикации.</p>
+        <p class="mb-0">Предметы будут удалены из всех разделов вместе с вариантами. Это действие нельзя отменить. Чтобы только убрать предметы с сайта, снимите их с публикации.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить</button>
+        <button type="submit" class="btn btn-danger" form="bulkForm" name="action" value="delete">Удалить</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============================ Footer ============================ -->
 <footer class="es-footer">
   <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
     <p class="mb-0">
-      eStables — справочник коллекционера. <span data-es-auth="guest" hidden><a class="es-quiet-link" href="login.html">Вход администратора</a></span> <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+      eStables — справочник коллекционера.
+      <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
     </p>
-    <p class="mb-0">Демонстрационная версия: описания и изображения условные. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

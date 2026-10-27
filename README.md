@@ -7,7 +7,7 @@
 - [docs/SANDBOX.md](docs/SANDBOX.md) — LNMP-песочница для проверки сборок.
 - [docs/BUILDS.md](docs/BUILDS.md) — что умеет каждая сборка и как это проверить.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — архитектура и план разработки.
-- [demo/](demo/) — статическое демо, эталон оформления; публикуется на GitHub Pages.
+- [demo/](demo/) — статическая демо-версия: страницы, отрендеренные движком с условным контентом; публикуется на GitHub Pages. Как её обновлять — [tools/demo-build/](tools/demo-build/README.md).
 
 ## Разработка
 

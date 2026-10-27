@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Предметы — eStables</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
+
+  <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="admin">
+  <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
+</head>
+<body>
+
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
+
+<header class="es-header">
+  <nav class="navbar navbar-expand-md" aria-label="Навигация администратора">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand" href="admin-items.html">
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables <span class="es-brand-role">администрирование</span>
+</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-audit.html"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Журнал</a></li>
+                              </ul>
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
+          <div class="dropdown">
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
+
+<main id="main" class="container-xxl px-3 px-lg-4 py-4">
+
+  <div class="alert alert-danger" role="alert" data-es-order-error hidden></div>
+
+  <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
+    <div>
+      <h1 class="mb-1">Предметы</h1>
+      <p class="text-body-secondary mb-0">32 предмета в каталоге, из них 1 черновик</p>
+    </div>
+    <a class="btn btn-primary" href="admin-item-new.html"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить предмет</a>
+  </div>
+
+  <!-- Filters -->
+  <form class="row g-2 align-items-end mb-3" role="search" aria-label="Фильтр предметов" method="get" action="admin-items.html" data-es-autosubmit>
+    <div class="col-12 col-md-5 col-xl-4">
+      <label class="form-label small" for="f-q">Поиск</label>
+      <div class="input-group">
+        <span class="input-group-text bg-transparent"><i class="bi bi-search" aria-hidden="true"></i></span>
+        <input class="form-control" type="search" id="f-q" name="q" value="" placeholder="Название или номер">
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+      <label class="form-label small" for="f-rubric">Раздел</label>
+      <select class="form-select" id="f-rubric" name="rubric">
+        <option value="">Все разделы</option>
+        <option value="1">Фигурки</option>
+        <option value="2">  Фарфор</option>
+        <option value="3">    Дулёвский завод</option>
+        <option value="4">    Ленинградский завод</option>
+        <option value="5">    Вербилки</option>
+        <option value="6">    Европейские мануфактуры</option>
+        <option value="7">  Художественное литьё</option>
+        <option value="8">    Чугун</option>
+        <option value="9">    Бронза</option>
+        <option value="10">  Пластик и смола</option>
+        <option value="11">Медали и знаки</option>
+        <option value="12">  Конный спорт</option>
+        <option value="13">  Ипподромы</option>
+        <option value="14">  Конные заводы</option>
+        <option value="15">Филателия</option>
+        <option value="16">  Марки</option>
+        <option value="17">  Конверты и карточки</option>
+        <option value="18">Открытки</option>
+        <option value="19" selected>Графика и плакаты</option>
+        <option value="20">Книги и каталоги</option>
+        <option value="21">Тематические подборки</option>
+        <option value="22">  Кони на дыбах</option>
+        <option value="23">  Орловские рысаки</option>
+      </select>
+    </div>
+    <div class="col-6 col-sm-3 col-md-3 col-xl-2">
+      <label class="form-label small" for="f-status">Статус</label>
+      <select class="form-select" id="f-status" name="status">
+        <option value="">Любой</option>
+        <option value="published">Опубликован</option>
+        <option value="draft">Черновик</option>
+      </select>
+    </div>
+    <div class="col-6 col-sm-3 col-xl-3">
+      <label class="form-label small" for="f-sort">Сортировка</label>
+      <!-- "Авторский порядок" is offered only when a single rubric is selected -->
+      <select class="form-select" id="f-sort" name="sort">
+        <option value="author" selected>Авторский порядок</option>
+        <option value="recent">Изменены недавно</option>
+        <option value="number">По номеру</option>
+        <option value="title">По названию</option>
+      </select>
+    </div>
+    <button class="visually-hidden" type="submit">Показать</button>
+  </form>
+
+  <p class="es-meta mb-3"><i class="bi bi-arrow-down-up me-1" aria-hidden="true"></i>Авторский порядок раздела «Графика и плакаты»: перетащите строку за значок, используйте стрелки в строке или клавиши ↑ ↓ на значке. Новые предметы встают в начало.</p>
+
+  <form id="bulkForm" method="post" action="#">
+    <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">
+    <input type="hidden" name="back" value="/admin/?rubric=19&amp;sort=author">
+    <input type="hidden" name="rubric" value="19">
+
+    <!-- Bulk actions: shown when rows are selected -->
+    <div class="es-bulk mb-3" data-es-bulk hidden>
+      <span>Выбрано: <strong data-es-bulk-count>0</strong></span>
+      <div class="d-flex flex-wrap gap-2" role="group" aria-label="Разделы">
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addRubricModal"><i class="bi bi-folder-plus me-1" aria-hidden="true"></i>Добавить в раздел</button>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#removeRubricModal"><i class="bi bi-folder-minus me-1" aria-hidden="true"></i>Убрать из раздела</button>
+      </div>
+      <div class="d-flex flex-wrap gap-2" role="group" aria-label="Порядок в разделе">
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="top"><i class="bi bi-chevron-bar-up me-1" aria-hidden="true"></i>В начало</button>
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="bottom"><i class="bi bi-chevron-bar-down me-1" aria-hidden="true"></i>В конец</button>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#positionModal"><i class="bi bi-123 me-1" aria-hidden="true"></i>На позицию…</button>
+      </div>
+      <div class="d-flex flex-wrap gap-2" role="group" aria-label="Публикация">
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="publish"><i class="bi bi-eye me-1" aria-hidden="true"></i>Опубликовать</button>
+        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="unpublish"><i class="bi bi-eye-slash me-1" aria-hidden="true"></i>Снять с публикации</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteItemsModal"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить</button>
+      </div>
+      <button class="btn btn-sm btn-link ms-auto" type="button" data-es-bulk-clear>Снять выделение</button>
+    </div>
+
+    <div class="table-responsive border-top">
+      <table class="table table-hover es-admin-table">
+        <thead>
+          <tr>
+            <th scope="col" class="ps-2 es-col-check">
+              <input class="form-check-input" type="checkbox" data-es-select-all aria-label="Выбрать все на странице">
+            </th>
+            <th scope="col" class="es-col-order">Порядок</th>
+            <th scope="col" class="es-col-thumb"><span class="visually-hidden">Фото</span></th>
+            <th scope="col">Номер</th>
+            <th scope="col">Название и разделы</th>
+            <th scope="col">Годы</th>
+            <th scope="col">Фото</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Изменён</th>
+            <th scope="col" class="text-end">Действия</th>
+          </tr>
+        </thead>
+        <tbody data-es-order data-es-sortable="list" data-es-order-url="#" data-es-order-rubric="19" data-es-csrf="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">
+          <tr data-es-order-row data-es-item="31">
+            <td class="ps-2"><input class="form-check-input" type="checkbox" name="ids[]" value="31" data-es-select aria-label="Выбрать Г-12"></td>
+            <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить Г-12</span></button><span class="es-position" data-es-order-pos>1</span></td>
+            <td><img class="es-thumb" src="media/400/94/94ce666ae1331cfe01f2990cce83433d089dbeacf4c628db2fd60f944beea59d.jpg" alt="" loading="lazy"></td>
+            <td class="es-catno">Г-12</td>
+            <td class="es-col-title"><a class="es-title" href="admin-item-31.html">Плакат «Развивайте коневодство»</a><span class="es-path">Графика и плакаты</span></td>
+            <td class="text-nowrap">1954</td>
+            <td>1</td>
+            <td><span class="es-status es-status-published">Опубликован</span></td>
+            <td class="text-nowrap small text-body-secondary">23.10.2026</td>
+            <td class="text-end text-nowrap">
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Выше" data-es-order-move="up"><i class="bi bi-arrow-up" aria-hidden="true"></i><span class="visually-hidden">Поднять Г-12</span></button>
+              <button class="btn btn-sm es-btn-quiet" type="button" title="Ниже" data-es-order-move="down"><i class="bi bi-arrow-down" aria-hidden="true"></i><span class="visually-hidden">Опустить Г-12</span></button>
+              <a class="btn btn-sm btn-outline-secondary" href="admin-item-31.html" title="Редактировать"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden">Редактировать Г-12</span></a>
+              <a class="btn btn-sm btn-outline-secondary" href="item-g-12.html" title="Открыть на сайте"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="visually-hidden">Открыть Г-12 на сайте</span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </form>
+
+  <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-4">
+    <span class="text-body-secondary small">Показаны 1–1 из 1</span>
+  </div>
+</main>
+
+<!-- Add selected items to a rubric -->
+<div class="modal fade" id="addRubricModal" tabindex="-1" aria-labelledby="addRubricModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="addRubricModalTitle">Добавить в раздел</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" for="addRubricTarget">Раздел</label>
+        <select class="form-select" id="addRubricTarget" name="target_add" form="bulkForm">
+          <option value="1">Фигурки</option>
+          <option value="2">  Фарфор</option>
+          <option value="3">    Дулёвский завод</option>
+          <option value="4">    Ленинградский завод</option>
+          <option value="5">    Вербилки</option>
+          <option value="6">    Европейские мануфактуры</option>
+          <option value="7">  Художественное литьё</option>
+          <option value="8">    Чугун</option>
+          <option value="9">    Бронза</option>
+          <option value="10">  Пластик и смола</option>
+          <option value="11">Медали и знаки</option>
+          <option value="12">  Конный спорт</option>
+          <option value="13">  Ипподромы</option>
+          <option value="14">  Конные заводы</option>
+          <option value="15">Филателия</option>
+          <option value="16">  Марки</option>
+          <option value="17">  Конверты и карточки</option>
+          <option value="18">Открытки</option>
+          <option value="19">Графика и плакаты</option>
+          <option value="20">Книги и каталоги</option>
+          <option value="21">Тематические подборки</option>
+          <option value="22">  Кони на дыбах</option>
+          <option value="23">  Орловские рысаки</option>
+        </select>
+        <p class="form-text mb-0">Предметы останутся и в своих нынешних разделах; главный раздел у них не изменится. В новом разделе они встанут в начало авторского порядка.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary" form="bulkForm" name="action" value="add-rubric">Добавить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove selected items from a rubric -->
+<div class="modal fade" id="removeRubricModal" tabindex="-1" aria-labelledby="removeRubricModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="removeRubricModalTitle">Убрать из раздела</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" for="removeRubricTarget">Раздел</label>
+        <select class="form-select" id="removeRubricTarget" name="target_remove" form="bulkForm">
+          <option value="1">Фигурки</option>
+          <option value="2">  Фарфор</option>
+          <option value="3">    Дулёвский завод</option>
+          <option value="4">    Ленинградский завод</option>
+          <option value="5">    Вербилки</option>
+          <option value="6">    Европейские мануфактуры</option>
+          <option value="7">  Художественное литьё</option>
+          <option value="8">    Чугун</option>
+          <option value="9">    Бронза</option>
+          <option value="10">  Пластик и смола</option>
+          <option value="11">Медали и знаки</option>
+          <option value="12">  Конный спорт</option>
+          <option value="13">  Ипподромы</option>
+          <option value="14">  Конные заводы</option>
+          <option value="15">Филателия</option>
+          <option value="16">  Марки</option>
+          <option value="17">  Конверты и карточки</option>
+          <option value="18">Открытки</option>
+          <option value="19" selected>Графика и плакаты</option>
+          <option value="20">Книги и каталоги</option>
+          <option value="21">Тематические подборки</option>
+          <option value="22">  Кони на дыбах</option>
+          <option value="23">  Орловские рысаки</option>
+        </select>
+        <p class="form-text mb-0">Если раздел у предмета единственный, предмет в нём останется: у каждого предмета должен быть хотя бы один раздел. Если убран главный раздел, главным станет следующий по дате добавления.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary" form="bulkForm" name="action" value="remove-rubric">Убрать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Move selected items to a position in the authorial order -->
+<div class="modal fade" id="positionModal" tabindex="-1" aria-labelledby="positionModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="positionModalTitle">Поставить на позицию</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label" for="positionTarget">Позиция в разделе «Графика и плакаты»</label>
+        <input class="form-control" type="number" id="positionTarget" name="position" form="bulkForm" min="1" max="1" value="1">
+        <p class="form-text mb-0">От 1 до 1. Выбранные предметы встанут подряд, начиная с этой позиции, в нынешнем взаимном порядке.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary" form="bulkForm" name="action" value="position">Переставить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete items -->
+<div class="modal fade" id="deleteItemsModal" tabindex="-1" aria-labelledby="deleteItemsModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="deleteItemsModalTitle">Удалить предметы?</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">Предметы будут удалены из всех разделов вместе с вариантами. Это действие нельзя отменить. Чтобы только убрать предметы с сайта, снимите их с публикации.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-danger" form="bulkForm" name="action" value="delete">Удалить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="es-footer">
+  <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
+    <p class="mb-0">
+      eStables — справочник коллекционера.
+      <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+    </p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+  </div>
+</footer>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,102 +1,93 @@
 <!doctype html>
-<!--
-  eStables demo: administrator login page.
-  Static mock-up for design review; all data and images are placeholders.
-  SPDX-License-Identifier: AGPL-3.0-or-later
--->
 <html lang="ru" data-bs-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Вход администратора — eStables</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="eStables: справочник коллекционера конной тематики. Демонстрационная страница.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" integrity="sha384-nWN3KqaaVcbEsCjLSV+2jMjh62Iny/+mN3srM8TZeM8N6aj7eDl5wwYggjAJ4/sJ" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/estables.css">
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
 
   <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="login">
   <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
 </head>
 <body>
 
 <a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
 
-<!-- ============================ Header ============================ -->
 <header class="es-header">
   <nav class="navbar" aria-label="Основная навигация">
     <div class="container-fluid px-3 px-lg-4">
       <a class="navbar-brand" href="index.html">
-        <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
-        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
-        eStables
-      </a>
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables
+</a>
       <div class="dropdown">
-            <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
-              <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
-            </ul>
-          </div>
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
     </div>
   </nav>
 </header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
 
 <main id="main" class="es-auth-page">
   <div class="es-auth-card">
     <h1 class="h2 mb-2">Вход администратора</h1>
     <p class="text-body-secondary mb-4">Только для редакторов справочника. Учётные записи создаёт владелец сайта.</p>
 
-    <!--
-      Demo: any input leads to the admin area (see js/demo.js).
-      Fields have no name attributes so nothing is sent in the URL;
-      the backend version posts them to the server.
-    -->
-    <form action="admin-items.html" data-es-login novalidate>
+
+    <form method="post" action="login.html" novalidate>
+      <input type="hidden" name="_token" value="1793120330.c6h7Rela-n3dWpKiTMISpjV2cn8yaR6GqKllFWzddg4">
+
       <div class="mb-3">
         <label class="form-label" for="login">Логин</label>
-        <input class="form-control" type="text" id="login" autocomplete="username" autocapitalize="off" spellcheck="false">
+        <input class="form-control" type="text" id="login" name="login" value="" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus>
       </div>
 
       <div class="mb-3">
         <label class="form-label" for="password">Пароль</label>
         <div class="input-group">
-          <input class="form-control" type="password" id="password" autocomplete="current-password">
+          <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" required>
           <button class="btn btn-outline-secondary" type="button" data-es-password-toggle aria-controls="password" aria-pressed="false" title="Показать пароль">
-            <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
-          </button>
+  <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
+</button>
         </div>
       </div>
 
       <!-- Without the mark the session cookie lives until the browser closes;
-           with it, for the period set in the config (30 days by default, sliding). -->
+           with it, for session.remember_days, renewed on every visit. -->
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="remember" aria-describedby="rememberHelp">
+        <input class="form-check-input" type="checkbox" id="remember" name="remember" value="1" aria-describedby="rememberHelp">
         <label class="form-check-label" for="remember">Запомнить меня</label>
         <div class="form-text mt-0" id="rememberHelp">Вход сохранится на этом устройстве на 30 дней. Без отметки — до закрытия браузера.</div>
       </div>
 
-      <!-- Captcha slot: the module is chosen with the backend (reCAPTCHA, Turnstile, Anubis...). -->
       <div class="mb-4">
         <div class="es-captcha">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="captcha">
-            <label class="form-check-label" for="captcha">Подтвердите, что вы человек</label>
-          </div>
-          <div class="es-captcha-mark" aria-hidden="true">
-            <i class="bi bi-shield-check"></i>
-            <span>проверка</span>
-          </div>
-        </div>
-        <div class="form-text">В демо-версии это условное место для модуля капчи.</div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="captcha" name="captcha_confirm" value="1">
+    <label class="form-check-label" for="captcha">Подтвердите, что вы человек</label>
+  </div>
+  <div class="es-captcha-mark" aria-hidden="true">
+    <i class="bi bi-shield-check"></i>
+    <span>проверка</span>
+  </div>
+</div>
       </div>
 
       <button class="btn btn-primary w-100" type="submit">Войти</button>
@@ -106,16 +97,17 @@
   <p class="mt-4 mb-0"><a href="index.html"><i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Вернуться в каталог</a></p>
 </main>
 
-<!-- ============================ Footer ============================ -->
 <footer class="es-footer">
   <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
     <p class="mb-0">
-      eStables — справочник коллекционера. <span data-es-auth="guest"><a class="es-quiet-link" href="login.html">Вход администратора</a></span> <span data-es-auth="admin" hidden>Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+      eStables — справочник коллекционера.
+      <span data-es-auth="guest"><a class="es-quiet-link" href="login.html">Вход администратора</a></span>
+      <span data-es-auth="admin" hidden>Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
     </p>
-    <p class="mb-0">Демонстрационная версия: описания и изображения условные. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

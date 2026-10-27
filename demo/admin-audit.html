@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Журнал — eStables</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
+
+  <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="admin">
+  <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
+</head>
+<body>
+
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
+
+<header class="es-header">
+  <nav class="navbar navbar-expand-md" aria-label="Навигация администратора">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand" href="admin-items.html">
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables <span class="es-brand-role">администрирование</span>
+</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                                    <li class="nav-item"><a class="nav-link" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
+                                                <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-audit.html"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Журнал</a></li>
+                              </ul>
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
+          <div class="dropdown">
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="main" class="container-xxl px-3 px-lg-4 py-4">
+
+  <div class="mb-4">
+    <h1 class="mb-1">Журнал</h1>
+    <p class="text-body-secondary mb-0">Кто и что менял в каталоге. Записи старше 730 дней удаляет <code>bin/estables gc</code>.</p>
+  </div>
+
+  <!-- Filters -->
+  <form class="row g-2 align-items-end mb-3" role="search" aria-label="Фильтр журнала" method="get" action="admin-audit.html" data-es-autosubmit>
+    <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+      <label class="form-label small" for="f-who">Кто</label>
+      <select class="form-select" id="f-who" name="who">
+        <option value="">Все</option>
+        <option value="1">admin</option>
+        <option value="2">ekovaleva</option>
+      </select>
+    </div>
+    <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+      <label class="form-label small" for="f-what">Что</label>
+      <select class="form-select" id="f-what" name="what">
+        <option value="">Все действия</option>
+        <option value="login">Вход и выход</option>
+        <option value="items">Предметы и фото</option>
+        <option value="rubrics">Разделы</option>
+        <option value="users">Администраторы</option>
+        <option value="site">Сайт</option>
+      </select>
+    </div>
+    <button class="visually-hidden" type="submit">Показать</button>
+  </form>
+
+  <div class="table-responsive border-top">
+    <table class="table es-admin-table es-audit">
+      <thead>
+        <tr>
+          <th scope="col">Когда</th>
+          <th scope="col">Кто</th>
+          <th scope="col">Действие</th>
+          <th scope="col">Что</th>
+          <th scope="col">Подробности</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-27T14:58:50Z">27.10.2026, 17:58</time></td>
+          <td class="text-nowrap">admin<span class="es-path">203.0.113.24</span></td>
+          <td>Вход</td>
+          <td class="es-col-title">admin</td>
+          <td class="small"></td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-25T19:31:00Z">25.10.2026, 22:31</time></td>
+          <td class="text-nowrap">admin<span class="es-path">198.51.100.7</span></td>
+          <td>Выключен режим техработ</td>
+          <td class="es-col-title">Режим техработ</td>
+          <td class="small"></td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-25T19:25:00Z">25.10.2026, 22:25</time></td>
+          <td class="text-nowrap">admin<span class="es-path">198.51.100.7</span></td>
+          <td>Включён режим техработ</td>
+          <td class="es-col-title">Режим техработ</td>
+          <td class="small"></td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-25T19:20:00Z">25.10.2026, 22:20</time></td>
+          <td class="text-nowrap">admin<span class="es-path">198.51.100.7</span></td>
+          <td>Изменён порядок</td>
+          <td class="es-col-title"><a class="es-title" href="admin-item-12.html">ЛФЗ-1039 Тройка, настольная композиция</a></td>
+          <td class="small">в разделе «Ленинградский завод»</td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-25T19:12:00Z">25.10.2026, 22:12</time></td>
+          <td class="text-nowrap">admin<span class="es-path">198.51.100.7</span></td>
+          <td>Сняты с публикации</td>
+          <td class="es-col-title">1 предмет</td>
+          <td class="small">ЛФЗ-1071 Конь с золочением</td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-24T16:05:00Z">24.10.2026, 19:05</time></td>
+          <td class="text-nowrap">ekovaleva<span class="es-path">203.0.113.81</span></td>
+          <td>Изменён предмет</td>
+          <td class="es-col-title"><a class="es-title" href="admin-item-11.html">ЛФЗ-1042 Конь вздыбленный</a></td>
+          <td class="small">характеристики; подписи к фото</td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-24T15:52:00Z">24.10.2026, 18:52</time></td>
+          <td class="text-nowrap">ekovaleva<span class="es-path">203.0.113.81</span></td>
+          <td>Добавлено фото</td>
+          <td class="es-col-title"><a class="es-title" href="admin-item-11.html">ЛФЗ-1042 Конь вздыбленный</a></td>
+          <td class="small">lfz-1042-d.jpg: JPEG, 1600 × 1200, 41 КБ</td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-24T15:40:00Z">24.10.2026, 18:40</time></td>
+          <td class="text-nowrap">ekovaleva<span class="es-path">203.0.113.81</span></td>
+          <td>Вход</td>
+          <td class="es-col-title">ekovaleva</td>
+          <td class="small"></td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-20T07:20:00Z">20.10.2026, 10:20</time></td>
+          <td class="text-nowrap">admin<span class="es-path">203.0.113.24</span></td>
+          <td>Заблокирован</td>
+          <td class="es-col-title"><a class="es-title" href="admin-users.html">archive</a></td>
+          <td class="small"></td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-20T07:05:00Z">20.10.2026, 10:05</time></td>
+          <td class="text-nowrap">admin<span class="es-path">203.0.113.24</span></td>
+          <td>Изменён раздел</td>
+          <td class="es-col-title"><a class="es-title" href="admin-rubric-4.html">Ленинградский завод</a></td>
+          <td class="small">описание</td>
+        </tr>
+        <tr>
+          <td class="text-nowrap small text-body-secondary"><time datetime="2026-10-20T06:58:00Z">20.10.2026, 09:58</time></td>
+          <td class="text-nowrap">admin<span class="es-path">203.0.113.24</span></td>
+          <td>Вход</td>
+          <td class="es-col-title">admin</td>
+          <td class="small"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between mt-4">
+    <span class="text-body-secondary small">Показаны 1–11 из 11</span>
+  </div>
+</main>
+
+<footer class="es-footer">
+  <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
+    <p class="mb-0">
+      eStables — справочник коллекционера.
+      <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+    </p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+  </div>
+</footer>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

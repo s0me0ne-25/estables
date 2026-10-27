@@ -1,0 +1,1132 @@
+/*
+ * eStables demo theme.
+ * Layered on top of Bootstrap 5.3: CSS custom properties plus a few
+ * project-specific components (pedigree tree, specimen card, item gallery,
+ * admin panels).
+ *
+ * Structure:
+ *   1. Tokens: palette per theme, theme-independent tokens, Bootstrap mapping
+ *   2. Base
+ *   3. Bootstrap component adjustments
+ *   4. Project components, public area
+ *   5. Project components, login and admin area
+ *   6. Motion preferences
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* ==================================================================
+ * 1. Tokens
+ * ================================================================== */
+
+/* ---- Palette: light theme (aqua). Contrast ratios are against --es-paper. */
+:root,
+[data-bs-theme="light"] {
+  --es-paper: #caf2fc;       /* page background (set by the client) */
+  --es-paper-rgb: 202, 242, 252;
+  --es-surface: #effbfe;     /* raised surfaces: sidebar, mounts, panels */
+  --es-ink: #0b2a33;         /* main text: deep sea navy, 12.6:1 */
+  --es-ink-rgb: 11, 42, 51;
+  --es-muted: #3b5f6b;       /* secondary text, 5.8:1 */
+  --es-line: #8ccfe0;        /* hairlines, tree connectors */
+  --es-primary: #00657e;     /* deep teal: links and buttons, 5.6:1 */
+  --es-primary-rgb: 0, 101, 126;
+  --es-primary-hover: #00566b;
+  --es-primary-active: #004a5c;
+  --es-on-primary: #ffffff;  /* text on primary, 6.6:1 */
+  --es-accent: #9a4a06;      /* amber, complementary to aqua, 5.3:1 */
+  --es-field-bg: #ffffff;    /* form fields */
+  --es-danger: #b42318;      /* destructive actions, 5.4:1 */
+  --es-danger-hover: #93190f;
+  --es-on-danger: #ffffff;
+
+  --es-header-bg: #0acffa;   /* site header (set by the client) */
+  --es-header-fg: #062b36;   /* header text, 8:1 on header */
+  --es-header-fg-muted: rgba(6, 43, 54, .78);
+  --es-header-edge: #07b4db;
+  --es-header-field-bg: rgba(255, 255, 255, .55);
+  --es-header-field-border: rgba(6, 43, 54, .22);
+
+  /* Roles */
+  --es-link-hover: var(--es-primary-active);   /* links darken on hover */
+  --es-link-hover-rgb: 0, 74, 92;              /* = --es-primary-active */
+  --es-focus: var(--es-header-bg);             /* keyboard focus rings */
+  --es-header-focus: var(--es-header-fg);      /* focus inside the header */
+  --es-header-focus-ring: var(--es-header-field-border);
+  --es-catno-color: var(--es-ink);             /* catalogue numbers, as item titles */
+  --es-thumb-active: var(--es-header-bg);      /* selected thumbnail frame */
+  --es-tree-lineage: var(--es-header-bg);      /* rubricator: path to the current node */
+  --es-tree-current-bg: var(--es-paper);       /* rubricator: current node */
+}
+
+/* ---- Palette: dark theme (previous green and brass, not redesigned yet). */
+[data-bs-theme="dark"] {
+  --es-paper: #141a17;
+  --es-paper-rgb: 20, 26, 23;
+  --es-surface: #1b231f;
+  --es-ink: #e3e7e0;
+  --es-ink-rgb: 227, 231, 224;
+  --es-muted: #9ba69f;
+  --es-line: #34413a;
+  --es-primary: #8fb39c;
+  --es-primary-rgb: 143, 179, 156;
+  --es-primary-hover: #a6c4b0;
+  --es-primary-active: #b8d1c0;
+  --es-on-primary: #10170f;
+  --es-accent: #d0ab6e;
+  --es-field-bg: var(--es-surface);
+  --es-danger: #f0897c;
+  --es-danger-hover: #93190f;
+  --es-on-danger: #ffffff;
+
+  --es-header-bg: #0f1512;
+  --es-header-fg: #f1f3ee;
+  --es-header-fg-muted: rgba(241, 243, 238, .82);
+  --es-header-edge: var(--es-line);
+  --es-header-field-bg: rgba(255, 255, 255, .1);
+  --es-header-field-border: rgba(255, 255, 255, .25);
+
+  --es-link-hover: var(--es-accent);
+  --es-link-hover-rgb: 208, 171, 110;          /* = --es-accent */
+  --es-focus: var(--es-accent);
+  --es-header-focus: var(--es-accent);
+  --es-header-focus-ring: color-mix(in srgb, var(--es-accent) 45%, transparent);
+  --es-catno-color: var(--es-accent);
+  --es-thumb-active: var(--es-accent);
+  --es-tree-lineage: var(--es-accent);
+  --es-tree-current-bg: #3a3122;
+}
+
+/* ---- Theme-independent tokens */
+:root {
+  --es-font-text: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --es-font-display: "Alegreya", Georgia, "Times New Roman", serif;
+
+  --es-text-xs: .75rem;
+  --es-text-sm: .8125rem;
+  --es-text-md: .875rem;
+  --es-radius-pill: 2rem;
+
+  /* Caption badge over photos: always dark, whatever the theme */
+  --es-overlay-bg: rgba(11, 42, 51, .75);
+  --es-overlay-fg: #ffffff;
+}
+
+/*
+ * ---- Bootstrap mapping, shared by all themes.
+ * Bootstrap's own [data-bs-theme=dark] block has the same specificity;
+ * this file loads later, so the mapping wins on every themed element.
+ */
+:root,
+[data-bs-theme] {
+  --bs-body-bg: var(--es-paper);
+  --bs-body-bg-rgb: var(--es-paper-rgb);
+  --bs-body-color: var(--es-ink);
+  --bs-body-color-rgb: var(--es-ink-rgb);
+  --bs-secondary-color: var(--es-muted);
+  --bs-border-color: var(--es-line);
+  --bs-tertiary-bg: var(--es-surface);
+  --bs-primary: var(--es-primary);
+  --bs-primary-rgb: var(--es-primary-rgb);
+  --bs-link-color: var(--es-primary);
+  --bs-link-color-rgb: var(--es-primary-rgb);
+  --bs-link-hover-color: var(--es-link-hover);
+  --bs-link-hover-color-rgb: var(--es-link-hover-rgb);
+  --bs-code-color: var(--es-ink);
+  --bs-focus-ring-color: color-mix(in srgb, var(--es-focus) 45%, transparent);
+  --bs-font-sans-serif: var(--es-font-text);
+  --bs-border-radius: .25rem;
+  --bs-border-radius-sm: .1875rem;
+  --bs-border-radius-lg: .375rem;
+}
+
+/* ==================================================================
+ * 2. Base (type scale ~1.25, display face for headings only)
+ * ================================================================== */
+body {
+  font-family: var(--es-font-text);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .h1, .h2, .h3 {
+  font-family: var(--es-font-display);
+  font-weight: 700;
+  letter-spacing: -.005em;
+  line-height: 1.15;
+}
+h1, .h1 { font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem); }
+h2, .h2 { font-size: 1.6rem; }
+h3, .h3 { font-size: 1.25rem; }
+
+:focus-visible {
+  outline: 2px solid var(--es-focus);
+  outline-offset: 2px;
+}
+
+.es-lead {
+  max-width: 62ch;
+  font-size: 1.0625rem;
+  color: var(--es-muted);
+}
+
+/* Catalogue numbers are data: tabular figures, own colour token. */
+.es-catno {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-weight: 600;
+  font-size: var(--es-text-sm);
+  color: var(--es-catno-color);
+}
+
+/* Small secondary text under titles and in lists */
+.es-meta {
+  font-size: var(--es-text-sm);
+  color: var(--es-muted);
+  margin: 0;
+}
+
+/* ==================================================================
+ * 3. Bootstrap component adjustments
+ * ================================================================== */
+
+/* ---- Buttons */
+.btn-primary {
+  --bs-btn-bg: var(--es-primary);
+  --bs-btn-border-color: var(--es-primary);
+  --bs-btn-color: var(--es-on-primary);
+  --bs-btn-hover-bg: var(--es-primary-hover);
+  --bs-btn-hover-border-color: var(--es-primary-hover);
+  --bs-btn-hover-color: var(--es-on-primary);
+  --bs-btn-active-bg: var(--es-primary-active);
+  --bs-btn-active-border-color: var(--es-primary-active);
+  --bs-btn-active-color: var(--es-on-primary);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--es-ink);
+  --bs-btn-border-color: var(--es-line);
+  --bs-btn-hover-bg: var(--es-surface);
+  --bs-btn-hover-border-color: var(--es-muted);
+  --bs-btn-hover-color: var(--es-ink);
+  --bs-btn-active-bg: var(--es-primary);
+  --bs-btn-active-border-color: var(--es-primary);
+  --bs-btn-active-color: var(--es-on-primary);
+}
+
+.btn-danger {
+  --bs-btn-bg: var(--es-danger);
+  --bs-btn-border-color: var(--es-danger);
+  --bs-btn-hover-bg: var(--es-danger-hover);
+  --bs-btn-hover-border-color: var(--es-danger-hover);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--es-danger);
+  --bs-btn-border-color: var(--es-danger);
+  --bs-btn-hover-bg: var(--es-danger);
+  --bs-btn-hover-border-color: var(--es-danger);
+  --bs-btn-hover-color: var(--es-on-danger);
+  --bs-btn-active-bg: var(--es-danger);
+  --bs-btn-active-border-color: var(--es-danger);
+}
+
+/* Text-only destructive action, e.g. "Удалить предмет": stays red on hover */
+.btn-link-danger {
+  --bs-btn-color: var(--es-danger);
+  --bs-btn-hover-color: var(--es-danger);
+  --bs-btn-active-color: var(--es-danger);
+}
+
+/*
+ * Quiet icon button: muted glyph, no frame. Used for row and node actions.
+ * Combine with .btn (and .btn-sm where needed); add .es-btn-quiet-danger
+ * for destructive actions.
+ */
+.es-btn-quiet {
+  --bs-btn-padding-x: .45rem;
+  --bs-btn-border-width: 0;
+  --bs-btn-color: var(--es-muted);
+  --bs-btn-hover-color: var(--es-ink);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-active-color: var(--es-ink);
+  --bs-btn-active-border-color: transparent;
+}
+.es-btn-quiet-danger {
+  --bs-btn-hover-color: var(--es-danger);
+  --bs-btn-active-color: var(--es-danger);
+}
+
+/* ---- Forms */
+.form-control,
+.form-select {
+  background-color: var(--es-field-bg);
+  border-color: var(--es-line);
+}
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--es-primary);
+  box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--es-primary) 25%, transparent);
+}
+.form-check-input {
+  background-color: var(--es-field-bg);
+  border-color: var(--es-muted);
+}
+.form-check-input:checked,
+.form-check-input:indeterminate {
+  background-color: var(--es-primary);
+  border-color: var(--es-primary);
+}
+.form-label { font-weight: 500; margin-bottom: .3rem; }
+.form-text { color: var(--es-muted); }
+
+/* ---- Overlays */
+.dropdown-menu {
+  --bs-dropdown-bg: var(--es-surface);
+  --bs-dropdown-border-color: var(--es-line);
+}
+.dropdown-item.active,
+.dropdown-item:active {
+  --bs-dropdown-link-active-bg: var(--es-primary);
+  --bs-dropdown-link-active-color: var(--es-on-primary);
+}
+.modal {
+  --bs-modal-bg: var(--es-surface);
+  --bs-modal-border-color: var(--es-line);
+}
+.modal-title { font-family: var(--es-font-display); font-weight: 700; }
+
+/* ---- Navigation */
+.pagination {
+  --bs-pagination-bg: transparent;
+  --bs-pagination-border-color: var(--es-line);
+  --bs-pagination-color: var(--es-ink);
+  --bs-pagination-hover-bg: var(--es-surface);
+  --bs-pagination-hover-color: var(--es-ink);
+  --bs-pagination-active-bg: var(--es-primary);
+  --bs-pagination-active-border-color: var(--es-primary);
+  --bs-pagination-active-color: var(--es-on-primary);
+  --bs-pagination-focus-box-shadow: 0 0 0 .2rem var(--bs-focus-ring-color);
+}
+
+.breadcrumb {
+  --bs-breadcrumb-divider-color: var(--es-muted);
+  --bs-breadcrumb-item-active-color: var(--es-muted);
+  font-size: var(--es-text-md);
+}
+.breadcrumb a { text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* ---- Tables: shared look for every data table */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--es-ink);
+  --bs-table-border-color: var(--es-line);
+}
+/* Column labels: table headers and the header row of editable lists */
+.table > thead th,
+.es-row-head {
+  font-weight: 600;
+  font-size: var(--es-text-sm);
+  color: var(--es-muted);
+}
+/* Bootstrap colours table cells explicitly, so catalogue numbers need this */
+.table td.es-catno {
+  color: var(--es-catno-color);
+  white-space: nowrap;
+}
+/* Keeps visually-hidden labels inside the scroll box from widening the page */
+.table-responsive { position: relative; }
+
+/* ==================================================================
+ * 4. Project components, public area
+ * ================================================================== */
+
+/* ---- Header */
+.es-header {
+  background: var(--es-header-bg);
+  color: var(--es-header-fg);
+  border-bottom: 1px solid var(--es-header-edge);
+}
+.es-header .navbar-brand {
+  font-family: var(--es-font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.es-header .navbar-brand svg { width: 1.6rem; height: 1.6rem; fill: currentColor; }
+.es-header .navbar-toggler { border-color: var(--es-header-field-border); }
+.es-header .nav-link { color: var(--es-header-fg-muted); }
+.es-header .nav-link:hover,
+.es-header .nav-link.active { color: var(--es-header-fg); }
+.es-header .nav-link.active { box-shadow: inset 0 -2px 0 currentColor; }
+.es-header .form-control {
+  background: var(--es-header-field-bg);
+  border-color: var(--es-header-field-border);
+  color: var(--es-header-fg);
+}
+.es-header .form-control::placeholder { color: var(--es-header-fg-muted); opacity: .8; }
+/* In the light theme the focus colour equals the header background,
+   so the header has its own focus colour. */
+.es-header .form-control:focus {
+  box-shadow: 0 0 0 .2rem var(--es-header-focus-ring);
+  border-color: var(--es-header-focus);
+}
+.es-header :focus-visible { outline-color: var(--es-header-focus); }
+.es-header .btn-icon {
+  color: inherit;
+  border: 1px solid var(--es-header-field-border);
+}
+.es-header .btn-icon:hover { background: var(--es-header-field-bg); color: inherit; }
+
+/* ---- Page layout with the rubricator sidebar */
+@media (min-width: 992px) {
+  .es-layout { display: flex; align-items: stretch; }
+  .es-aside {
+    flex: 0 0 19rem;
+    background: var(--es-surface);
+    border-right: 1px solid var(--es-line);
+  }
+  .es-main { flex: 1 1 auto; min-width: 0; }
+  .es-sidebar {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+.es-sidebar {
+  --bs-offcanvas-bg: var(--es-surface);
+  background: var(--es-surface);
+}
+.es-sidebar-title {
+  font-family: var(--es-font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+/*
+ * ---- Rubricator drawn as a pedigree chart.
+ * Each nesting level is joined by elbow connectors, the way horse
+ * pedigrees connect sire and dam lines. The path to the current node
+ * has its own colour token.
+ */
+.es-tree,
+.es-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.es-tree ul { margin-left: .75rem; }
+.es-tree li { position: relative; }
+
+/* Vertical spine of a branch, painted as the item's own background */
+.es-tree ul > li {
+  padding-left: .75rem;
+  background: linear-gradient(var(--es-line), var(--es-line)) 0 0 / 1px 100% no-repeat;
+}
+.es-tree ul > li:last-child { background-size: 1px 1.15rem; }
+
+/* Elbow from the spine to the node */
+.es-tree ul > li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.15rem;
+  width: .6rem;
+  border-top: 1px solid var(--es-line);
+}
+
+/* The lineage spine runs down past the preceding siblings and turns into
+   the active node; siblings below it keep the neutral line. */
+.es-tree ul > li:has(~ li.is-lineage, ~ li.is-current) {
+  background-image: linear-gradient(var(--es-tree-lineage), var(--es-tree-lineage));
+  background-size: 2px 100%;
+}
+.es-tree ul > li.is-lineage::before,
+.es-tree ul > li.is-current::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: calc(1.15rem + 1px);
+  border-left: 2px solid var(--es-tree-lineage);
+}
+.es-tree ul > li.is-lineage::after,
+.es-tree ul > li.is-current::after {
+  border-top: 2px solid var(--es-tree-lineage);
+}
+
+.es-node {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  min-height: 2.3rem;
+}
+.es-node a {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+  padding: .3rem .5rem;
+  border-radius: var(--bs-border-radius-sm);
+  color: var(--es-ink);
+  text-decoration: none;
+}
+.es-node a:hover { background: var(--es-paper); }
+.es-node .es-count {
+  white-space: nowrap;
+  font-size: var(--es-text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--es-muted);
+}
+.es-tree li.is-lineage > .es-node a { font-weight: 600; }
+.es-tree li.is-current > .es-node a {
+  font-weight: 700;
+  background: var(--es-tree-current-bg);
+}
+
+/* Structural icon controls of the tree and lists: muted, darken on hover */
+.es-toggle,
+.es-drag {
+  border: 0;
+  background: none;
+  color: var(--es-muted);
+}
+.es-toggle:hover,
+.es-drag:hover { color: var(--es-ink); }
+
+/* Expand/collapse toggle */
+.es-toggle {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border-radius: var(--bs-border-radius-sm);
+}
+.es-toggle:hover { background: var(--es-paper); }
+.es-toggle .bi { transition: transform .15s ease; }
+.es-toggle[aria-expanded="true"] .bi { transform: rotate(90deg); }
+.es-toggle-spacer { width: 1.5rem; flex: none; }
+
+/* Drag handle for reordering */
+.es-drag {
+  cursor: grab;
+  padding: 0 .25rem;
+  line-height: 1;
+}
+
+/* ---- Category heading block */
+.es-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem 2rem;
+  margin: 0;
+}
+.es-facts div { display: flex; flex-direction: column; }
+.es-facts dt { font-weight: 400; font-size: var(--es-text-sm); color: var(--es-muted); }
+.es-facts dd {
+  margin: 0;
+  font-family: var(--es-font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  font-variant-numeric: lining-nums;
+}
+
+.es-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.es-chip {
+  padding: .3rem .8rem;
+  border: 1px solid var(--es-line);
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-md);
+  color: var(--es-ink);
+  text-decoration: none;
+  background: transparent;
+}
+.es-chip:hover { border-color: var(--es-muted); color: var(--es-ink); }
+.es-chip.active {
+  background: var(--es-primary);
+  border-color: var(--es-primary);
+  color: var(--es-on-primary);
+}
+.es-chip small { color: inherit; opacity: .7; margin-left: .25rem; }
+
+/*
+ * ---- Specimen card: a photo on a mount with a museum label beneath it.
+ * No boxed card chrome; the mount is the only frame.
+ */
+.es-specimen {
+  position: relative;
+  height: 100%;
+}
+.es-mount {
+  background: var(--es-surface);
+  border: 1px solid var(--es-line);
+  padding: .5rem;
+}
+.es-mount img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.es-label { padding: .625rem .125rem 0; }
+.es-label h3 {
+  font-size: clamp(1rem, .95rem + .25vw, 1.125rem);
+  margin: .125rem 0 .25rem;
+}
+.es-label h3 a {
+  color: var(--es-ink);
+  text-decoration: none;
+}
+/* Whole card is clickable via the title link */
+.es-label h3 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.es-specimen:hover .es-label h3 a { text-decoration: underline; text-underline-offset: .2em; }
+.es-specimen:hover .es-mount { border-color: var(--es-muted); }
+
+/* List view: same specimen, laid out horizontally */
+.es-catalog.is-list > [class*="col"] { width: 100%; }
+.es-catalog.is-list .es-specimen {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--es-line);
+}
+.es-catalog.is-list .es-label { padding-top: 0; }
+.es-catalog .es-desc { display: none; }
+.es-catalog.is-list .es-desc {
+  display: block;
+  font-size: var(--es-text-md);
+  max-width: 70ch;
+  margin: .375rem 0 0;
+}
+
+/* ---- Item page */
+.es-stage {
+  background: var(--es-surface);
+  border: 1px solid var(--es-line);
+  padding: .75rem;
+}
+.es-stage img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  display: block;
+}
+.es-stage a { position: relative; display: block; }
+.es-stage .es-zoom {
+  position: absolute;
+  right: .5rem;
+  bottom: .5rem;
+  background: var(--es-overlay-bg);
+  color: var(--es-overlay-fg);
+  font-size: var(--es-text-sm);
+  padding: .25rem .6rem;
+  border-radius: var(--bs-border-radius-sm);
+}
+.es-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .5rem;
+}
+.es-thumbs a {
+  display: block;
+  border: 1px solid var(--es-line);
+  background: var(--es-surface);
+  padding: .25rem;
+}
+.es-thumbs a:hover { border-color: var(--es-muted); }
+.es-thumbs a.active {
+  border-color: var(--es-thumb-active);
+  box-shadow: inset 0 0 0 1px var(--es-thumb-active);
+}
+.es-thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+
+/* "Скачать оригинал" with the size of the current photo */
+.es-photo-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+}
+
+.es-attrs {
+  display: grid;
+  grid-template-columns: minmax(8rem, 38%) 1fr;
+  margin: 0;
+  border-top: 1px solid var(--es-line);
+}
+.es-attrs dt,
+.es-attrs dd {
+  margin: 0;
+  padding: .55rem 0;
+  border-bottom: 1px solid var(--es-line);
+}
+.es-attrs dt { font-weight: 400; color: var(--es-muted); padding-right: 1rem; }
+
+.es-variants { font-size: .9375rem; }
+
+.es-prose { max-width: 68ch; }
+.es-prose p { margin-bottom: 1em; }
+
+.es-pager a {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--es-ink);
+  padding: .75rem 0;
+}
+.es-pager a span { font-size: var(--es-text-sm); color: var(--es-muted); }
+.es-pager a:hover strong { text-decoration: underline; }
+
+/* GLightbox caption in project colours */
+.glightbox-clean .gslide-description { background: var(--es-surface); }
+.glightbox-clean .gdesc-inner { padding: .75rem 1rem; }
+.glightbox-clean .gslide-desc {
+  font-family: var(--es-font-text);
+  color: var(--es-ink);
+  font-size: .9375rem;
+}
+
+/* ---- Footer */
+.es-footer {
+  border-top: 1px solid var(--es-line);
+  color: var(--es-muted);
+  font-size: var(--es-text-md);
+}
+.es-footer a { color: inherit; }
+.es-footer [data-es-auth] { margin-left: .5rem; }
+/* Unobtrusive admin entry: reads as plain footer text until hovered. */
+.es-footer .es-quiet-link { text-decoration: none; }
+.es-footer .es-quiet-link:hover,
+.es-footer .es-quiet-link:focus-visible { text-decoration: underline; color: var(--es-ink); }
+.es-footer [data-es-auth="admin"] a { text-decoration: underline; }
+
+/* ==================================================================
+ * 5. Project components, login and admin area
+ * ================================================================== */
+
+/* ---- Login page */
+.es-auth-page {
+  min-height: calc(100vh - 9rem);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  padding: 3rem 1rem;
+}
+.es-auth-card {
+  width: 100%;
+  max-width: 25rem;
+  background: var(--es-surface);
+  border: 1px solid var(--es-line);
+  border-radius: var(--bs-border-radius-lg);
+  padding: 2rem 1.75rem;
+}
+
+/* Placeholder for the pluggable captcha module (reCAPTCHA, Turnstile, Anubis...) */
+.es-captcha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.25rem;
+  padding: .75rem 1rem;
+  background: var(--es-field-bg);
+  border: 1px dashed var(--es-muted);
+  border-radius: var(--bs-border-radius);
+}
+.es-captcha .form-check {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding-left: 0;
+}
+.es-captcha .form-check .form-check-input {
+  float: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+}
+.es-captcha-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: .6875rem;
+  color: var(--es-muted);
+  line-height: 1.2;
+}
+.es-captcha-mark .bi { font-size: 1.5rem; color: var(--es-primary); }
+
+/* ---- Admin shell */
+.es-brand-role {
+  font-family: var(--es-font-text);
+  font-weight: 500;
+  font-size: var(--es-text-md);
+  opacity: .8;
+  align-self: flex-end;
+  margin-bottom: .2rem;
+}
+
+.es-panel {
+  background: var(--es-surface);
+  border: 1px solid var(--es-line);
+  border-radius: var(--bs-border-radius-lg);
+  padding: 1.25rem;
+}
+@media (min-width: 768px) {
+  .es-panel { padding: 1.5rem; }
+}
+.es-panel h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+.es-panel-sticky { position: sticky; top: 1rem; }
+
+/* ---- Admin rubricator: the public pedigree tree with edit controls */
+.es-tree-admin .es-node-actions {
+  display: flex;
+  gap: .125rem;
+  opacity: 0;
+}
+.es-tree-admin .es-node:hover .es-node-actions,
+.es-tree-admin .es-node:focus-within .es-node-actions,
+.es-tree-admin li.is-current > .es-node .es-node-actions { opacity: 1; }
+@media (hover: none) {
+  .es-tree-admin .es-node-actions { opacity: 1; }
+}
+.es-node-actions .btn {
+  --bs-btn-padding-x: .3rem;
+  --bs-btn-padding-y: .1rem;
+  --bs-btn-hover-bg: var(--es-paper);
+}
+.es-node .es-hidden-mark { color: var(--es-muted); font-size: var(--es-text-sm); margin-left: .25rem; }
+
+/* ---- Items table */
+.es-admin-table {
+  --bs-table-hover-bg: color-mix(in srgb, var(--es-primary) 6%, transparent);
+  --bs-table-hover-color: var(--es-ink);
+  margin-bottom: 0;
+}
+.es-admin-table th { white-space: nowrap; }
+.es-admin-table td { vertical-align: middle; }
+.es-admin-table .es-col-check { width: 2.5rem; }
+.es-admin-table .es-col-thumb { width: 4.5rem; }
+.es-admin-table .es-col-title { min-width: 15rem; }
+.es-admin-table .es-thumb {
+  width: 3.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--es-line);
+  display: block;
+}
+.es-admin-table .es-title { font-weight: 600; color: var(--es-ink); text-decoration: none; }
+.es-admin-table .es-title:hover { text-decoration: underline; }
+.es-admin-table .es-path { display: block; font-size: var(--es-text-sm); color: var(--es-muted); }
+/* "+N" marker for further rubrics of an item */
+.es-more {
+  display: inline-block;
+  margin-left: .25rem;
+  padding: 0 .4rem;
+  border: 1px solid var(--es-line);
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-xs);
+  cursor: help;
+}
+
+/* Authorial order: position column */
+.es-admin-table .es-col-order { width: 5.5rem; }
+.es-position {
+  display: inline-block;
+  min-width: 1.75rem;
+  text-align: right;
+  font-size: var(--es-text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--es-muted);
+}
+
+
+.es-status {
+  display: inline-block;
+  padding: .15rem .55rem;
+  border-radius: var(--es-radius-pill);
+  font-size: var(--es-text-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.es-status-published {
+  background: color-mix(in srgb, var(--es-primary) 12%, transparent);
+  color: var(--es-primary);
+}
+.es-status-draft {
+  background: color-mix(in srgb, var(--es-accent) 12%, transparent);
+  color: var(--es-accent);
+}
+
+.es-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem 1rem;
+  padding: .5rem 1rem;
+  background: color-mix(in srgb, var(--es-primary) 10%, transparent);
+  border: 1px solid var(--es-line);
+  border-radius: var(--bs-border-radius);
+}
+
+/* ---- Item editor */
+
+/* Rubrics of an item, one per line; the main one is marked */
+.es-rubric-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--es-line);
+}
+.es-rubric {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem .75rem;
+  padding: .4rem 0;
+  border-bottom: 1px solid var(--es-line);
+}
+.es-rubric.is-main .es-rubric-path { font-weight: 600; }
+
+.es-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+.es-photo {
+  border: 1px solid var(--es-line);
+  background: var(--es-field-bg);
+  border-radius: var(--bs-border-radius);
+  padding: .5rem;
+  position: relative;
+}
+.es-photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.es-photo.is-cover { border-color: var(--es-primary); box-shadow: inset 0 0 0 1px var(--es-primary); }
+.es-photo .es-photo-cover {
+  position: absolute;
+  top: .875rem;
+  left: .875rem;
+  background: var(--es-primary);
+  color: var(--es-on-primary);
+  font-size: var(--es-text-xs);
+  padding: .1rem .5rem;
+  border-radius: var(--es-radius-pill);
+}
+.es-photo-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: .5rem;
+}
+.es-photo .form-control { margin-top: .5rem; font-size: var(--es-text-sm); }
+
+.es-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  min-height: 100%;
+  padding: 1rem;
+  text-align: center;
+  font-size: var(--es-text-md);
+  color: var(--es-muted);
+  border: 1px dashed var(--es-muted);
+  border-radius: var(--bs-border-radius);
+  cursor: pointer;
+}
+.es-dropzone:hover { color: var(--es-ink); border-color: var(--es-primary); }
+.es-dropzone .bi { font-size: 1.75rem; color: var(--es-primary); }
+
+/* Editable lists (attributes, variants): one grid row per entry */
+.es-rows { display: grid; gap: .5rem; }
+.es-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 2fr) minmax(0, 3fr) auto;
+  gap: .5rem;
+  align-items: center;
+}
+.es-row-variant { grid-template-columns: auto minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1.4fr) auto; }
+@media (max-width: 575.98px) {
+  .es-row,
+  .es-row-variant { grid-template-columns: auto 1fr auto; }
+  .es-row > :nth-child(3),
+  .es-row-variant > :nth-child(3),
+  .es-row-variant > :nth-child(4) { grid-column: 2; }
+  .es-row-head { display: none; }
+}
+
+/* ---- Drag-and-drop sorting (initSortables in js/demo.js) */
+[data-es-sortable-handle] { touch-action: none; }
+.es-sorting,
+.es-sorting * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+[data-es-sortable] .is-dragging { opacity: .45; }
+
+/*
+ * Drop indicator: a line in the middle of the gap before or after the target
+ * (vertical in grids), or a frame around a tree node when nesting into it.
+ * Table rows draw the line on their cells, since rows cannot hold pseudo-elements.
+ */
+.es-rows[data-es-sortable] { --es-drop-gap: .5rem; }
+.es-photo-grid[data-es-sortable] { --es-drop-gap: 1rem; }
+
+[data-es-sortable] .is-drop-before:not(tr),
+[data-es-sortable] .is-drop-after:not(tr) { position: relative; }
+[data-es-sortable] .is-drop-before:not(tr)::before,
+[data-es-sortable] .is-drop-after:not(tr)::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--es-focus);
+  pointer-events: none;
+}
+[data-es-sortable] .is-drop-before:not(tr)::before { top: calc(var(--es-drop-gap, 0px) / -2 - 1px); }
+[data-es-sortable] .is-drop-after:not(tr)::before { bottom: calc(var(--es-drop-gap, 0px) / -2 - 1px); }
+
+[data-es-sortable="grid"] > .is-drop-before:not(tr)::before,
+[data-es-sortable="grid"] > .is-drop-after:not(tr)::before {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  height: auto;
+}
+[data-es-sortable="grid"] > .is-drop-before:not(tr)::before { left: calc(var(--es-drop-gap, 0px) / -2 - 1px); right: auto; }
+[data-es-sortable="grid"] > .is-drop-after:not(tr)::before { right: calc(var(--es-drop-gap, 0px) / -2 - 1px); left: auto; }
+
+[data-es-sortable] > tr.is-drop-before > td { box-shadow: inset 0 2px 0 var(--es-focus); }
+[data-es-sortable] > tr.is-drop-after > td { box-shadow: inset 0 -2px 0 var(--es-focus); }
+
+.es-tree .es-node.is-drop-into {
+  background: color-mix(in srgb, var(--es-focus) 18%, transparent);
+  box-shadow: inset 0 0 0 2px var(--es-focus);
+  border-radius: var(--bs-border-radius-sm);
+}
+
+/* ==================================================================
+ * 6. Motion preferences
+ * ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==================================================================
+ * 7. Engine-only components
+ * Everything above is identical to demo/css/estables.css; this section
+ * holds pages the static demo does not have (installer, service pages).
+ * ================================================================== */
+
+/* ---- Installer and service pages */
+.es-auth-card-wide { max-width: 36rem; }
+
+.es-steps { padding-left: 1.25rem; margin-bottom: 1.25rem; }
+.es-steps > li { margin-bottom: .75rem; }
+
+.es-code,
+.es-debug {
+  margin: .5rem 0 0;
+  padding: .625rem .75rem;
+  background: var(--es-field-bg);
+  border: 1px solid var(--es-line);
+  border-radius: var(--bs-border-radius);
+  font-size: var(--es-text-sm);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Environment check: one line per check with a status icon */
+.es-checks {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border-top: 1px solid var(--es-line);
+}
+.es-checks > li {
+  display: flex;
+  gap: .625rem;
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--es-line);
+}
+.es-checks .bi { flex: none; line-height: 1.55; }
+.es-checks .is-ok .bi { color: var(--es-primary); }
+.es-checks .is-warning .bi { color: var(--es-accent); }
+.es-checks .is-error .bi { color: var(--es-danger); }
+
+details > summary { cursor: pointer; }
+
+/* Short pages (empty catalogue, errors) keep the footer at the bottom */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.es-footer { margin-top: auto; }
+/* The rubricator column reaches down to the footer */
+.es-layout { flex: 1 0 auto; }
+
+/* ---- Sign-out: a POST form whose button looks like the footer links */
+.es-link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- New password shown in clear text: its confirmation field is hidden,
+   so the field before it closes the form without a trailing gap */
+.modal-body > :has(+ [data-es-password-confirm-field][hidden]:last-child) { margin-bottom: 0 !important; }
+
+/* ---- "About" page: owner-written text */
+.es-about {
+  max-width: 62ch;
+  font-size: 1.0625rem;
+}
+
+/* ---- Rubric card without a cover: an empty mount (covers come with photos) */
+.es-mount-empty {
+  display: grid;
+  place-items: center;
+  font-size: 2.5rem;
+  color: var(--es-line);
+}
+
+/* ---- Admin list: thumbnail cell of an item without photos (photos come in build 5) */
+.es-admin-table .es-thumb-empty { background: var(--es-surface); }
+
+/* ---- Photos: a drag over the upload zone, the current rubric cover */
+.es-dropzone.is-over { color: var(--es-ink); border-color: var(--es-primary); }
+.es-cover-preview {
+  width: 4.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--es-line);
+}

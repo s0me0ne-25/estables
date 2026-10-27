@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Орловские рысаки — eStables</title>
+
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
+
+  <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="public">
+  <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
+</head>
+<body>
+
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
+
+<header class="es-header">
+  <nav class="navbar navbar-expand-md" aria-label="Основная навигация">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand" href="index.html">
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables
+</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Каталог</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="about.html">О справочнике</a></li>
+                              </ul>
+
+        <form class="d-flex gap-2 align-items-center" role="search" method="get" action="search.html">
+          <label class="visually-hidden" for="q">Поиск по каталогу</label>
+          <input class="form-control" type="search" id="q" name="q" value="" placeholder="Поиск по каталогу">
+          <div class="dropdown">
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
+
+<div class="es-layout">
+
+    <!-- ======================= Rubricator ======================= -->
+    <aside class="es-aside">
+      <div class="offcanvas-lg offcanvas-start es-sidebar" tabindex="-1" id="rubricator" aria-labelledby="rubricatorTitle">
+        <div class="offcanvas-header">
+          <h2 class="offcanvas-title es-sidebar-title mb-0" id="rubricatorTitle">Рубрикатор</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#rubricator" aria-label="Закрыть"></button>
+        </div>
+        <div class="offcanvas-body d-block p-3 p-lg-4">
+          <h2 class="es-sidebar-title d-none d-lg-block">Рубрикатор</h2>
+
+          <nav aria-label="Рубрикатор">
+            <ul class="es-tree">
+<li>
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-1" aria-expanded="false" aria-controls="t-1" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-figurki.html"><span>Фигурки</span> <span class="es-count">21</span></a>
+  </div>
+  <ul class="collapse" id="t-1">
+<li>
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-2" aria-expanded="false" aria-controls="t-2" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-figurki-farfor.html"><span>Фарфор</span> <span class="es-count">17</span></a>
+  </div>
+  <ul class="collapse" id="t-2">
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-farfor-dulyovskiy-zavod.html"><span>Дулёвский завод</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-farfor-lfz.html"><span>Ленинградский завод</span> <span class="es-count">12</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-farfor-verbilki.html"><span>Вербилки</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-farfor-evropeyskie-manufaktury.html"><span>Европейские мануфактуры</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+<li>
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-7" aria-expanded="false" aria-controls="t-7" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-figurki-khudozhestvennoe-lityo.html"><span>Художественное литьё</span> <span class="es-count">3</span></a>
+  </div>
+  <ul class="collapse" id="t-7">
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-khudozhestvennoe-lityo-chugun.html"><span>Чугун</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-khudozhestvennoe-lityo-bronza.html"><span>Бронза</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-figurki-plastik-i-smola.html"><span>Пластик и смола</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+<li>
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-11" aria-expanded="false" aria-controls="t-11" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-medali-i-znaki.html"><span>Медали и знаки</span> <span class="es-count">3</span></a>
+  </div>
+  <ul class="collapse" id="t-11">
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-medali-i-znaki-konnyy-sport.html"><span>Конный спорт</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-medali-i-znaki-ippodromy.html"><span>Ипподромы</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-medali-i-znaki-konnye-zavody.html"><span>Конные заводы</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+<li>
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-15" aria-expanded="false" aria-controls="t-15" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-filateliya.html"><span>Филателия</span> <span class="es-count">3</span></a>
+  </div>
+  <ul class="collapse" id="t-15">
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-filateliya-marki.html"><span>Марки</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-filateliya-konverty-i-kartochki.html"><span>Конверты и карточки</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-otkrytki.html"><span>Открытки</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-grafika-i-plakaty.html"><span>Графика и плакаты</span> <span class="es-count">1</span></a>
+  </div>
+</li>
+<li class="is-lineage">
+  <div class="es-node">
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#t-21" aria-expanded="true" aria-controls="t-21" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="catalog-tematicheskie-podborki.html"><span>Тематические подборки</span> <span class="es-count">4</span></a>
+  </div>
+  <ul class="collapse show" id="t-21">
+<li>
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-tematicheskie-podborki-koni-na-dybakh.html"><span>Кони на дыбах</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+<li class="is-current">
+  <div class="es-node">
+    <span class="es-toggle-spacer"></span>
+    <a href="catalog-tematicheskie-podborki-orlovskie-rysaki.html" aria-current="page"><span>Орловские рысаки</span> <span class="es-count">2</span></a>
+  </div>
+</li>
+  </ul>
+</li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================= Main content ======================= -->
+    <main id="main" class="es-main px-3 px-lg-4 px-xxl-5 py-4">
+
+      <nav aria-label="Путь по разделам">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Каталог</a></li>
+          <li class="breadcrumb-item"><a href="catalog-tematicheskie-podborki.html">Тематические подборки</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Орловские рысаки</li>
+        </ol>
+      </nav>
+
+
+      <div class="row g-4 align-items-end mb-4">
+        <div class="col-xl-8">
+          <h1 class="mb-0">Орловские рысаки</h1>
+        </div>
+        <div class="col-xl-4">
+          <dl class="es-facts justify-content-xl-end">
+            <div><dt>Моделей</dt><dd>2</dd></div>
+            <div><dt>Вариантов</dt><dd>6</dd></div>
+            <div><dt>Годы выпуска</dt><dd>1958–1975</dd></div>
+          </dl>
+        </div>
+      </div>
+
+
+      <div class="es-chips mb-4" role="group" aria-label="Десятилетие выпуска">
+        <a class="es-chip" href="catalog-tematicheskie-podborki-orlovskie-rysaki.html">Все <small>2</small></a>
+        <a class="es-chip" href="catalog-tematicheskie-podborki-orlovskie-rysaki-d1950.html">1950-е <small>1</small></a>
+        <a class="es-chip active" href="catalog-tematicheskie-podborki-orlovskie-rysaki-d1960.html" aria-current="true">1960-е <small>1</small></a>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between border-top border-bottom py-2 mb-4">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#rubricator" aria-controls="rubricator">
+            <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор
+          </button>
+          <span class="text-body-secondary small">Показаны 1–1 из 1</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="visually-hidden" for="sort">Сортировка</label>
+          <!-- The visitor's choice is remembered site-wide in the es_sort cookie -->
+          <select class="form-select form-select-sm w-auto" id="sort" data-es-sort>
+            <option value="author" selected>Авторский порядок</option>
+            <option value="number">По номеру в каталоге</option>
+            <option value="year">По году выпуска</option>
+            <option value="title">По названию</option>
+          </select>
+          <div class="btn-group btn-group-sm" role="group" aria-label="Вид списка">
+            <button class="btn btn-outline-secondary active" type="button" data-es-view="grid" aria-pressed="true" title="Плитка"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="visually-hidden">Плитка</span></button>
+            <button class="btn btn-outline-secondary" type="button" data-es-view="list" aria-pressed="false" title="Список"><i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden">Список</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="row row-cols-2 row-cols-md-3 row-cols-xxl-4 g-3 g-md-4 es-catalog" data-es-catalog>
+        <div class="col"><article class="es-specimen">
+          <div class="es-mount ratio ratio-4x3"><img src="media/400/ae/ae3a39f9a0deb26e2a9c2692512e401e128d75272730cc5961339e88106d3761.jpg" srcset="media/400/ae/ae3a39f9a0deb26e2a9c2692512e401e128d75272730cc5961339e88106d3761.jpg 400w, media/originals/ae/ae3a39f9a0deb26e2a9c2692512e401e128d75272730cc5961339e88106d3761.jpg 1600w" sizes="(min-width: 1400px) 20vw, (min-width: 768px) 30vw, 50vw" alt="Орловский рысак" loading="lazy"></div>
+          <div class="es-label">
+            <span class="es-catno">ЛФЗ-1051</span>
+            <h3><a href="item-lfz-1051.html">Орловский рысак</a></h3>
+            <p class="es-meta">1962, 4 варианта</p>
+            <p class="es-desc text-body-secondary">Рысак на ходу; варианты различаются мастью и цветом постамента.</p>
+          </div>
+        </article></div>
+      </div>
+    </main>
+</div>
+
+<footer class="es-footer">
+  <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
+    <p class="mb-0">
+      eStables — справочник коллекционера.
+      <span data-es-auth="guest"><a class="es-quiet-link" href="login.html">Вход администратора</a></span>
+      <span data-es-auth="admin" hidden>Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+    </p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+  </div>
+</footer>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

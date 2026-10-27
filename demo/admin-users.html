@@ -1,41 +1,33 @@
 <!doctype html>
-<!--
-  eStables demo: admin, users and sessions.
-  Static mock-up for design review; all data and images are placeholders.
-  SPDX-License-Identifier: AGPL-3.0-or-later
--->
 <html lang="ru" data-bs-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Пользователи — администрирование eStables</title>
+  <title>Пользователи — eStables</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="eStables: справочник коллекционера конной тематики. Демонстрационная страница.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap">
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" integrity="sha384-nWN3KqaaVcbEsCjLSV+2jMjh62Iny/+mN3srM8TZeM8N6aj7eDl5wwYggjAJ4/sJ" crossorigin="anonymous">
-  <link rel="stylesheet" href="css/estables.css">
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
 
   <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="admin">
   <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
 </head>
-<body data-es-area="admin">
+<body>
 
 <a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
 
-<!-- ============================ Header ============================ -->
 <header class="es-header">
   <nav class="navbar navbar-expand-md" aria-label="Навигация администратора">
     <div class="container-fluid px-3 px-lg-4">
       <a class="navbar-brand" href="admin-items.html">
-        <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
-        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
-        eStables <span class="es-brand-role">администрирование</span>
-      </a>
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables <span class="es-brand-role">администрирование</span>
+</a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
         <span class="navbar-toggler-icon"></span>
@@ -43,29 +35,34 @@
 
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
-          <li class="nav-item"><a class="nav-link" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
-          <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
-        </ul>
+                                    <li class="nav-item"><a class="nav-link" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+                                                <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-audit.html"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Журнал</a></li>
+                              </ul>
         <div class="d-flex gap-2 align-items-center">
           <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
           <div class="dropdown">
-            <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
-              <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
-              <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
-            </ul>
-          </div>
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
         </div>
       </div>
     </div>
   </nav>
 </header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
 
 <main id="main" class="container-xxl px-3 px-lg-4 py-4">
+
 
   <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
     <div>
@@ -91,24 +88,15 @@
         <tr>
           <td class="fw-semibold">admin <span class="es-meta d-inline">(вы)</span></td>
           <td>Владелец справочника</td>
-          <td class="text-nowrap small text-body-secondary">26.10.2026, 09:14</td>
+          <td class="text-nowrap small text-body-secondary">27.10.2026, 17:58</td>
           <td>3</td>
           <td><span class="es-status es-status-published">Активен</span></td>
           <td class="text-end text-nowrap">
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
-          </td>
-        </tr>
-        <tr>
-          <td class="fw-semibold">ekovaleva</td>
-          <td>Елена Ковалёва</td>
-          <td class="text-nowrap small text-body-secondary">24.10.2026, 18:40</td>
-          <td>1</td>
-          <td><span class="es-status es-status-published">Активен</span></td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-lock me-1" aria-hidden="true"></i>Заблокировать</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal-1"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
+            <form class="d-inline" method="post" action="admin-users.html" data-es-confirm="Завершить все ваши сессии, включая эту? Потребуется войти заново.">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-sessions"><input type="hidden" name="user" value="1">
+              <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
+            </form>
           </td>
         </tr>
         <tr>
@@ -118,9 +106,33 @@
           <td>0</td>
           <td><span class="es-status es-status-draft">Заблокирован</span></td>
           <td class="text-end text-nowrap">
-            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button" disabled><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button"><i class="bi bi-unlock me-1" aria-hidden="true"></i>Разблокировать</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal-3"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
+            <form class="d-inline" method="post" action="admin-users.html" data-es-confirm="Завершить все сессии «archive»?">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-sessions"><input type="hidden" name="user" value="3">
+              <button class="btn btn-sm btn-outline-secondary" type="submit" disabled><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
+            </form>
+            <form class="d-inline" method="post" action="admin-users.html">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="unblock"><input type="hidden" name="user" value="3">
+              <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-unlock me-1" aria-hidden="true"></i>Разблокировать</button>
+            </form>
+          </td>
+        </tr>
+        <tr>
+          <td class="fw-semibold">ekovaleva</td>
+          <td>Елена Ковалёва</td>
+          <td class="text-nowrap small text-body-secondary">24.10.2026, 18:40</td>
+          <td>1</td>
+          <td><span class="es-status es-status-published">Активен</span></td>
+          <td class="text-end text-nowrap">
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#passwordModal-2"><i class="bi bi-key me-1" aria-hidden="true"></i>Сменить пароль</button>
+            <form class="d-inline" method="post" action="admin-users.html" data-es-confirm="Завершить все сессии «ekovaleva»?">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-sessions"><input type="hidden" name="user" value="2">
+              <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить сессии</button>
+            </form>
+            <form class="d-inline" method="post" action="admin-users.html" data-es-confirm="Заблокировать «ekovaleva»? Все его сессии будут завершены.">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="block"><input type="hidden" name="user" value="2">
+              <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="bi bi-lock me-1" aria-hidden="true"></i>Заблокировать</button>
+            </form>
           </td>
         </tr>
       </tbody>
@@ -133,7 +145,10 @@
         <h2 id="sessionsTitle" class="mb-1">Мои активные сессии</h2>
         <p class="es-meta">Сессия «до закрытия браузера» дополнительно завершается после 12 часов без активности. Запомненная продлевается при каждом заходе.</p>
       </div>
-      <button class="btn btn-outline-secondary" type="button"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить все, кроме этой</button>
+      <form method="post" action="admin-users.html">
+        <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-others">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Завершить все, кроме этой</button>
+      </form>
     </div>
     <div class="table-responsive border-top">
       <table class="table es-admin-table">
@@ -151,10 +166,12 @@
         <tr>
           <td><i class="bi bi-laptop me-2 text-body-secondary" aria-hidden="true"></i>Firefox, Linux</td>
           <td class="text-nowrap">203.0.113.24</td>
-          <td class="text-nowrap small text-body-secondary">26.10.2026, 09:14</td>
+          <td class="text-nowrap small text-body-secondary">27.10.2026, 17:58</td>
           <td class="text-nowrap small text-body-secondary">только что</td>
           <td class="small">до закрытия браузера</td>
-          <td class="text-end text-nowrap"><span class="es-meta d-inline">это устройство</span></td>
+          <td class="text-end text-nowrap">
+            <span class="es-meta d-inline">это устройство</span>
+          </td>
         </tr>
         <tr>
           <td><i class="bi bi-phone me-2 text-body-secondary" aria-hidden="true"></i>Safari, iOS</td>
@@ -162,7 +179,12 @@
           <td class="text-nowrap small text-body-secondary">12.10.2026, 21:02</td>
           <td class="text-nowrap small text-body-secondary">25.10.2026, 22:31</td>
           <td class="small">запомнена до 24.11.2026</td>
-          <td class="text-end text-nowrap"><button class="btn btn-sm btn-outline-secondary" type="button">Завершить</button></td>
+          <td class="text-end text-nowrap">
+            <form method="post" action="admin-users.html">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-session"><input type="hidden" name="session" value="4866ea664cd149fb1fbc898c7110c0c76930e87336dad7f88ddef7b083e8f3c9">
+              <button class="btn btn-sm btn-outline-secondary" type="submit">Завершить</button>
+            </form>
+          </td>
         </tr>
         <tr>
           <td><i class="bi bi-pc-display me-2 text-body-secondary" aria-hidden="true"></i>Chrome, Windows</td>
@@ -170,18 +192,38 @@
           <td class="text-nowrap small text-body-secondary">20.10.2026, 10:47</td>
           <td class="text-nowrap small text-body-secondary">23.10.2026, 16:05</td>
           <td class="small">запомнена до 22.11.2026</td>
-          <td class="text-end text-nowrap"><button class="btn btn-sm btn-outline-secondary" type="button">Завершить</button></td>
+          <td class="text-end text-nowrap">
+            <form method="post" action="admin-users.html">
+              <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="end-session"><input type="hidden" name="session" value="8814aaca27ef24f4bdef7f9be116beea325015f9d27992da6f8f82c1ea8396fd">
+              <button class="btn btn-sm btn-outline-secondary" type="submit">Завершить</button>
+            </form>
+          </td>
         </tr>
         </tbody>
       </table>
     </div>
+  </section>
+
+  <section class="mt-5" aria-labelledby="maintenanceTitle">
+    <h2 id="maintenanceTitle" class="mb-1">Режим техработ</h2>
+    <p class="es-meta">Пока режим включён, посетители вместо сайта видят заглушку «Ведутся технические работы». Администраторы входят как обычно, по ссылке в подвале, и видят сайт целиком.</p>
+    <form method="post" action="admin-users.html" data-es-autosubmit>
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="maintenance"><input type="hidden" name="maintenance" value="0">
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="maintenance" name="maintenance" value="1">
+        <label class="form-check-label" for="maintenance">Сайт закрыт для посетителей</label>
+      </div>
+      <!-- Without JavaScript the switch is applied with this button; with it, by the switch itself -->
+      <button class="btn btn-sm btn-outline-secondary mt-2" type="submit" data-es-autosubmit-button>Применить</button>
+    </form>
   </section>
 </main>
 
 <!-- Add administrator -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <form class="modal-content" method="post" action="admin-users.html" novalidate>
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="add">
       <div class="modal-header">
         <h2 class="modal-title h4" id="addUserModalTitle">Добавить администратора</h2>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
@@ -189,71 +231,164 @@
       <div class="modal-body">
         <div class="mb-3">
           <label class="form-label" for="u-login">Логин</label>
-          <input class="form-control" type="text" id="u-login" autocomplete="off" autocapitalize="off" spellcheck="false">
-        </div>
+          <input class="form-control" type="text" id="u-login" name="login" value="" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+                  </div>
         <div class="mb-3">
           <label class="form-label" for="u-name">Имя</label>
-          <input class="form-control" type="text" id="u-name">
-        </div>
+          <input class="form-control" type="text" id="u-name" name="display_name" value="">
+                  </div>
         <div class="mb-3">
           <label class="form-label" for="u-pass">Пароль</label>
-          <input class="form-control" type="password" id="u-pass" autocomplete="new-password" aria-describedby="u-pass-help">
+          <div class="input-group has-validation">
+            <input class="form-control" type="password" id="u-pass" name="password" autocomplete="new-password" aria-describedby="u-pass-help" required>
+            <button class="btn btn-outline-secondary" type="button" data-es-password-toggle data-es-password-confirm="u-pass2" aria-controls="u-pass" aria-pressed="false" title="Показать пароль">
+  <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
+</button>
+                      </div>
           <div class="form-text" id="u-pass-help">Не короче 12 символов.</div>
         </div>
-        <div>
+        <div data-es-password-confirm-field>
           <label class="form-label" for="u-pass2">Пароль ещё раз</label>
-          <input class="form-control" type="password" id="u-pass2" autocomplete="new-password">
-        </div>
+          <input class="form-control" type="password" id="u-pass2" name="password_again" autocomplete="new-password" required>
+                  </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Добавить</button>
+        <button type="submit" class="btn btn-primary">Добавить</button>
       </div>
-    </div>
+    </form>
   </div>
 </div>
 
-<!-- Change password -->
-<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalTitle" aria-hidden="true">
+<!-- Change password of admin -->
+<div class="modal fade" id="passwordModal-1" tabindex="-1" aria-labelledby="passwordModal-1-title" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <form class="modal-content" method="post" action="admin-users.html" novalidate>
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="password"><input type="hidden" name="user" value="1">
+      <!-- Lets password managers know whose password this is -->
+      <input type="text" name="username" value="admin" autocomplete="username" hidden>
       <div class="modal-header">
-        <h2 class="modal-title h4" id="passwordModalTitle">Сменить пароль</h2>
+        <h2 class="modal-title h4" id="passwordModal-1-title">Сменить пароль</h2>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label class="form-label" for="p-new">Новый пароль</label>
-          <input class="form-control" type="password" id="p-new" autocomplete="new-password" aria-describedby="p-new-help">
-          <div class="form-text" id="p-new-help">Не короче 12 символов.</div>
-        </div>
+          <label class="form-label" for="p1-current">Текущий пароль</label>
+          <input class="form-control" type="password" id="p1-current" name="current_password" autocomplete="current-password" required>
+                  </div>
         <div class="mb-3">
-          <label class="form-label" for="p-new2">Новый пароль ещё раз</label>
-          <input class="form-control" type="password" id="p-new2" autocomplete="new-password">
+          <label class="form-label" for="p1-new">Новый пароль</label>
+          <div class="input-group has-validation">
+            <input class="form-control" type="password" id="p1-new" name="password" autocomplete="new-password" aria-describedby="p1-new-help" required>
+            <button class="btn btn-outline-secondary" type="button" data-es-password-toggle data-es-password-confirm="p1-new2" aria-controls="p1-new" aria-pressed="false" title="Показать пароль">
+  <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
+</button>
+                      </div>
+          <div class="form-text" id="p1-new-help">Не короче 12 символов.</div>
         </div>
+        <div class="mb-3" data-es-password-confirm-field>
+          <label class="form-label" for="p1-new2">Новый пароль ещё раз</label>
+          <input class="form-control" type="password" id="p1-new2" name="password_again" autocomplete="new-password" required>
+                  </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="p-logout" checked>
-          <label class="form-check-label" for="p-logout">Завершить все сессии этого пользователя</label>
+          <input class="form-check-input" type="checkbox" id="p1-logout" name="end_sessions" value="1" checked>
+          <label class="form-check-label" for="p1-logout">Завершить остальные мои сессии</label>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Сменить пароль</button>
+        <button type="submit" class="btn btn-primary">Сменить пароль</button>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+<!-- Change password of archive -->
+<div class="modal fade" id="passwordModal-3" tabindex="-1" aria-labelledby="passwordModal-3-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="admin-users.html" novalidate>
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="password"><input type="hidden" name="user" value="3">
+      <!-- Lets password managers know whose password this is -->
+      <input type="text" name="username" value="archive" autocomplete="username" hidden>
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="passwordModal-3-title">Сменить пароль: archive</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" for="p3-new">Новый пароль</label>
+          <div class="input-group has-validation">
+            <input class="form-control" type="password" id="p3-new" name="password" autocomplete="new-password" aria-describedby="p3-new-help" required>
+            <button class="btn btn-outline-secondary" type="button" data-es-password-toggle data-es-password-confirm="p3-new2" aria-controls="p3-new" aria-pressed="false" title="Показать пароль">
+  <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
+</button>
+                      </div>
+          <div class="form-text" id="p3-new-help">Не короче 12 символов.</div>
+        </div>
+        <div class="mb-3" data-es-password-confirm-field>
+          <label class="form-label" for="p3-new2">Новый пароль ещё раз</label>
+          <input class="form-control" type="password" id="p3-new2" name="password_again" autocomplete="new-password" required>
+                  </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="p3-logout" name="end_sessions" value="1" checked>
+          <label class="form-check-label" for="p3-logout">Завершить все сессии этого пользователя</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary">Сменить пароль</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Change password of ekovaleva -->
+<div class="modal fade" id="passwordModal-2" tabindex="-1" aria-labelledby="passwordModal-2-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="admin-users.html" novalidate>
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ"><input type="hidden" name="action" value="password"><input type="hidden" name="user" value="2">
+      <!-- Lets password managers know whose password this is -->
+      <input type="text" name="username" value="ekovaleva" autocomplete="username" hidden>
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="passwordModal-2-title">Сменить пароль: ekovaleva</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" for="p2-new">Новый пароль</label>
+          <div class="input-group has-validation">
+            <input class="form-control" type="password" id="p2-new" name="password" autocomplete="new-password" aria-describedby="p2-new-help" required>
+            <button class="btn btn-outline-secondary" type="button" data-es-password-toggle data-es-password-confirm="p2-new2" aria-controls="p2-new" aria-pressed="false" title="Показать пароль">
+  <i class="bi bi-eye" aria-hidden="true"></i><span class="visually-hidden">Показать пароль</span>
+</button>
+                      </div>
+          <div class="form-text" id="p2-new-help">Не короче 12 символов.</div>
+        </div>
+        <div class="mb-3" data-es-password-confirm-field>
+          <label class="form-label" for="p2-new2">Новый пароль ещё раз</label>
+          <input class="form-control" type="password" id="p2-new2" name="password_again" autocomplete="new-password" required>
+                  </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="p2-logout" name="end_sessions" value="1" checked>
+          <label class="form-check-label" for="p2-logout">Завершить все сессии этого пользователя</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary">Сменить пароль</button>
+      </div>
+    </form>
   </div>
 </div>
 
-<!-- ============================ Footer ============================ -->
 <footer class="es-footer">
   <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
     <p class="mb-0">
-      eStables — справочник коллекционера. <span data-es-auth="guest" hidden><a class="es-quiet-link" href="login.html">Вход администратора</a></span> <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+      eStables — справочник коллекционера.
+      <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
     </p>
-    <p class="mb-0">Демонстрационная версия: описания и изображения условные. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

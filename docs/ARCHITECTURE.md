@@ -69,7 +69,7 @@ bin/estables          CLI: migrate, create-admin, passwd, gc, check, backup
 deploy/               конфиги nginx (общая часть, сайт по HTTP, сайт по HTTPS) и php-fpm pool, строки для /etc/crontab, logrotate, фильтр fail2ban
 tests/                PHPUnit, визуальные тесты
 docs/                 INSTALL.md, UPGRADE.md, ARCHITECTURE.md
-demo/                 статичное демо, остаётся на GitHub Pages
+demo/                 статическая демо-версия для GitHub Pages, рендерится движком (tools/demo-build/)
 ```
 
 Document root указывает на `public/`, остальное снаружи. Запасной режим «всё в корне» для виртуального хостинга не нужен.

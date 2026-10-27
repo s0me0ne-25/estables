@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ru" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Рубрикатор — eStables</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="stylesheet" href="assets/vendor/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estables.css">
+
+  <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
+  <meta name="es-demo-area" content="admin">
+  <script src="js/demo.js"></script>
+  <script src="assets/js/estables.js"></script>
+</head>
+<body>
+
+<a class="visually-hidden-focusable position-absolute top-0 start-0 p-2 bg-body" href="#main">Перейти к содержанию</a>
+
+<header class="es-header">
+  <nav class="navbar navbar-expand-md" aria-label="Навигация администратора">
+    <div class="container-fluid px-3 px-lg-4">
+      <a class="navbar-brand" href="admin-items.html">
+  <!-- Horse head: Font Awesome Free, CC BY 4.0, https://fontawesome.com/license/free -->
+  <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M0 464L0 316.9C0 208.5 68.3 111.8 170.5 75.6L340.2 15.5c21.4-7.6 43.8 8.3 43.8 30.9 0 11-5.5 21.2-14.6 27.3L336 96c48.1 0 91.2 29.8 108.1 74.9l48.6 129.5c11.8 31.4 4.1 66.8-19.6 90.5-16 16-37.8 25.1-60.5 25.1l-3.4 0c-26.1 0-50.9-11.6-67.6-31.7l-32.3-38.7c-11.7 4.1-24.2 6.4-37.3 6.4l-.1 0c-6.3 0-12.5-.5-18.6-1.5-3.6-.6-7.2-1.4-10.7-2.3l0 0c-28.9-7.8-53.1-26.8-67.8-52.2-4.4-7.7-14.2-10.3-21.9-5.8s-10.3 14.2-5.8 21.9c24 41.5 68.3 70 119.3 71.9l47.2 70.8c4 6.1 6.2 13.2 6.2 20.4 0 20.3-16.5 36.8-36.8 36.8L48 512c-26.5 0-48-21.5-48-48zM328 224a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
+  eStables <span class="es-brand-role">администрирование</span>
+</a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                                    <li class="nav-item"><a class="nav-link" href="admin-items.html"><i class="bi bi-collection me-1" aria-hidden="true"></i>Предметы</a></li>
+                                                <li class="nav-item"><a class="nav-link active" aria-current="page" href="admin-rubrics.html"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>Рубрикатор</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-users.html"><i class="bi bi-people me-1" aria-hidden="true"></i>Пользователи</a></li>
+                                                <li class="nav-item"><a class="nav-link" href="admin-audit.html"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>Журнал</a></li>
+                              </ul>
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-icon" href="index.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть сайт</a>
+          <div class="dropdown">
+  <button class="btn btn-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Оформление">
+    <i class="bi bi-sun" data-es-theme-icon aria-hidden="true"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item" type="button" data-es-theme-value="light"><i class="bi bi-sun me-2" aria-hidden="true"></i>Светлое</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="dark"><i class="bi bi-moon-stars me-2" aria-hidden="true"></i>Тёмное</button></li>
+    <li><button class="dropdown-item" type="button" data-es-theme-value="auto"><i class="bi bi-circle-half me-2" aria-hidden="true"></i>Как в системе</button></li>
+  </ul>
+</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="alert alert-warning rounded-0 border-start-0 border-end-0 border-top-0 mb-0 px-3 px-lg-4 py-2 small" role="status" data-es-demo-maintenance hidden>
+  <i class="bi bi-cone-striped me-1" aria-hidden="true"></i>Включён режим техработ: посетители видят заглушку, сайт видят только администраторы. <a class="alert-link" href="admin-users.html#maintenanceTitle">Выключить</a>
+</div>
+
+<main id="main" class="container-xxl px-3 px-lg-4 py-4">
+
+  <div class="alert alert-danger" role="alert" data-es-rubric-move-error hidden></div>
+
+  <div class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-4">
+    <div>
+      <h1 class="mb-1">Рубрикатор</h1>
+      <p class="text-body-secondary mb-0">Разделы каталога и их порядок. Перетащите раздел за значок слева, чтобы изменить порядок или вложенность. С клавиатуры: на значке клавиши ↑ ↓ меняют порядок, ← → — вложенность.</p>
+    </div>
+    <a class="btn btn-primary" href="admin-rubric-new.html"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Добавить раздел</a>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Tree -->
+    <div class="col-lg-5">
+      <section class="es-panel" aria-labelledby="treeTitle">
+        <h2 id="treeTitle">Разделы</h2>
+        <ul class="es-tree es-tree-admin" data-es-sortable="tree" data-es-rubric-tree data-es-move-url="#" data-es-csrf="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">
+<li data-es-rubric="1">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Фигурки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-1" aria-expanded="false" aria-controls="a-1" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-1.html"><span>Фигурки</span> <span class="es-count">21</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Фигурки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="1" data-es-rubric-name="Фигурки" data-es-rubric-children="3" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Фигурки»</span></button>
+    </div>
+  </div>
+  <ul class="collapse" id="a-1">
+<li data-es-rubric="2">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Фарфор»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-2" aria-expanded="false" aria-controls="a-2" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-2.html"><span>Фарфор</span> <span class="es-count">17</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Фарфор»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="2" data-es-rubric-name="Фарфор" data-es-rubric-children="4" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Фарфор»</span></button>
+    </div>
+  </div>
+  <ul class="collapse" id="a-2">
+<li data-es-rubric="3">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Дулёвский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-3.html"><span>Дулёвский завод</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Дулёвский завод»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="3" data-es-rubric-name="Дулёвский завод" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="1"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Дулёвский завод»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="4">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Ленинградский завод»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-4.html"><span>Ленинградский завод</span> <span class="es-count">12</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Ленинградский завод»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="4" data-es-rubric-name="Ленинградский завод" data-es-rubric-children="0" data-es-rubric-items="13" data-es-rubric-shared="2"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Ленинградский завод»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="5">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Вербилки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-5.html"><span>Вербилки</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Вербилки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="5" data-es-rubric-name="Вербилки" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Вербилки»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="6">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Европейские мануфактуры»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-6.html"><span>Европейские мануфактуры</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Европейские мануфактуры»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="6" data-es-rubric-name="Европейские мануфактуры" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Европейские мануфактуры»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+<li data-es-rubric="7">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Художественное литьё»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-7" aria-expanded="false" aria-controls="a-7" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-7.html"><span>Художественное литьё</span> <span class="es-count">3</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Художественное литьё»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="7" data-es-rubric-name="Художественное литьё" data-es-rubric-children="2" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Художественное литьё»</span></button>
+    </div>
+  </div>
+  <ul class="collapse" id="a-7">
+<li data-es-rubric="8">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Чугун»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-8.html"><span>Чугун</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Чугун»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="8" data-es-rubric-name="Чугун" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="1"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Чугун»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="9">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Бронза»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-9.html"><span>Бронза</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Бронза»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="9" data-es-rubric-name="Бронза" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Бронза»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+<li data-es-rubric="10">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Пластик и смола»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-10.html"><span>Пластик и смола</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Пластик и смола»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="10" data-es-rubric-name="Пластик и смола" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Пластик и смола»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+<li data-es-rubric="11">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Медали и знаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-11" aria-expanded="false" aria-controls="a-11" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-11.html"><span>Медали и знаки</span> <span class="es-count">3</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Медали и знаки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="11" data-es-rubric-name="Медали и знаки" data-es-rubric-children="3" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Медали и знаки»</span></button>
+    </div>
+  </div>
+  <ul class="collapse" id="a-11">
+<li data-es-rubric="12">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Конный спорт»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-12.html"><span>Конный спорт</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Конный спорт»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="12" data-es-rubric-name="Конный спорт" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Конный спорт»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="13">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Ипподромы»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-13.html"><span>Ипподромы</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Ипподромы»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="13" data-es-rubric-name="Ипподромы" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Ипподромы»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="14">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Конные заводы»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-14.html"><span>Конные заводы</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Конные заводы»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="14" data-es-rubric-name="Конные заводы" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Конные заводы»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+<li data-es-rubric="15" class="is-lineage">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Филателия»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-15" aria-expanded="true" aria-controls="a-15" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-15.html"><span>Филателия</span> <span class="es-count">3</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Филателия»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="15" data-es-rubric-name="Филателия" data-es-rubric-children="2" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Филателия»</span></button>
+    </div>
+  </div>
+  <ul class="collapse show" id="a-15">
+<li data-es-rubric="16" class="is-current">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Марки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-16.html" aria-current="true"><span>Марки</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Марки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="16" data-es-rubric-name="Марки" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Марки»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="17">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Конверты и карточки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-17.html"><span>Конверты и карточки</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Конверты и карточки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="17" data-es-rubric-name="Конверты и карточки" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Конверты и карточки»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+<li data-es-rubric="18">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Открытки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-18.html"><span>Открытки</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Открытки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="18" data-es-rubric-name="Открытки" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Открытки»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="19">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Графика и плакаты»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-19.html"><span>Графика и плакаты</span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Графика и плакаты»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="19" data-es-rubric-name="Графика и плакаты" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Графика и плакаты»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="20">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Книги и каталоги»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-20.html"><span>Книги и каталоги<i class="bi bi-eye-slash es-hidden-mark" aria-hidden="true" title="Скрыт на сайте"></i><span class="visually-hidden">, скрыт на сайте</span></span> <span class="es-count">1</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Книги и каталоги»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="20" data-es-rubric-name="Книги и каталоги" data-es-rubric-children="0" data-es-rubric-items="1" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Книги и каталоги»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="21">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Тематические подборки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <button class="es-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#a-21" aria-expanded="false" aria-controls="a-21" aria-label="Подразделы"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    <a href="admin-rubric-21.html"><span>Тематические подборки</span> <span class="es-count">4</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Тематические подборки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="21" data-es-rubric-name="Тематические подборки" data-es-rubric-children="2" data-es-rubric-items="0" data-es-rubric-shared="0"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Тематические подборки»</span></button>
+    </div>
+  </div>
+  <ul class="collapse" id="a-21">
+<li data-es-rubric="22">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Кони на дыбах»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-22.html"><span>Кони на дыбах</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Кони на дыбах»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="22" data-es-rubric-name="Кони на дыбах" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="2"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Кони на дыбах»</span></button>
+    </div>
+  </div>
+</li>
+<li data-es-rubric="23">
+  <div class="es-node">
+    <button class="es-drag" data-es-sortable-handle type="button" title="Перетащить" aria-label="Переместить «Орловские рысаки»"><i class="bi bi-grip-vertical" aria-hidden="true"></i></button>
+    <span class="es-toggle-spacer"></span>
+    <a href="admin-rubric-23.html"><span>Орловские рысаки</span> <span class="es-count">2</span></a>
+    <div class="es-node-actions">
+      <button class="btn btn-sm es-btn-quiet" type="button" title="Добавить подраздел" data-es-href="admin-rubric-new.html"><i class="bi bi-plus-lg" aria-hidden="true"></i><span class="visually-hidden">Добавить подраздел в «Орловские рысаки»</span></button>
+      <button class="btn btn-sm es-btn-quiet es-btn-quiet-danger" type="button" title="Удалить" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="23" data-es-rubric-name="Орловские рысаки" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="2"><i class="bi bi-trash" aria-hidden="true"></i><span class="visually-hidden">Удалить «Орловские рысаки»</span></button>
+    </div>
+  </div>
+</li>
+  </ul>
+</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- Selected rubric -->
+    <div class="col-lg-7">
+      <section class="es-panel" aria-labelledby="rubricTitle">
+        <div class="d-flex flex-wrap gap-2 align-items-baseline justify-content-between mb-3">
+          <h2 id="rubricTitle" class="mb-0">Марки</h2>
+          <a class="small" href="catalog-filateliya-marki.html"><i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i>Открыть на сайте</a>
+        </div>
+
+        <form method="post" action="admin-rubrics.html" enctype="multipart/form-data" novalidate>
+          <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">          <input type="hidden" name="action" value="save">
+          <input type="hidden" name="id" value="16">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="r-name">Название в рубрикаторе</label>
+              <input class="form-control" type="text" id="r-name" name="name" value="Марки" required>
+                          </div>
+            <div class="col-md-6">
+              <label class="form-label" for="r-title">Заголовок страницы</label>
+              <input class="form-control" type="text" id="r-title" name="title" value="">
+                            <div class="form-text">Если пусто, используется название.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="r-parent">Родительский раздел</label>
+              <select class="form-select" id="r-parent" name="parent" data-es-slug-parent>
+                <option value="0" data-es-prefix="index.html">Верхний уровень</option>
+                <option value="1" data-es-prefix="catalog-figurki.html">Фигурки</option>
+                <option value="2" data-es-prefix="…/farfor/">  Фарфор</option>
+                <option value="3" data-es-prefix="…/dulyovskiy-zavod/">    Дулёвский завод</option>
+                <option value="4" data-es-prefix="…/lfz/">    Ленинградский завод</option>
+                <option value="5" data-es-prefix="…/verbilki/">    Вербилки</option>
+                <option value="6" data-es-prefix="…/evropeyskie-manufaktury/">    Европейские мануфактуры</option>
+                <option value="7" data-es-prefix="…/khudozhestvennoe-lityo/">  Художественное литьё</option>
+                <option value="8" data-es-prefix="…/chugun/">    Чугун</option>
+                <option value="9" data-es-prefix="…/bronza/">    Бронза</option>
+                <option value="10" data-es-prefix="…/plastik-i-smola/">  Пластик и смола</option>
+                <option value="11" data-es-prefix="catalog-medali-i-znaki.html">Медали и знаки</option>
+                <option value="12" data-es-prefix="…/konnyy-sport/">  Конный спорт</option>
+                <option value="13" data-es-prefix="…/ippodromy/">  Ипподромы</option>
+                <option value="14" data-es-prefix="…/konnye-zavody/">  Конные заводы</option>
+                <option value="15" data-es-prefix="catalog-filateliya.html" selected>Филателия</option>
+                <option value="17" data-es-prefix="…/konverty-i-kartochki/">  Конверты и карточки</option>
+                <option value="18" data-es-prefix="catalog-otkrytki.html">Открытки</option>
+                <option value="19" data-es-prefix="catalog-grafika-i-plakaty.html">Графика и плакаты</option>
+                <option value="20" data-es-prefix="catalog-knigi-i-katalogi.html">Книги и каталоги</option>
+                <option value="21" data-es-prefix="catalog-tematicheskie-podborki.html">Тематические подборки</option>
+                <option value="22" data-es-prefix="…/koni-na-dybakh/">  Кони на дыбах</option>
+                <option value="23" data-es-prefix="…/orlovskie-rysaki/">  Орловские рысаки</option>
+              </select>
+                          </div>
+            <div class="col-md-6">
+              <label class="form-label" for="r-slug">Адрес страницы</label>
+              <div class="input-group has-validation">
+                <span class="input-group-text small text-body-secondary bg-transparent" data-es-slug-prefix>/catalog/filateliya/</span>
+                <input class="form-control" type="text" id="r-slug" name="slug" value="marki" spellcheck="false" autocapitalize="off" aria-describedby="r-slug-help">
+                              </div>
+              <div class="form-text" id="r-slug-help">Латиница, цифры и дефисы. Если пусто, адрес получится из названия. Старый адрес будет перенаправлять на новый.</div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="r-desc">Описание</label>
+              <textarea class="form-control" id="r-desc" name="description" rows="4"></textarea>
+                            <div class="form-text">Показывается под заголовком раздела. Пустая строка начинает новый абзац.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="r-cover">Обложка раздела</label>
+              <input class="form-control" type="file" id="r-cover" name="cover" accept="image/*">
+                            <div class="form-text">Необязательно. Без обложки берётся фото первого предмета в авторском порядке.</div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="r-visible" name="visible" value="1" checked>
+                <label class="form-check-label" for="r-visible">Показывать раздел на сайте</label>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-body-secondary small mt-3 mb-0">В разделе 2 предмета, подразделов нет.</p>
+
+          <div class="d-flex flex-wrap gap-2 border-top pt-3 mt-3">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+            <button class="btn btn-outline-secondary" type="reset">Отменить изменения</button>
+            <button class="btn btn-outline-danger ms-sm-auto" type="button" data-bs-toggle="modal" data-bs-target="#deleteRubricModal" data-es-rubric-delete="16" data-es-rubric-name="Марки" data-es-rubric-children="0" data-es-rubric-items="2" data-es-rubric-shared="0"><i class="bi bi-trash me-1" aria-hidden="true"></i>Удалить раздел</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- Delete rubric: filled in from the data-es-rubric-* attributes of the button that opens it -->
+<div class="modal fade" id="deleteRubricModal" tabindex="-1" aria-labelledby="deleteRubricTitle" aria-hidden="true" data-es-rubric-delete-modal>
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="admin-rubrics.html">
+      <input type="hidden" name="_csrf" value="QVfDC7lX0MK0m33VsJFnW4HigOAw9p2MU5AAt2h-2aQ">      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="id" value="" data-es-rubric-delete-id>
+      <div class="modal-header">
+        <h2 class="modal-title h4" id="deleteRubricTitle">Удалить раздел «<span data-es-rubric-delete-name></span>»?</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0" data-es-rubric-delete-empty>В разделе нет ни предметов, ни подразделов. Удаление нельзя отменить.</p>
+        <p class="mb-0" data-es-rubric-delete-busy hidden>У раздела есть подразделы. Сначала перенесите их в другой раздел (перетаскиванием в дереве) или удалите.</p>
+        <div data-es-rubric-delete-items hidden>
+          <p data-es-rubric-delete-summary></p>
+          <div data-es-rubric-delete-choice>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="items" id="delMove" value="move" checked>
+              <label class="form-check-label" for="delMove">Перенести в другой раздел</label>
+            </div>
+            <select class="form-select mb-3 ms-4 w-auto mw-100" name="target" aria-label="Раздел для переноса" data-es-rubric-delete-target>
+              <option value="1">Фигурки</option>
+              <option value="2">  Фарфор</option>
+              <option value="3">    Дулёвский завод</option>
+              <option value="4">    Ленинградский завод</option>
+              <option value="5">    Вербилки</option>
+              <option value="6">    Европейские мануфактуры</option>
+              <option value="7">  Художественное литьё</option>
+              <option value="8">    Чугун</option>
+              <option value="9">    Бронза</option>
+              <option value="10">  Пластик и смола</option>
+              <option value="11">Медали и знаки</option>
+              <option value="12">  Конный спорт</option>
+              <option value="13">  Ипподромы</option>
+              <option value="14">  Конные заводы</option>
+              <option value="15">Филателия</option>
+              <option value="16">  Марки</option>
+              <option value="17">  Конверты и карточки</option>
+              <option value="18">Открытки</option>
+              <option value="19">Графика и плакаты</option>
+              <option value="20">Книги и каталоги</option>
+              <option value="21">Тематические подборки</option>
+              <option value="22">  Кони на дыбах</option>
+              <option value="23">  Орловские рысаки</option>
+            </select>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="items" id="delAll" value="delete">
+              <label class="form-check-label" for="delAll" data-es-rubric-delete-all>Удалить эти предметы</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-danger" data-es-rubric-delete-submit>Удалить раздел</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer class="es-footer">
+  <div class="container-fluid px-3 px-lg-4 py-4 d-flex flex-wrap gap-2 column-gap-4 justify-content-between">
+    <p class="mb-0">
+      eStables — справочник коллекционера.
+      <span data-es-auth="admin">Вы — администратор (<a href="admin-items.html">панель управления</a> | <a href="index.html" data-es-logout>выход</a>)</span>
+    </p>
+    <p class="mb-0">Статическая демонстрационная версия: контент условный. <a href="https://github.com/s0me0ne-25/estables">Исходный код</a> под лицензией AGPL-3.0</p>
+  </div>
+</footer>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
