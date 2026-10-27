@@ -13,6 +13,7 @@
  * - the item editor: rubrics with the main one, rows of characteristics and variants
  * - the admin list of items: selection for bulk actions, filters, authorial order
  * - the catalogue: grid or list view, the visitor's sort order (es_sort cookie)
+ * - photos: the editor grid with uploads, the gallery of the item page
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
@@ -848,6 +849,177 @@
     });
   };
 
+  /* ------------------------------------------------ admin: item photos */
+
+  // The first photo is the cover. The star moves a photo to the front, the
+  // bin takes it off the item when the form is saved.
+  const initPhotoManager = () => {
+    const grid = document.querySelector('[data-es-photos]');
+    const sortable = grid && sortables.get(grid);
+    if (!sortable) return;
+    const photos = () => Array.from(grid.querySelectorAll(':scope > .es-photo'));
+
+    const refresh = () => {
+      let badge = grid.querySelector('[data-es-photo-cover-badge]');
+      photos().forEach((photo, i) => {
+        const isCover = i === 0;
+        photo.classList.toggle('is-cover', isCover);
+        const star = photo.querySelector('[data-es-photo-cover-set]');
+        if (star) star.hidden = isCover;
+        if (isCover) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'es-photo-cover';
+            badge.dataset.esPhotoCoverBadge = '';
+            badge.textContent = 'Обложка';
+          }
+          photo.querySelector('img').after(badge);
+        }
+        // Keep "фото N" in accessible names in step with the order.
+        photo.querySelectorAll('label, .visually-hidden').forEach((el) => {
+          el.textContent = el.textContent.replace(/фото \d+$/, `фото ${i + 1}`);
+        });
+      });
+      if (badge && !photos().length) badge.remove();
+    };
+    grid.esRefreshPhotos = refresh;
+
+    grid.addEventListener('es:sorted', refresh);
+    grid.addEventListener('click', (event) => {
+      const star = event.target.closest('[data-es-photo-cover-set]');
+      if (star) {
+        const photo = star.closest('.es-photo');
+        sortable.place(photo, photos()[0], 'before');
+        announce('Фото стало обложкой');
+        photo.querySelector(SORT_HANDLE)?.focus();
+        return;
+      }
+      const remove = event.target.closest('[data-es-photo-remove]');
+      if (remove) {
+        remove.closest('.es-photo')?.remove();
+        refresh();
+        announce('Фото будет убрано при сохранении');
+      }
+    });
+  };
+
+  // Uploads of photos: one request per file, each tile appears as soon as
+  // its file is processed; files can be dropped onto the zone.
+  const initPhotoUpload = () => {
+    const input = document.querySelector('[data-es-upload]');
+    const grid = document.querySelector('[data-es-photos]');
+    const zone = document.querySelector('[data-es-upload-zone]');
+    const status = document.querySelector('[data-es-upload-status]');
+    const csrf = document.querySelector('#itemForm input[name="_csrf"]')?.value || '';
+    if (!input || !grid || !zone) return;
+    const max = Number(input.dataset.esUploadMax || 0);
+    let queue = Promise.resolve();
+
+    const line = (text, isError) => {
+      const p = document.createElement('p');
+      p.className = `small mb-1 ${isError ? 'text-danger' : 'text-body-secondary'}`;
+      p.textContent = text;
+      status?.appendChild(p);
+      return p;
+    };
+
+    const upload = (file) => {
+      queue = queue.then(async () => {
+        if (max && file.size > max) {
+          line(`${file.name}: файл больше ${Math.round(max / 1048576)} МБ.`, true);
+          return;
+        }
+        const progress = line(`${file.name}: загружается…`, false);
+        const body = new FormData();
+        body.append('_csrf', csrf);
+        body.append('photo', file);
+        let result = null;
+        try {
+          const response = await fetch(input.dataset.esUpload, {
+            method: 'POST', body, credentials: 'same-origin', headers: { Accept: 'application/json' },
+          });
+          if ((response.headers.get('Content-Type') || '').includes('application/json')) result = await response.json();
+        } catch (e) {
+          result = null;
+        }
+        if (result?.ok) {
+          zone.insertAdjacentHTML('beforebegin', result.html);
+          grid.esRefreshPhotos?.();
+          progress.remove();
+        } else {
+          progress.textContent = `${file.name}: ${result?.error || 'не загрузился (нет ответа сервера, файл слишком большой или сессия закончилась).'}`;
+          progress.className = 'small mb-1 text-danger';
+        }
+      });
+    };
+
+    input.addEventListener('change', () => {
+      Array.from(input.files).forEach(upload);
+      input.value = '';
+    });
+    ['dragenter', 'dragover'].forEach((type) => zone.addEventListener(type, (event) => {
+      event.preventDefault();
+      zone.classList.add('is-over');
+    }));
+    ['dragleave', 'drop'].forEach((type) => zone.addEventListener(type, () => zone.classList.remove('is-over')));
+    zone.addEventListener('drop', (event) => {
+      event.preventDefault();
+      Array.from(event.dataTransfer?.files || []).forEach(upload);
+    });
+  };
+
+  /* ---------------------------------------------------------- item gallery */
+
+  // The stage shows the chosen thumbnail; "Скачать оригинал" follows it; the
+  // stage opens the full-screen view (GLightbox) at the same photo.
+  const initItemGallery = () => {
+    const stage = document.querySelector('[data-es-gallery-stage]');
+    if (!stage) return;
+    const container = document.querySelector('[data-es-gallery-thumbs]');
+    const stageImg = stage.querySelector('img');
+    const thumbs = container ? Array.from(container.querySelectorAll('a')) : [stage];
+    const download = document.querySelector('[data-es-gallery-download]');
+    const info = document.querySelector('[data-es-gallery-info]');
+    let currentIndex = 0;
+
+    const captionOf = (t) => t.querySelector('img')?.alt || '';
+    const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+    const lightbox = window.GLightbox
+      ? window.GLightbox({
+        loop: true,
+        elements: thumbs.map((t) => ({
+          href: t.getAttribute('href'),
+          type: 'image',
+          description: `${escapeHtml(captionOf(t))}<br><a href="${escapeHtml(t.dataset.original)}">Скачать оригинал</a> `
+            + `(${escapeHtml(t.dataset.originalInfo)})`,
+        })),
+      })
+      : null;
+
+    if (container) {
+      thumbs.forEach((thumb, index) => {
+        thumb.addEventListener('click', (event) => {
+          event.preventDefault();
+          stageImg.src = thumb.getAttribute('href');
+          stageImg.alt = captionOf(thumb);
+          if (download) download.href = thumb.dataset.original;
+          if (info) info.textContent = thumb.dataset.originalInfo;
+          currentIndex = index;
+          setActive(thumbs, thumb, 'aria-current');
+        });
+      });
+    }
+
+    if (lightbox) {
+      stage.addEventListener('click', (event) => {
+        event.preventDefault();
+        lightbox.openAt(currentIndex);
+      });
+    }
+  };
+
   /* ------------------------------------------------------------------ boot */
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -868,6 +1040,9 @@
       initOrderTable,
       initCatalogView,
       initCatalogSort,
+      initPhotoManager,
+      initPhotoUpload,
+      initItemGallery,
     ].forEach((init) => init());
   });
 })();

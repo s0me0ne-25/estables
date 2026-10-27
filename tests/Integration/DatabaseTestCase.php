@@ -77,6 +77,16 @@ abstract class DatabaseTestCase extends TestCase
         return $tables;
     }
 
+    /**
+     * Settings of the test site, to build a Config with overrides.
+     *
+     * @return array<string, mixed>
+     */
+    protected function configArray(): array
+    {
+        return ['db' => $this->config->get('db'), 'app' => $this->config->get('app')];
+    }
+
     private static function env(string $name, string $default): string
     {
         $value = getenv($name);

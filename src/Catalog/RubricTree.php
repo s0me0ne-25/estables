@@ -17,7 +17,11 @@ namespace Estables\Catalog;
  * ("count"), their variants and the span of their years. Items of a hidden
  * rubric count in that rubric but not above it.
  *
- * @phpstan-type Node array{id: int, parent: int, slug: string, name: string, visible: bool, count: int, variants: int, yearMin: ?int, yearMax: ?int}
+ * Its cover (an image packed by Image::PACKED) is its own cover, else the
+ * first photo of its first published item in the authorial order, else the
+ * cover of its first visible subrubric that has one.
+ *
+ * @phpstan-type Node array{id: int, parent: int, slug: string, name: string, visible: bool, count: int, variants: int, yearMin: ?int, yearMax: ?int, cover: ?string}
  */
 final class RubricTree
 {

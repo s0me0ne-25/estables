@@ -46,6 +46,21 @@ final class RubricRepositoryTest extends DatabaseTestCase
         self::assertFileExists($this->site->paths->cache() . '/rubrics.ser', 'The tree is cached');
     }
 
+    public function testCacheOfAnOlderEngineIsRebuilt(): void
+    {
+        $figures = $this->add('Фигурки');
+        $old = $this->rubrics->tree()->toArray();
+        foreach ($old as &$node) {
+            unset($node['cover']);
+        }
+        unset($node);
+        // Before build 5 the cache held the bare node list, without covers.
+        file_put_contents($this->site->paths->cache() . '/rubrics.ser', serialize($old));
+
+        $fresh = new Services($this->site->paths, $this->config, new Logger($this->site->paths->var() . '/log/estables.log'))->rubrics();
+        self::assertArrayHasKey('cover', $fresh->tree()->node($figures));
+    }
+
     public function testValidation(): void
     {
         $figures = $this->add('Фигурки');

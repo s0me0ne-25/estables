@@ -22,7 +22,9 @@ final class TestSite
         mkdir($root . '/config', 0o777, true);
         $repo = \dirname(__DIR__);
         symlink($repo . '/templates', $root . '/templates');
-        symlink($repo . '/public', $root . '/public');
+        // Its own public/ so that photos land in the throw-away site, with the real assets
+        mkdir($root . '/public', 0o777, true);
+        symlink($repo . '/public/assets', $root . '/public/assets');
         $this->paths = new Paths($root);
     }
 

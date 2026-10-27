@@ -23,7 +23,7 @@ namespace Estables\Db;
  */
 final class Schema
 {
-    public const VERSION = 11;
+    public const VERSION = 14;
 
     /** Table options shared by every table. */
     private const TABLE_OPTIONS = 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=' . Connection::COLLATION;
@@ -211,6 +211,44 @@ final class Schema
                     CONSTRAINT fk_item_variants_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE
                 ) ' . self::TABLE_OPTIONS);
                 $stepDone(11);
+                // no break
+            case 11:
+                // Build 5: cleaned original images, named by the SHA-256 of the file
+                $this->db->exec('CREATE TABLE IF NOT EXISTS images (
+                    sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY,
+                    ext VARCHAR(4) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    width INT UNSIGNED NOT NULL,
+                    height INT UNSIGNED NOT NULL,
+                    bytes BIGINT UNSIGNED NOT NULL,
+                    frames INT UNSIGNED NOT NULL DEFAULT 1,
+                    source_format VARCHAR(16) NOT NULL,
+                    created_at DATETIME NOT NULL,
+                    KEY ix_images_created (created_at)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(12);
+                // no break
+            case 12:
+                // Build 5: photos of items; the first by position is the cover
+                $this->db->exec('CREATE TABLE IF NOT EXISTS item_photos (
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    item_id INT UNSIGNED NOT NULL,
+                    image_sha CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    caption VARCHAR(500) NOT NULL DEFAULT \'\',
+                    position INT NOT NULL,
+                    UNIQUE KEY uq_item_photos (item_id, image_sha),
+                    KEY ix_item_photos_order (item_id, position),
+                    KEY ix_item_photos_image (image_sha),
+                    CONSTRAINT fk_item_photos_item FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE,
+                    CONSTRAINT fk_item_photos_image FOREIGN KEY (image_sha) REFERENCES images (sha256)
+                ) ' . self::TABLE_OPTIONS);
+                $stepDone(13);
+                // no break
+            case 13:
+                // Build 5: own cover of a rubric
+                $this->db->exec('ALTER TABLE rubrics
+                    ADD COLUMN IF NOT EXISTS cover_image CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
+                    ADD FOREIGN KEY IF NOT EXISTS fk_rubrics_cover (cover_image) REFERENCES images (sha256) ON DELETE SET NULL');
+                $stepDone(14);
                 // no break
             default:
                 // Up to date.

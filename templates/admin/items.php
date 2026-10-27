@@ -16,6 +16,7 @@
  * @var array<string, mixed>         $query     current filters for links
  * @var int                          $firstPosition position number of the first row
  * @var string                       $csrfToken
+ * @var \Estables\Media\MediaStore  $media
  */
 use Estables\Core\Text;
 use Estables\Http\ItemsController;
@@ -146,12 +147,12 @@ $hasRows = $rows !== [];
 <?php if ($author): ?>
             <td class="text-nowrap"><button class="es-drag" data-es-sortable-handle type="button" title="Перетащить"><i class="bi bi-grip-vertical" aria-hidden="true"></i><span class="visually-hidden">Переместить <?= $catno ?></span></button><span class="es-position" data-es-order-pos><?= $firstPosition + $n ?></span></td>
 <?php endif ?>
-            <td><span class="es-thumb es-thumb-empty" aria-hidden="true"></span></td>
+            <td><?php if ($row['cover'] !== null): ?><img class="es-thumb" src="<?= $this->e($media->thumbUrl($row['cover'])) ?>" alt="" loading="lazy"><?php else: ?><span class="es-thumb es-thumb-empty" aria-hidden="true"></span><?php endif ?></td>
             <td class="es-catno"><?= $catno ?></td>
             <td class="es-col-title"><a class="es-title" href="/admin/items/<?= $row['id'] ?>/"><?= $this->e($row['name']) ?></a><span class="es-path"><?= $this->e($path($row['main'])) ?><?php if ($others !== []):
                 $titles = implode('; ', array_map($path, $others)); ?> <span class="es-more" title="Также: <?= $this->e($titles) ?>">+<?= \count($others) ?><span class="visually-hidden"> <?= $this->e(preg_replace('~^\d+ ~', '', Text::plural(\count($others), 'раздел', 'раздела', 'разделов'))) ?>: <?= $this->e($titles) ?></span></span><?php endif ?></span></td>
             <td class="text-nowrap"><?= $this->e(ItemsController::years($row['yearFrom'], $row['yearTo'])) ?></td>
-            <td>0</td>
+            <td><?= $row['photos'] ?></td>
             <td><?= $row['published'] ? '<span class="es-status es-status-published">Опубликован</span>' : '<span class="es-status es-status-draft">Черновик</span>' ?></td>
             <td class="text-nowrap small text-body-secondary"><?= $this->e($this->dateTime($row['updatedAt'], 'd.m.Y')) ?></td>
             <td class="text-end text-nowrap">

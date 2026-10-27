@@ -13,6 +13,7 @@ use Estables\Core\Request;
 use Estables\Core\Response;
 use Estables\Core\Services;
 use Estables\Core\View;
+use Estables\Security\Csp;
 
 /**
  * Public pages of the site.
@@ -141,8 +142,9 @@ final class CatalogController
             throw HttpException::notFound();
         }
         $main = $rubrics[0] ?? 0;
+        $photos = $this->services->images()->photos($item->id);
 
-        return Response::html($this->view->page('pages/item', [
+        $response = Response::html($this->view->page('pages/item', [
             'title' => $item->catno . ' ' . $item->name,
             'description' => self::summary($item->summary !== '' ? $item->summary : $item->description),
             'activeNav' => 'catalog',
@@ -155,9 +157,15 @@ final class CatalogController
             'variants' => $items->variants($item->id),
             'neighbours' => $main > 0 ? $items->neighbours($main, $item->id) : ['prev' => null, 'next' => null],
             'series' => $main > 0 ? $items->series($main, $item->id, 4) : [],
+            'photos' => $photos,
+            'gallery' => $photos !== [],
             'public' => $public,
             'admin' => $this->admin,
         ]));
+
+        // The full-screen viewer sizes its slides through style attributes;
+        // <style> elements and style sheets of other sites stay forbidden.
+        return $photos === [] ? $response : $response->setHeader('Content-Security-Policy', Csp::header(['style-src-attr' => ["'unsafe-inline'"]]));
     }
 
     /**

@@ -15,6 +15,7 @@ use Estables\Db\SchemaException;
 use Estables\Db\SchemaState;
 use Estables\Install\Check;
 use Estables\Install\Environment;
+use Estables\Media\GarbageCollector;
 
 /**
  * Command line interface: bin/estables <command> [arguments].
@@ -28,6 +29,8 @@ final class Application
         'create-admin' => 'создать администратора: create-admin [логин] [--name="Имя"] [--password-stdin]',
         'passwd' => 'сменить пароль и завершить все сессии: passwd <логин> [--password-stdin]',
         'unlock' => 'снять блокировку входа после неудачных попыток: unlock <логин>',
+        'gc' => 'удалить неиспользуемые фото, истёкшие сессии и старые попытки входа (для cron)',
+        'media:warm' => 'заранее сделать уменьшенные копии всех фото',
     ];
 
     /** @var resource */
@@ -69,6 +72,8 @@ final class Application
                 'create-admin' => $this->createAdmin($args),
                 'passwd' => $this->passwd($args),
                 'unlock' => $this->unlock($args),
+                'gc' => $this->gc(),
+                'media:warm' => $this->warm(),
                 'help', '--help', '-h' => $this->help(),
                 default => $this->fail("Неизвестная команда «{$command}». Список: bin/estables help"),
             };
@@ -250,6 +255,46 @@ final class Application
         $count = $this->currentServices()->throttle()->clear($args[0]);
 
         return $this->ok("Неудачных попыток входа «{$args[0]}» сброшено: {$count}. Блокировка по IP-адресу снимается сама через login.lockout_minutes.");
+    }
+
+    private function gc(): int
+    {
+        $services = $this->currentServices();
+        $media = new GarbageCollector($services->images(), $services->media(), $services->config->int('media.gc_delay_hours'))->run();
+        $sessions = $services->sessions()->purgeExpired();
+        $attempts = $services->throttle()->purgeOld();
+        $services->logger->info("gc: {$media['images']} images, {$media['files']} files, {$sessions} sessions, {$attempts} login attempts");
+
+        return $this->ok("Удалено: изображений {$media['images']}, файлов без записи в базе {$media['files']}, "
+            . "истёкших сессий {$sessions}, старых попыток входа {$attempts}.");
+    }
+
+    private function warm(): int
+    {
+        $services = $this->currentServices();
+        $media = $services->media();
+        $thumbnailer = $services->thumbnailer();
+        $made = 0;
+        $failed = 0;
+        foreach ($services->images()->all() as $image) {
+            foreach ([$media->thumbSize(), $media->largeSize()] as $size) {
+                $needed = $size === $media->thumbSize()
+                    ? $media->thumbUrl($image) !== $media->originalUrl($image)
+                    : $media->largeUrl($image) !== $media->originalUrl($image);
+                if (!$needed || is_file($media->copyPath($size, $image->sha, $image->ext))) {
+                    continue;
+                }
+                try {
+                    $thumbnailer->copy($image, $size);
+                    $made++;
+                } catch (\Throwable $e) {
+                    $this->error("{$image->sha}: " . $e->getMessage());
+                    $failed++;
+                }
+            }
+        }
+
+        return $failed === 0 ? $this->ok("Сделано копий: {$made}.") : $this->fail("Сделано копий: {$made}, ошибок: {$failed}.");
     }
 
     /**

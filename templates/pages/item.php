@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Item page. Photos arrive in build 5; until then the stage holds a placeholder.
+ * Item page: the photo stage with thumbnails, the description, the neighbours.
  *
  * @var \Estables\Core\View                           $this
  * @var \Estables\Catalog\RubricTree                  $tree
@@ -12,9 +12,11 @@
  * @var list<array{number: string, finish: string, years: string}> $variants
  * @var array{prev: ?array{catno: string, slug: string, name: string}, next: ?array{catno: string, slug: string, name: string}} $neighbours
  * @var list<array{id: int, catno: string, slug: string, name: string, summary: string, yearFrom: ?int, yearTo: ?int, published: bool,
- *     updatedAt: \DateTimeImmutable, variants: int, main: int, rubrics: list<int>}> $series
+ *     updatedAt: \DateTimeImmutable, variants: int, main: int, rubrics: list<int>, photos: int, cover: ?\Estables\Media\Image}> $series
  * @var bool                                         $public  guests see this item
  * @var bool                                         $admin
+ * @var list<array{image: \Estables\Media\Image, caption: string}> $photos
+ * @var \Estables\Media\MediaStore                  $media
  */
 $paragraphs = static fn(string $text): array => array_values(array_filter(array_map('trim', preg_split('~\n\s*\n~', trim($text)) ?: [])));
 $path = static fn(int $id): string => implode(' / ', array_map(static fn(int $r): string => $tree->node($r)['name'], [...$tree->ancestors($id), $id]));
@@ -43,10 +45,36 @@ $pager = array_values(array_filter([$neighbours['prev'], $neighbours['next']]));
 
     <!-- Photos -->
     <div class="col-lg-7">
+<?php if ($photos === []): ?>
       <div class="es-stage mb-2">
         <div class="ratio ratio-4x3"><div class="es-mount-empty"><i class="bi bi-image" aria-hidden="true"></i></div></div>
       </div>
       <p class="es-meta">Фотографий пока нет.</p>
+<?php else:
+    // A caption describes its photo; without one the item name stands in.
+    $alt = fn(array $photo, int $i): string => $photo['caption'] !== '' ? $photo['caption'] : $item->name . (\count($photos) > 1 ? ', фото ' . ($i + 1) : '');
+    $download = fn(array $photo, int $i): string => $media->downloadUrl($photo['image'], $item->slug . '-' . ($i + 1) . '.' . $photo['image']->ext);
+    $first = $photos[0];
+?>
+      <div class="es-stage mb-2">
+        <a href="<?= $this->e($media->largeUrl($first['image'])) ?>" aria-label="Открыть фото во весь экран" data-es-gallery-stage data-original="<?= $this->e($download($first, 0)) ?>" data-original-info="<?= $this->e($first['image']->label()) ?>">
+          <img src="<?= $this->e($media->largeUrl($first['image'])) ?>" alt="<?= $this->e($alt($first, 0)) ?>">
+          <span class="es-zoom"><i class="bi bi-arrows-fullscreen me-1" aria-hidden="true"></i><?= $this->e(\Estables\Core\Text::plural(\count($photos), 'фото', 'фото', 'фото')) ?></span>
+        </a>
+      </div>
+<?php if (\count($photos) > 1): ?>
+      <!-- Each thumbnail carries its original file for "Скачать оригинал" -->
+      <div class="es-thumbs" role="group" aria-label="Фотографии предмета" data-es-gallery-thumbs>
+<?php foreach ($photos as $i => $photo): ?>
+        <a href="<?= $this->e($media->largeUrl($photo['image'])) ?>"<?= $i === 0 ? ' class="active" aria-current="true"' : '' ?> data-original="<?= $this->e($download($photo, $i)) ?>" data-original-info="<?= $this->e($photo['image']->label()) ?>"><img src="<?= $this->e($media->thumbUrl($photo['image'])) ?>" alt="<?= $this->e($alt($photo, $i)) ?>"></a>
+<?php endforeach ?>
+      </div>
+<?php endif ?>
+      <div class="es-photo-bar mt-2">
+        <a class="btn btn-sm btn-outline-secondary" href="<?= $this->e($download($first, 0)) ?>" data-es-gallery-download><i class="bi bi-download me-1" aria-hidden="true"></i>Скачать оригинал</a>
+        <span class="es-meta" data-es-gallery-info><?= $this->e($first['image']->label()) ?></span>
+      </div>
+<?php endif ?>
     </div>
 
     <!-- Description -->

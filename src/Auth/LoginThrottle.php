@@ -72,6 +72,17 @@ final class LoginThrottle
     }
 
     /**
+     * Deletes attempts older than the window that could still matter (bin/estables gc).
+     */
+    public function purgeOld(): int
+    {
+        return $this->db->run(
+            'DELETE FROM login_attempts WHERE attempted_at < :before',
+            ['before' => gmdate('Y-m-d H:i:s', time() - self::KEEP_DAYS * 86400)],
+        )->rowCount();
+    }
+
+    /**
      * Forgets failed attempts of a login (bin/estables unlock).
      */
     public function clear(string $login): int

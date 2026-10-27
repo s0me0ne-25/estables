@@ -52,6 +52,17 @@ final class Config
             'site_key' => '',
             'secret_key' => '',
         ],
+        'media' => [
+            'max_upload_mb' => 50,
+            'max_megapixels' => 100,
+            'thumb_size' => 400,
+            'large_size' => 1600,
+            'original_max' => 2560,
+            'jpegtran' => 'jpegtran',
+            'imagick_memory_mb' => 256,
+            'imagick_map_mb' => 1024,
+            'gc_delay_hours' => 24,
+        ],
     ];
 
     /** @var array<string, mixed> */
@@ -146,10 +157,16 @@ final class Config
             $problems[] = 'captcha: для Cloudflare Turnstile заполните site_key и secret_key.';
         }
         foreach (['session.remember_days', 'session.idle_hours', 'session.touch_minutes', 'session.rotate_hours',
-            'login.max_failures_per_login', 'login.max_failures_per_ip', 'login.lockout_minutes'] as $key) {
+            'login.max_failures_per_login', 'login.max_failures_per_ip', 'login.lockout_minutes',
+            'media.max_upload_mb', 'media.max_megapixels', 'media.thumb_size', 'media.large_size', 'media.original_max',
+            'media.imagick_memory_mb', 'media.imagick_map_mb', 'media.gc_delay_hours'] as $key) {
             if ($this->int($key) < 1) {
                 $problems[] = "{$key}: нужно целое число больше нуля.";
             }
+        }
+
+        if ($this->int('media.thumb_size') >= $this->int('media.large_size')) {
+            $problems[] = 'media.thumb_size должен быть меньше media.large_size.';
         }
 
         return $problems;

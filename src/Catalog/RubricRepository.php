@@ -8,6 +8,7 @@ namespace Estables\Catalog;
 
 use Estables\Core\Paths;
 use Estables\Db\Connection;
+use Estables\Media\Image;
 
 /**
  * Rubrics in the database: the tree, editing, moving and deleting, plus
@@ -31,6 +32,9 @@ final class RubricRepository
     /** Longest public path "a/b/c" that slug_history can keep. */
     private const MAX_URL_PATH = 700;
 
+    /** Shape of the cached tree; raise it when Node gains or changes a field. */
+    private const CACHE_FORMAT = 2;
+
     private ?RubricTree $tree = null;
 
     public function __construct(
@@ -48,15 +52,18 @@ final class RubricRepository
         }
         $file = $this->cacheFile();
         if (is_file($file)) {
-            $nodes = @unserialize((string) file_get_contents($file), ['allowed_classes' => false]);
-            if (\is_array($nodes)) {
+            $cached = @unserialize((string) file_get_contents($file), ['allowed_classes' => false]);
+            // A cache written by an older engine lacks newer fields: it is rebuilt.
+            if (\is_array($cached) && ($cached['format'] ?? null) === self::CACHE_FORMAT && \is_array($cached['nodes'] ?? null)) {
                 /** @var list<Node> $nodes */
+                $nodes = $cached['nodes'];
+
                 return $this->tree = new RubricTree($nodes);
             }
         }
         $this->tree = $this->loadTree(true);
         try {
-            $this->paths->writeAtomic($file, serialize($this->tree->toArray()));
+            $this->paths->writeAtomic($file, serialize(['format' => self::CACHE_FORMAT, 'nodes' => $this->tree->toArray()]));
         } catch (\RuntimeException) {
             // Not writable: the next request reads the database again.
         }
@@ -391,13 +398,82 @@ final class RubricRepository
                 'variants' => 0,
                 'yearMin' => null,
                 'yearMax' => null,
+                'cover' => null,
             ];
         }
         if ($stats && $nodes !== []) {
             $this->aggregate($nodes);
+            $covers = $this->covers($nodes);
+            foreach ($nodes as $id => $node) {
+                $node['cover'] = $covers[$id] ?? null;
+                $nodes[$id] = $node;
+            }
         }
 
         return new RubricTree(array_values($nodes));
+    }
+
+    /**
+     * Fills the cover of every node: its own, its first item's, its first
+     * visible subrubric's.
+     *
+     * @param array<int, Node> $nodes
+     *
+     * @return array<int, ?string> packed cover image by rubric
+     */
+    private function covers(array $nodes): array
+    {
+        $own = [];
+        foreach ($this->db->rows('SELECT r.id, ' . Image::PACKED . ' AS packed FROM rubrics r JOIN images im ON im.sha256 = r.cover_image') as $row) {
+            $own[(int) $row['id']] = (string) $row['packed'];
+        }
+        $first = [];
+        $rows = $this->db->rows(
+            'SELECT x.rubric_id, x.packed FROM (
+                SELECT ir.rubric_id, ' . Image::PACKED . ' AS packed,
+                    ROW_NUMBER() OVER (PARTITION BY ir.rubric_id ORDER BY ir.position, ir.item_id) AS n
+                FROM item_rubrics ir
+                JOIN items i ON i.id = ir.item_id AND i.is_published = 1
+                JOIN item_photos p ON p.item_id = i.id
+                    AND p.position = (SELECT MIN(p2.position) FROM item_photos p2 WHERE p2.item_id = i.id)
+                JOIN images im ON im.sha256 = p.image_sha
+             ) x WHERE x.n = 1',
+        );
+        foreach ($rows as $row) {
+            $first[(int) $row['rubric_id']] = (string) $row['packed'];
+        }
+        $children = [];
+        $visible = [];
+        foreach ($nodes as $id => $node) {
+            $children[$node['parent']][] = $id;
+            $visible[$id] = $node['visible'];
+        }
+        $covers = [];
+        $resolve = function (int $id) use (&$resolve, &$covers, $own, $first, $children, $visible): ?string {
+            $cover = $own[$id] ?? $first[$id] ?? null;
+            foreach ($children[$id] ?? [] as $child) {
+                $childCover = $resolve($child);
+                if ($cover === null && $visible[$child]) {
+                    $cover = $childCover;
+                }
+            }
+
+            return $covers[$id] = $cover;
+        };
+        foreach ($children[0] ?? [] as $top) {
+            $resolve($top);
+        }
+
+        return $covers;
+    }
+
+    /**
+     * Sets or removes the own cover of a rubric.
+     */
+    public function setCover(int $id, ?string $sha): void
+    {
+        $this->db->run('UPDATE rubrics SET cover_image = :sha WHERE id = :id', ['sha' => $sha, 'id' => $id]);
+        $this->invalidate();
     }
 
     /**

@@ -10,7 +10,9 @@
  * @var bool                $noindex     hide the page from search engines
  * @var string              $header      "site" or "minimal"
  * @var string              $activeNav   key of the current main menu item
+ * @var bool                $gallery     the page needs the full-screen photo viewer (GLightbox)
  */
+$gallery ??= false;
 $description ??= '';
 $activeNav ??= '';
 $noindex ??= false;
@@ -32,6 +34,9 @@ $header ??= 'site';
   <link rel="stylesheet" href="<?= $this->e($this->asset('vendor/fonts/fonts.css')) ?>">
   <link rel="stylesheet" href="<?= $this->e($this->asset('vendor/bootstrap/css/bootstrap.min.css')) ?>">
   <link rel="stylesheet" href="<?= $this->e($this->asset('vendor/bootstrap-icons/bootstrap-icons.min.css')) ?>">
+<?php if ($gallery): ?>
+  <link rel="stylesheet" href="<?= $this->e($this->asset('vendor/glightbox/css/glightbox.min.css')) ?>">
+<?php endif ?>
   <link rel="stylesheet" href="<?= $this->e($this->asset('css/estables.css')) ?>">
 
   <!-- Loaded in <head> on purpose: sets the colour theme before first paint. -->
@@ -48,5 +53,8 @@ $header ??= 'site';
 <?= $this->partial('partials/footer') ?>
 
 <script src="<?= $this->e($this->asset('vendor/bootstrap/js/bootstrap.bundle.min.js')) ?>"></script>
+<?php if ($gallery): ?>
+<script src="<?= $this->e($this->asset('vendor/glightbox/js/glightbox.min.js')) ?>"></script>
+<?php endif ?>
 </body>
 </html>

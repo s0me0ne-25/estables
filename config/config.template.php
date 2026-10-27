@@ -82,4 +82,25 @@ return [
         'site_key' => '',
         'secret_key' => '',
     ],
+
+    // Photos. Originals are kept cleaned of metadata in public/media/originals/;
+    // smaller copies are made on the first request and kept next to them.
+    'media' => [
+        // Limits of an uploaded file; the size must also fit php-fpm's
+        // upload_max_filesize and nginx's client_max_body_size.
+        'max_upload_mb' => 50,
+        'max_megapixels' => 100,
+        // Longest side of the copies: cards and lists, and the item page.
+        'thumb_size' => 400,
+        'large_size' => 1600,
+        // An original up to this size is shown itself instead of the large copy.
+        'original_max' => 2560,
+        // Lossless JPEG cleaning and rotation (package libjpeg-turbo-progs).
+        'jpegtran' => 'jpegtran',
+        // Memory ImageMagick may use before it spills to disk.
+        'imagick_memory_mb' => 256,
+        'imagick_map_mb' => 1024,
+        // bin/estables gc deletes images nobody uses after this delay.
+        'gc_delay_hours' => 24,
+    ],
 ];

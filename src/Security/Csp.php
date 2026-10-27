@@ -9,7 +9,7 @@ namespace Estables\Security;
 /**
  * Content-Security-Policy header. Every asset is served by the site itself,
  * so the policy allows only 'self'; a page may add foreign sources it really
- * needs (a captcha widget on the login form).
+ * needs (a captcha widget on the login form) or a directive of its own.
  */
 final class Csp
 {
@@ -38,6 +38,9 @@ final class Csp
             if ($sources !== []) {
                 $parts[] = $directive . ' ' . implode(' ', $sources);
             }
+        }
+        foreach (array_diff_key($extra, self::BASE) as $directive => $sources) {
+            $parts[] = $directive . ' ' . implode(' ', array_values(array_unique($sources)));
         }
 
         return implode('; ', $parts);

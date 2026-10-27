@@ -18,6 +18,7 @@ use Estables\Core\Response;
 use Estables\Core\Services;
 use Estables\Core\Text;
 use Estables\Core\View;
+use Estables\Media\MediaException;
 
 /**
  * Admin pages of items: the list with filters, bulk actions and the
@@ -190,9 +191,14 @@ final class ItemsController
                 return Response::redirect(self::LIST_PATH . '?done=deleted&n=1', 303);
             }
             $input = self::input($request);
+            $photos = self::photoInput($request);
             $errors = $items->validate($input, $item?->id);
             if ($errors === []) {
                 $saved = $items->save($item?->id, $input, $this->auth->user()?->id);
+                if ($item !== null) {
+                    $this->services->images()->arrange($saved, $photos);
+                    $this->services->rubrics()->invalidate();
+                }
 
                 return Response::redirect("/admin/items/{$saved}/?done=" . ($item === null ? 'created' : 'saved'), 303);
             }
@@ -223,6 +229,20 @@ final class ItemsController
 
         $tree = $this->services->rubrics()->tree();
         $done = self::query($request, 'done');
+        $photoList = $item === null ? [] : $this->services->images()->photos($item->id);
+        if ($request->isPost() && $item !== null) {
+            // A form with errors comes back with the photos as they were arranged in it
+            $byId = [];
+            foreach ($photoList as $photo) {
+                $byId[$photo['image']->sha] = $photo['image'];
+            }
+            $photoList = [];
+            foreach (self::photoInput($request) as $photo) {
+                if (isset($byId[$photo['sha']])) {
+                    $photoList[] = ['image' => $byId[$photo['sha']], 'caption' => $photo['caption']];
+                }
+            }
+        }
 
         return Response::html($this->view->page('admin/item-edit', [
             'title' => $item === null ? 'Новый предмет' : $item->catno . ' ' . $item->name,
@@ -235,6 +255,8 @@ final class ItemsController
             'tree' => $tree,
             'rubricOptions' => self::rubricOptions($tree),
             'attributeNames' => $items->attributeNames(),
+            'photos' => $photoList,
+            'maxUploadMb' => $this->services->config->int('media.max_upload_mb'),
             'notice' => match ($done) {
                 'created' => 'Предмет добавлен.',
                 'saved' => 'Предмет сохранён.',
@@ -242,6 +264,71 @@ final class ItemsController
             },
             'publicUrl' => $item !== null && $item->published ? $item->url() : null,
         ]), $errors === [] ? 200 : 422);
+    }
+
+    /**
+     * Uploads one photo of an item (the editor sends files one by one) and
+     * answers JSON {ok: true, html} with the new tile, or {ok: false, error}.
+     *
+     * @param array<string, string> $params
+     */
+    public function upload(Request $request, array $params): Response
+    {
+        $item = $this->services->items()->find((int) $params['id']);
+        if ($item === null) {
+            return Response::json(['ok' => false, 'error' => 'Предмета уже нет: возможно, его удалили.'], 404);
+        }
+        $file = $request->file('photo');
+        if ($file === null) {
+            return Response::json(['ok' => false, 'error' => 'Файл не выбран.'], 422);
+        }
+        $error = match ($file['error']) {
+            UPLOAD_ERR_OK => null,
+            UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'Файл больше, чем разрешает сервер (upload_max_filesize в php-fpm).',
+            default => 'Файл не загрузился. Попробуйте ещё раз.',
+        };
+        if ($error !== null) {
+            return Response::json(['ok' => false, 'error' => $error], 422);
+        }
+        try {
+            $image = $this->services->ingest()->ingest($file['tmp'], $file['name']);
+        } catch (MediaException $e) {
+            return Response::json(['ok' => false, 'error' => $e->getMessage()], 422);
+        }
+        $images = $this->services->images();
+        if (!$images->attach($item->id, $image)) {
+            return Response::json(['ok' => false, 'error' => 'Это фото уже есть у предмета.'], 409);
+        }
+        $this->services->rubrics()->invalidate();
+        $this->services->logger->info('"' . ($this->auth->user()->login ?? '?') . "\" added photo {$image->sha} to item {$item->id}");
+
+        return Response::json([
+            'ok' => true,
+            'html' => $this->view->partial('admin/photo-tile', [
+                'image' => $image,
+                'caption' => '',
+                'index' => \count($images->photos($item->id)) - 1,
+                'item' => $item,
+            ]),
+        ]);
+    }
+
+    /**
+     * Photos of the editor form in order: hidden photo[] and photo_caption[].
+     *
+     * @return list<array{sha: string, caption: string}>
+     */
+    private static function photoInput(Request $request): array
+    {
+        $captions = $request->inputList('photo_caption');
+        $photos = [];
+        foreach ($request->inputList('photo') as $i => $sha) {
+            if (preg_match('~^[0-9a-f]{64}$~', $sha)) {
+                $photos[] = ['sha' => $sha, 'caption' => $captions[$i] ?? ''];
+            }
+        }
+
+        return $photos;
     }
 
     /**

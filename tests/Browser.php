@@ -41,9 +41,27 @@ final class Browser
     }
 
     /**
+     * A multipart form: files are local paths sent under the given field names.
+     *
      * @param array<string, string> $fields
+     * @param array<string, string> $files  field name => path of the file to send
      */
-    public function request(string $method, string $url, array $fields = []): Response
+    public function upload(string $url, array $fields, array $files): Response
+    {
+        $sent = [];
+        foreach ($files as $field => $path) {
+            $size = filesize($path);
+            $sent[$field] = ['name' => basename($path), 'tmp' => $path, 'error' => UPLOAD_ERR_OK, 'size' => $size === false ? 0 : $size];
+        }
+
+        return $this->request('POST', $url, $fields, $sent);
+    }
+
+    /**
+     * @param array<string, string>                                              $fields
+     * @param array<string, array{name: string, tmp: string, error: int, size: int}> $files
+     */
+    public function request(string $method, string $url, array $fields = [], array $files = []): Response
     {
         $path = (string) parse_url($url, PHP_URL_PATH);
         parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
@@ -51,7 +69,7 @@ final class Browser
         $response = new Kernel($this->paths)->handle(new Request($method, $path, $query, $fields, $this->cookies, [
             'REMOTE_ADDR' => '203.0.113.24',
             'HTTP_USER_AGENT' => $this->userAgent,
-        ]));
+        ], $files));
         $this->lastSetCookies = [];
         foreach ($response->cookies() as $cookie) {
             [$pair] = explode(';', $cookie, 2);

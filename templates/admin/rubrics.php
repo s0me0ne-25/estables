@@ -16,6 +16,8 @@
  * @var array<int, array{items: int, shared: int}> $stats items linked directly, and how many of them have other rubrics
  * @var list<array{id: int, label: string, path: string}> $targets rubrics to move items to
  * @var string                              $csrfToken
+ * @var \Estables\Media\MediaStore          $media
+ * @var \Estables\Media\ImageRepository     $images
  */
 $csrf = '<input type="hidden" name="_csrf" value="' . $this->e($csrfToken) . '">';
 $invalid = fn(string $name): string => isset($errors[$name]) ? ' is-invalid' : '';
@@ -81,7 +83,7 @@ $children = $rubric !== null ? \count($tree->children($rubric->id)) : 0;
 <?php endif ?>
         </div>
 
-        <form method="post" action="/admin/rubrics/" novalidate>
+        <form method="post" action="/admin/rubrics/" enctype="multipart/form-data" novalidate>
           <?= $csrf ?>
           <input type="hidden" name="action" value="save">
           <input type="hidden" name="id" value="<?= $selected ?>">
@@ -122,6 +124,22 @@ $children = $rubric !== null ? \count($tree->children($rubric->id)) : 0;
               <textarea class="form-control<?= $invalid('description') ?>" id="r-desc" name="description" rows="4"><?= $this->e($form['description']) ?></textarea>
               <?= $error('description') ?>
               <div class="form-text">Показывается под заголовком раздела. Пустая строка начинает новый абзац.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="r-cover">Обложка раздела</label>
+<?php if ($rubric?->cover !== null && ($coverImage = $images->find($rubric->cover)) !== null): ?>
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <img class="es-cover-preview" src="<?= $this->e($media->thumbUrl($coverImage)) ?>" alt="Текущая обложка">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="r-cover-remove" name="remove_cover" value="1">
+                  <label class="form-check-label" for="r-cover-remove">Убрать обложку</label>
+                </div>
+              </div>
+<?php endif ?>
+              <input class="form-control<?= $invalid('cover') ?>" type="file" id="r-cover" name="cover" accept="image/*">
+              <?= $error('cover') ?>
+              <div class="form-text">Необязательно. Без обложки берётся фото первого предмета в авторском порядке.</div>
             </div>
 
             <div class="col-12">

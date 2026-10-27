@@ -16,6 +16,7 @@ final readonly class Request
      * @param array<string, mixed>  $post
      * @param array<string, string> $cookies
      * @param array<string, mixed>  $server
+     * @param array<string, array{name: string, tmp: string, error: int, size: int}> $files uploaded files, one per field
      */
     public function __construct(
         public string $method,
@@ -24,6 +25,7 @@ final readonly class Request
         public array $post = [],
         public array $cookies = [],
         public array $server = [],
+        public array $files = [],
     ) {}
 
     public static function fromGlobals(): self
@@ -35,6 +37,18 @@ final readonly class Request
         /** @var array<string, string> $cookies */
         $cookies = array_filter($_COOKIE, 'is_string');
 
+        $files = [];
+        foreach ($_FILES as $field => $file) {
+            if (\is_string($field) && \is_array($file) && \is_string($file['tmp_name'] ?? null)) {
+                $files[$field] = [
+                    'name' => \is_string($file['name'] ?? null) ? $file['name'] : '',
+                    'tmp' => $file['tmp_name'],
+                    'error' => (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE),
+                    'size' => (int) ($file['size'] ?? 0),
+                ];
+            }
+        }
+
         return new self(
             $method,
             \is_string($path) && $path !== '' ? $path : '/',
@@ -42,7 +56,20 @@ final readonly class Request
             $_POST,
             $cookies,
             $_SERVER,
+            $files,
         );
+    }
+
+    /**
+     * An uploaded file of a single-file field, or null when none was sent.
+     *
+     * @return array{name: string, tmp: string, error: int, size: int}|null
+     */
+    public function file(string $name): ?array
+    {
+        $file = $this->files[$name] ?? null;
+
+        return $file === null || $file['error'] === UPLOAD_ERR_NO_FILE ? null : $file;
     }
 
     /**

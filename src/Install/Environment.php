@@ -53,13 +53,13 @@ final class Environment
         );
         $checks[] = new Check(
             'Расширение PHP imagick',
-            \extension_loaded('imagick') ? Check::OK : Check::WARNING,
-            'Понадобится для фотографий (сборка 5): установите php8.4-imagick.',
+            \extension_loaded('imagick') ? Check::OK : Check::ERROR,
+            'Нужно для фотографий: установите php8.4-imagick.',
         );
         $checks[] = new Check(
             'Утилита jpegtran',
-            self::findBinary('jpegtran') !== null ? Check::OK : Check::WARNING,
-            'Понадобится для очистки JPEG без потерь (сборка 5): установите libjpeg-turbo-progs.',
+            self::findBinary($this->config?->string('media.jpegtran') ?: 'jpegtran') !== null ? Check::OK : Check::WARNING,
+            'Без неё JPEG очищается средствами PHP, а повёрнутые снимки с телефона перекодируются с небольшой потерей качества: установите libjpeg-turbo-progs.',
         );
         $checks[] = $this->writable($this->paths->var(), Check::ERROR);
         $checks[] = $this->writable($this->paths->public() . '/media', Check::WARNING);

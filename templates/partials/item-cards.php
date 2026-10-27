@@ -2,13 +2,14 @@
 
 /**
  * Items as catalogue cards; the list view (.is-list) also shows the summary.
- * Photos arrive in build 5; until then the mount holds a placeholder.
+ * The cover is the item's first photo; without photos the mount holds a placeholder.
  *
  * @var \Estables\Core\View $this
  * @var list<array{id: int, catno: string, slug: string, name: string, summary: string, yearFrom: ?int, yearTo: ?int, published: bool,
  *     updatedAt: \DateTimeImmutable, variants: int, main: int, rubrics: list<int>}> $rows
  * @var string              $class  grid classes
  * @var bool                $toggle the grid/list switch drives this list
+ * @var \Estables\Media\MediaStore $media
  */
 $class ??= 'row row-cols-2 row-cols-md-3 row-cols-xxl-4 g-3 g-md-4 es-catalog';
 $toggle ??= true;
@@ -18,7 +19,11 @@ $toggle ??= true;
     $meta = \Estables\Http\CatalogController::cardMeta($row['yearFrom'], $row['yearTo'], $row['variants']);
 ?>
         <div class="col"><article class="es-specimen">
+<?php if ($row['cover'] !== null): ?>
+          <div class="es-mount ratio ratio-4x3"><img src="<?= $this->e($media->thumbUrl($row['cover'])) ?>"<?php if (($srcset = $media->srcset($row['cover'])) !== ''): ?> srcset="<?= $this->e($srcset) ?>" sizes="(min-width: 1400px) 20vw, (min-width: 768px) 30vw, 50vw"<?php endif ?> alt="<?= $this->e($row['name']) ?>" loading="lazy"></div>
+<?php else: ?>
           <div class="es-mount ratio ratio-4x3"><div class="es-mount-empty"><i class="bi bi-image" aria-hidden="true"></i></div></div>
+<?php endif ?>
           <div class="es-label">
             <span class="es-catno"><?= $this->e($row['catno']) ?></span>
             <h3><a href="/item/<?= $this->e($row['slug']) ?>/"><?= $this->e($row['name']) ?></a></h3>

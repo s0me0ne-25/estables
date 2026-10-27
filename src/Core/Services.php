@@ -18,6 +18,10 @@ use Estables\Db\Backup;
 use Estables\Db\Connection;
 use Estables\Db\SchemaManager;
 use Estables\Install\InstallState;
+use Estables\Media\ImageRepository;
+use Estables\Media\Ingest;
+use Estables\Media\MediaStore;
+use Estables\Media\Thumbnailer;
 
 /**
  * Lazily built services of a configured installation, shared by the web
@@ -64,6 +68,26 @@ final class Services
     public function items(): ItemRepository
     {
         return $this->items ??= new ItemRepository($this->db(), $this->rubrics());
+    }
+
+    public function media(): MediaStore
+    {
+        return new MediaStore($this->paths, $this->config);
+    }
+
+    public function images(): ImageRepository
+    {
+        return new ImageRepository($this->db());
+    }
+
+    public function ingest(): Ingest
+    {
+        return new Ingest($this->db(), $this->media(), $this->config, $this->logger);
+    }
+
+    public function thumbnailer(): Thumbnailer
+    {
+        return new Thumbnailer($this->media(), $this->config, $this->paths);
     }
 
     public function sessions(): SessionStore

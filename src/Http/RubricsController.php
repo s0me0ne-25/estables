@@ -14,6 +14,8 @@ use Estables\Core\Request;
 use Estables\Core\Response;
 use Estables\Core\Services;
 use Estables\Core\View;
+use Estables\Media\Image;
+use Estables\Media\MediaException;
 
 /**
  * Admin page "Rubricator": the tree on the left, the form of the selected
@@ -82,15 +84,20 @@ final class RubricsController
             } else {
                 $input = self::input($request);
                 $errors = $rubrics->validate($input, $id > 0 ? $id : null);
+                $cover = $this->cover($request, $errors);
                 if ($errors === []) {
                     if ($id > 0) {
                         $rubrics->update($id, $input);
-
-                        return Response::redirect(self::PATH . "?id={$id}&done=saved", 303);
+                    } else {
+                        $id = $rubrics->create($input);
                     }
-                    $id = $rubrics->create($input);
+                    if ($cover !== null) {
+                        $rubrics->setCover($id, $cover->sha);
+                    } elseif ($request->input('remove_cover') === '1') {
+                        $rubrics->setCover($id, null);
+                    }
 
-                    return Response::redirect(self::PATH . "?id={$id}&done=created", 303);
+                    return Response::redirect(self::PATH . "?id={$id}&done=" . ($request->input('id') === '0' ? 'created' : 'saved'), 303);
                 }
             }
         }
@@ -134,7 +141,33 @@ final class RubricsController
             'parents' => $input === null ? [] : $this->parentOptions($tree, $rubric),
             'stats' => $this->services->items()->rubricStats(),
             'targets' => ItemsController::rubricOptions($tree),
+            'images' => $this->services->images(),
         ]), $errors === [] && $failure === null ? 200 : 422);
+    }
+
+    /**
+     * The uploaded cover, cleaned and stored; a problem goes to $errors['cover'].
+     *
+     * @param array<string, string> $errors
+     */
+    private function cover(Request $request, array &$errors): ?Image
+    {
+        $file = $request->file('cover');
+        if ($file === null) {
+            return null;
+        }
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $errors['cover'] = $file['error'] === UPLOAD_ERR_INI_SIZE ? 'Файл больше, чем разрешает сервер.' : 'Файл не загрузился. Попробуйте ещё раз.';
+
+            return null;
+        }
+        try {
+            return $this->services->ingest()->ingest($file['tmp'], $file['name']);
+        } catch (MediaException $e) {
+            $errors['cover'] = $e->getMessage();
+
+            return null;
+        }
     }
 
     /**

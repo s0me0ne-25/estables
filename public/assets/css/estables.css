@@ -1121,3 +1121,12 @@ body {
 
 /* ---- Admin list: thumbnail cell of an item without photos (photos come in build 5) */
 .es-admin-table .es-thumb-empty { background: var(--es-surface); }
+
+/* ---- Photos: a drag over the upload zone, the current rubric cover */
+.es-dropzone.is-over { color: var(--es-ink); border-color: var(--es-primary); }
+.es-cover-preview {
+  width: 4.5rem;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--es-line);
+}

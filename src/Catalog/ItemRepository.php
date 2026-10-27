@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Estables\Catalog;
 
 use Estables\Db\Connection;
+use Estables\Media\Image;
 
 /**
  * Items in the database: editing, rubric links with the authorial order,
@@ -27,7 +28,8 @@ use Estables\Db\Connection;
  *     variants: list<array{number: string, finish: string, years: string}>
  * }
  * @phpstan-type ItemRow array{id: int, catno: string, slug: string, name: string, summary: string,
- *     yearFrom: ?int, yearTo: ?int, published: bool, updatedAt: \DateTimeImmutable, variants: int, main: int, rubrics: list<int>}
+ *     yearFrom: ?int, yearTo: ?int, published: bool, updatedAt: \DateTimeImmutable, variants: int, main: int, rubrics: list<int>,
+ *     photos: int, cover: ?Image}
  */
 final class ItemRepository
 {
@@ -44,7 +46,10 @@ final class ItemRepository
     /** Columns of the lists. */
     private const ROW_COLUMNS = 'i.id, i.catno, i.slug, i.name, i.summary, i.year_from, i.year_to, i.is_published, i.updated_at,
         (SELECT COUNT(*) FROM item_variants v WHERE v.item_id = i.id) AS variant_count,
-        (SELECT GROUP_CONCAT(m.rubric_id ORDER BY m.is_main DESC, m.added_at, m.rubric_id) FROM item_rubrics m WHERE m.item_id = i.id) AS rubric_ids';
+        (SELECT GROUP_CONCAT(m.rubric_id ORDER BY m.is_main DESC, m.added_at, m.rubric_id) FROM item_rubrics m WHERE m.item_id = i.id) AS rubric_ids,
+        (SELECT COUNT(*) FROM item_photos ph WHERE ph.item_id = i.id) AS photo_count,
+        (SELECT ' . Image::PACKED . ' FROM item_photos p JOIN images im ON im.sha256 = p.image_sha
+            WHERE p.item_id = i.id ORDER BY p.position, p.id LIMIT 1) AS cover';
 
     public function __construct(
         private readonly Connection $db,
@@ -946,6 +951,8 @@ final class ItemRepository
             'variants' => (int) $row['variant_count'],
             'main' => $rubrics[0] ?? 0,
             'rubrics' => $rubrics,
+            'photos' => (int) $row['photo_count'],
+            'cover' => Image::unpack(\is_string($row['cover']) ? $row['cover'] : null),
         ];
     }
 

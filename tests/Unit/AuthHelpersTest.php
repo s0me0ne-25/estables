@@ -74,6 +74,13 @@ final class AuthHelpersTest extends TestCase
         self::assertStringContainsString("frame-ancestors 'none'", $header);
     }
 
+    public function testCspTakesDirectivesOutsideTheBase(): void
+    {
+        $header = Csp::header(['style-src-attr' => ["'unsafe-inline'"]]);
+        self::assertStringEndsWith("frame-ancestors 'none'; style-src-attr 'unsafe-inline'", $header);
+        self::assertStringContainsString("style-src 'self';", $header, 'Style elements stay restricted');
+    }
+
     public function testStubCaptchaWantsTheCheckbox(): void
     {
         $captcha = new StubCaptcha();

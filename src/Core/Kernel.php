@@ -12,6 +12,7 @@ use Estables\Db\SchemaState;
 use Estables\Http\AuthController;
 use Estables\Http\CatalogController;
 use Estables\Http\ItemsController;
+use Estables\Http\MediaController;
 use Estables\Http\RubricsController;
 use Estables\Http\SetupController;
 use Estables\Http\UsersController;
@@ -172,6 +173,7 @@ final class Kernel
             $this->globals['authState'] = $session === null ? 'guest' : 'admin';
             $this->globals['currentUser'] = $session?->user;
             $this->globals['csrfToken'] = $session === null ? '' : $services->csrf()->token($session);
+            $this->globals['media'] = $services->media();
 
             if ($request->path === '/admin' || str_starts_with($request->path, '/admin/')) {
                 if ($session === null) {
@@ -195,6 +197,9 @@ final class Kernel
         $router->add('rubric', 'GET', '/catalog/{path:.+}/', $catalog->rubric(...));
         $router->add('item', 'GET', '/item/{slug}/', $catalog->item(...));
         $router->add('search', 'GET', '/search/', $catalog->search(...));
+        $media = new MediaController($services);
+        $router->add('media.copy', 'GET', '/media/{size:\d+}/{dir:[0-9a-f][0-9a-f]}/{sha:[0-9a-f]+}.{ext:jpg|png|gif}', $media->copy(...));
+        $router->add('media.download', 'GET', '/download/{sha:[0-9a-f]+}/{name}', $media->download(...));
         if ($auth === null) {
             $setup = new SetupController($services, $view, $this->paths);
             $router->add('setup', ['GET', 'POST'], '/setup/', $setup->handle(...));
@@ -209,6 +214,7 @@ final class Kernel
             $router->add('admin.items.order', 'POST', '/admin/items/order/', $items->order(...));
             $router->add('admin.items.new', ['GET', 'POST'], '/admin/items/new/', $items->edit(...));
             $router->add('admin.items.edit', ['GET', 'POST'], '/admin/items/{id:\d+}/', $items->edit(...));
+            $router->add('admin.items.photos', 'POST', '/admin/items/{id:\d+}/photos/', $items->upload(...));
             $rubrics = new RubricsController($services, $view);
             $router->add('admin.rubrics', ['GET', 'POST'], '/admin/rubrics/', $rubrics->handle(...));
             $router->add('admin.rubrics.move', 'POST', '/admin/rubrics/move/', $rubrics->move(...));

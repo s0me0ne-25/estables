@@ -10,7 +10,8 @@ namespace Estables\Core;
  * Maps request paths to handlers and builds URLs from route names.
  *
  * Patterns use placeholders: "/item/{slug}/" matches one path segment,
- * "/catalog/{path:.+}/" a custom regular expression. Canonical paths end
+ * "/catalog/{path:.+}/" a custom regular expression (without braces: write
+ * "[0-9a-f][0-9a-f]", not "[0-9a-f]{2}"). Canonical paths end
  * with a slash; a GET request for the same path without it is redirected.
  */
 final class Router

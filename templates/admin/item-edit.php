@@ -14,6 +14,8 @@
  * @var list<string>                                                 $attributeNames
  * @var string|null                                                  $notice
  * @var string|null                                                  $publicUrl
+ * @var list<array{image: \Estables\Media\Image, caption: string}> $photos
+ * @var int                                                          $maxUploadMb
  * @var string                                                       $csrfToken
  */
 $invalid = fn(string $name): string => isset($errors[$name]) ? ' is-invalid' : '';
@@ -140,8 +142,28 @@ $variantCount = \count($form['variants']);
 
       <!-- Photos -->
       <section class="es-panel" aria-labelledby="sPhotos">
-        <h2 id="sPhotos">Фотографии</h2>
-        <p class="text-body-secondary mb-0">Загрузка фотографий появится в сборке 5. Пока на сайте вместо фото пустая подложка.</p>
+        <div class="d-flex flex-wrap gap-2 align-items-baseline justify-content-between mb-3">
+          <h2 id="sPhotos" class="mb-0">Фотографии</h2>
+          <span class="small text-body-secondary">Перетащите фото за значок, чтобы изменить порядок (с клавиатуры — стрелками на значке). Первое фото становится обложкой. Метаданные (EXIF, GPS) удаляются при загрузке.</span>
+        </div>
+<?php if ($item === null): ?>
+        <p class="text-body-secondary mb-0">Фотографии можно добавить после первого сохранения предмета.</p>
+<?php else: ?>
+        <div class="es-photo-grid" data-es-sortable="grid" data-es-photos>
+<?php foreach ($photos as $i => $photo): ?>
+<?= $this->partial('admin/photo-tile', ['image' => $photo['image'], 'caption' => $photo['caption'], 'index' => $i]) ?>
+<?php endforeach ?>
+          <label class="es-dropzone" for="i-upload" data-es-upload-zone>
+            <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
+            <span>Добавить фото</span>
+            <span class="small">перетащите файлы сюда или выберите на компьютере</span>
+            <span class="small">JPEG, PNG и GIF сохраняются как есть, остальные форматы преобразуются в JPEG; до <?= $maxUploadMb ?> МБ</span>
+            <input class="visually-hidden" type="file" id="i-upload" accept="image/*" multiple data-es-upload="/admin/items/<?= $item->id ?>/photos/" data-es-upload-max="<?= $maxUploadMb * 1048576 ?>">
+          </label>
+        </div>
+        <div class="mt-3" data-es-upload-status aria-live="polite"></div>
+        <p class="form-text mb-0">Новые фото сохраняются сразу при загрузке; порядок, подписи и удаление — кнопкой «Сохранить».</p>
+<?php endif ?>
       </section>
 
       <!-- Attributes -->
@@ -257,7 +279,7 @@ $variantCount = \count($form['variants']);
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <div class="modal-body">
-        <p class="mb-0">Предмет будет удалён из всех разделов<?= $variantCount > 0 ? ' вместе с ' . $this->e(\Estables\Core\Text::plural($variantCount, 'вариантом', 'вариантами', 'вариантами')) : '' ?>. Это действие нельзя отменить. Чтобы только убрать предмет с сайта, переведите его в черновики.</p>
+        <p class="mb-0">Предмет будет удалён из всех разделов<?= $variantCount > 0 ? ' вместе с ' . $this->e(\Estables\Core\Text::plural($variantCount, 'вариантом', 'вариантами', 'вариантами')) : '' ?><?php if ($photos !== []): ?>; <?= \count($photos) === 1 ? 'его фотография удалится' : 'его ' . $this->e(\Estables\Core\Text::plural(\count($photos), 'фотография', 'фотографии', 'фотографий')) . ' удалятся' ?>, если не используются у других предметов<?php endif ?>. Это действие нельзя отменить. Чтобы только убрать предмет с сайта, переведите его в черновики.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>

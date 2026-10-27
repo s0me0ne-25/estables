@@ -11,7 +11,7 @@ apt install nginx php8.4-fpm php8.4-mysql php8.4-mbstring php8.4-intl php8.4-ima
     mariadb-server mariadb-client libjpeg-turbo-progs composer git
 ```
 
-`php8.4-imagick` и `libjpeg-turbo-progs` понадобятся для фотографий (сборка 5); до этого проверка сервера только предупреждает об их отсутствии.
+`php8.4-imagick` обязателен: без него не обработать фотографии. `libjpeg-turbo-progs` (утилита `jpegtran`) желателен: с ним JPEG очищается от метаданных и поворачивается без пересжатия; без него движок пересжимает только повёрнутые снимки, а проверка сервера об этом предупреждает.
 
 ## 2. База данных
 
@@ -100,7 +100,23 @@ sudo -u www-data php bin/estables create-admin
 - Капча: `stub` — простая галочка без настоящей проверки (для разработки или когда сайт закрыт Anubis/fail2ban); `turnstile` — [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/): создайте виджет в панели Cloudflare и впишите `site_key` и `secret_key`. Серверу нужен исходящий HTTPS к `challenges.cloudflare.com` и `allow_url_fopen = On` (в Debian включено по умолчанию).
 - Забытый пароль меняется из консоли: `sudo -u www-data php bin/estables passwd <логин>`; все сессии этого администратора при этом завершаются.
 
-## 8. Обновление до новой сборки
+## 8. Фотографии
+
+Настройки — раздел `media` файла `config/config.php` (пояснения в `config/config.template.php`).
+
+- Оригиналы лежат в `public/media/originals/`, очищенные от метаданных (EXIF с геометкой, XMP, комментарии). JPEG, PNG и GIF сохраняются в своём формате, WebP, AVIF, BMP и TIFF преобразуются в JPEG, HEIC не принимается. Файл называется по SHA-256 содержимого, поэтому одинаковые фото хранятся один раз.
+- Уменьшенные копии (`thumb_size` 400 и `large_size` 1600 по длинной стороне) делаются при первом запросе и складываются в `public/media/<размер>/`; дальше их отдаёт nginx без PHP. Сделать все копии заранее, например после смены размеров: `sudo -u www-data php bin/estables media:warm`. После смены размеров старые каталоги копий можно удалить.
+- «Скачать оригинал» идёт через `/download/…`: движок проверяет файл, а отдаёт его nginx (`X-Accel-Redirect`).
+- Предел файла — `max_upload_mb` (50 МБ). Он должен укладываться в `upload_max_filesize` пула php-fpm и `client_max_body_size` nginx: в конфигурациях из `deploy/` это 50 и 64 МБ.
+- Удалённые из предметов фото и файлы без записи в базе убирает `bin/estables gc` — не раньше чем через `gc_delay_hours` (24 часа) после загрузки. Заодно он удаляет истёкшие сессии и старые попытки входа. Его стоит запускать раз в сутки:
+
+```sh
+echo '17 4 * * * www-data php /var/www/estables/bin/estables gc > /dev/null' > /etc/cron.d/estables
+```
+
+Каталог `public/media/` в git не попадает; в резервную копию сайта его нужно включать вместе с базой.
+
+## 9. Обновление до новой сборки
 
 ```sh
 cd /var/www/estables
@@ -108,6 +124,8 @@ git pull                      # или git apply <патч>
 composer install --no-dev --optimize-autoloader
 sudo -u www-data php bin/estables migrate
 ```
+
+Если в новой сборке менялись `deploy/nginx/estables.conf` или `deploy/php-fpm/estables.conf`, скопируйте их заново, как в п. 5 (в сборке 5 добавился блок `location ^~ /media/`).
 
 Перед обновлением схемы делается резервная копия базы в `var/backups/`. Если `migrate` забыть, схема обновится сама при первом запросе к сайту; на эти секунды посетители увидят страницу «Идёт обновление».
 
@@ -121,6 +139,8 @@ sudo -u www-data php bin/estables migrate
 | `bin/estables create-admin [логин] [--name="Имя"] [--password-stdin]` | создаёт администратора |
 | `bin/estables passwd <логин> [--password-stdin]` | меняет пароль администратора и завершает все его сессии |
 | `bin/estables unlock <логин>` | сбрасывает неудачные попытки входа, снимая блокировку логина |
+| `bin/estables gc` | удаляет неиспользуемые фото, файлы без записи в базе, истёкшие сессии и старые попытки входа (для cron) |
+| `bin/estables media:warm` | делает все уменьшенные копии фото заранее |
 
 ## Журнал и резервные копии
 
